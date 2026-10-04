@@ -1,1 +1,85 @@
 # ModelSentinel
+
+**ModelSentinel** is an AI-powered ML reliability engineering platform. It is designed to take an ML incident through its complete lifecycle: from model failure to validated, human-approved code change. 
+
+## Core Product Workflow
+
+1. **Monitor & Detect:** Watch for ML anomalies or drift.
+2. **Investigate & Find Root Cause:** Deep dive into failures.
+3. **Identify Affected Code:** Trace issues back to the specific ML code or data pipelines.
+4. **Propose Multi-File Fix:** AI-assisted suggestion of necessary code modifications.
+5. **Human Review & Validation:** Engineers review the fix within a sandbox environment.
+6. **Regression Test Generation:** Automatically create tests to prevent recurrence.
+7. **Pull Request:** Ship the fix securely.
+
+## Current Architecture
+
+The architecture emphasizes maintainability, strong typing, and standard industry practices without unnecessary microservices.
+
+- **Frontend:** A single-page application communicating with the REST API.
+- **Backend:** A monolithic REST API providing the core services.
+- **Database:** Relational storage for all entities, designed for future vector capabilities (pgvector).
+
+## Technology Stack
+
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query.
+- **Backend:** Python, FastAPI, Pydantic, SQLAlchemy, Alembic.
+- **Infrastructure:** Docker, Docker Compose, PostgreSQL.
+
+## Local Setup
+
+You can run the entire environment locally using Docker Compose.
+
+1. **Environment Variables:**
+   Copy `.env.example` to `.env` and fill in the values if necessary.
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Start Services:**
+   ```bash
+   docker-compose up --build
+   ```
+
+This will start:
+- Frontend on `http://localhost:5173`
+- Backend API on `http://localhost:8000` (Health endpoint: `http://localhost:8000/health`)
+- PostgreSQL database
+
+## Repository Structure
+
+```
+ModelSentinel/
+├── frontend/           # React frontend application
+├── backend/            # FastAPI backend application
+│   ├── app/            # Application code
+│   └── tests/          # Backend test suite
+├── docs/               # Project documentation
+├── scripts/            # Helper and deployment scripts
+├── docker-compose.yml  # Local development environment
+└── README.md           # This file
+```
+
+## Development Commands
+
+**Frontend (Local):**
+```bash
+cd frontend
+npm install
+npm run dev
+npm run lint
+```
+
+**Backend (Local):**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+## Current Project Status
+
+**Phase 0 / Foundation:** 
+The repository is currently in its initial foundation phase. The application shells, project structures, and minimal Docker infrastructure have been established. Business logic, AI integrations, and full UI components are slated for future phases.
