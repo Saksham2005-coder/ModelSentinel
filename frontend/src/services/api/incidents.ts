@@ -17,14 +17,14 @@ export interface IncidentEvent {
   id: string;
   event_type: string;
   message: string;
-  metadata_json?: any;
+  metadata_json?: Record<string, unknown>;
   created_at: string;
 }
 
 export interface IncidentEvidence {
   id: string;
   monitoring_run_id: string;
-  snapshot: any;
+  snapshot: Record<string, unknown>;
   created_at: string;
 }
 

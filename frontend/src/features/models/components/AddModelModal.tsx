@@ -54,8 +54,8 @@ export function AddModelModal({ open, onOpenChange, onSuccess }: AddModelModalPr
         environment: 'development',
         status: 'draft'
       });
-    } catch (err: any) {
-      setError(err.message || 'Failed to create model');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create model');
     } finally {
       setLoading(false);
     }

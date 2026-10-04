@@ -23,8 +23,8 @@ export function RunMonitoringModal({ open, onClose, modelId, versionId, onSucces
       await MonitoringApi.runMonitoring(modelId, versionId);
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to run monitoring');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to run monitoring');
     } finally {
       setLoading(false);
     }

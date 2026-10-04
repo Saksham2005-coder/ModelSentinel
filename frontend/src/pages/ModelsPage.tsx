@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -15,22 +15,22 @@ export function ModelsPage() {
   const [search, setSearch] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const fetchModels = async () => {
+  const fetchModels = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await ModelsApi.getModels({ search });
       setModels(data.items);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch models');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch models');
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
 
   useEffect(() => {
     fetchModels();
-  }, [search]);
+  }, [fetchModels]);
 
   const handleRefresh = () => {
     fetchModels();

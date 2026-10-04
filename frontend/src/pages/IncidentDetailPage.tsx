@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { IncidentApi, IncidentDetail, IncidentEvent } from '@/services/api/incidents';
 import { ModelsApi, Model } from '@/services/api/models';
@@ -16,7 +16,7 @@ export function IncidentDetailPage() {
   
   const [activeTab, setActiveTab] = useState('Overview');
 
-  const fetchIncident = async () => {
+  const fetchIncident = useCallback(async () => {
     if (!incidentId) return;
     try {
       setLoading(true);
@@ -24,16 +24,16 @@ export function IncidentDetailPage() {
       setIncident(inc);
       const mod = await ModelsApi.getModel(inc.model_id);
       setModel(mod);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch incident details');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch incident details');
     } finally {
       setLoading(false);
     }
-  };
+  }, [incidentId]);
 
   useEffect(() => {
     fetchIncident();
-  }, [incidentId]);
+  }, [fetchIncident]);
 
   const handleAction = async (action: 'acknowledge' | 'startInvestigation' | 'resolve' | 'suppress') => {
     if (!incidentId) return;
@@ -44,8 +44,8 @@ export function IncidentDetailPage() {
       if (action === 'resolve') await IncidentApi.resolve(incidentId, 'Resolved via UI');
       if (action === 'suppress') await IncidentApi.suppress(incidentId);
       await fetchIncident();
-    } catch (err: any) {
-      setError(err.message || `Failed to ${action} incident`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : `Failed to ${action} incident`);
     } finally {
       setActionLoading(false);
     }

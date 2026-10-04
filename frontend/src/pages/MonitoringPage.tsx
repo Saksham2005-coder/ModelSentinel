@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { ModelsApi, ModelDetailResponse } from '@/services/api/models';
 import { 
@@ -29,7 +29,7 @@ export function MonitoringPage() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!modelId) return;
     setLoading(true);
     try {
@@ -49,16 +49,16 @@ export function MonitoringPage() {
       setDataQuality(dqRes);
       setPredictionDrift(pdRes);
       setSegments(segRes);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load monitoring data');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load monitoring data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [modelId]);
 
   useEffect(() => {
     fetchData();
-  }, [modelId]);
+  }, [fetchData]);
 
   if (loading) return <div className="p-8">Loading monitoring data...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;

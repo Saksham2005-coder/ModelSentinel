@@ -2,9 +2,9 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 
 export class ApiError extends Error {
   status: number;
-  data: any;
+  data: unknown;
 
-  constructor(status: number, data: any, message: string) {
+  constructor(status: number, data: unknown, message: string) {
     super(message);
     this.status = status;
     this.data = data;

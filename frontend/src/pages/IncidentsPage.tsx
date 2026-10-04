@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IncidentApi, Incident } from '@/services/api/incidents';
 import { ModelsApi, Model } from '@/services/api/models';
@@ -17,7 +17,7 @@ export function IncidentsPage() {
   
   const [activeTab, setActiveTab] = useState('All');
   
-  const fetchIncidents = async () => {
+  const fetchIncidents = useCallback(async () => {
     setLoading(true);
     try {
       let statusFilter;
@@ -35,16 +35,16 @@ export function IncidentsPage() {
       const modelMap: Record<string, Model> = {};
       mods.items.forEach(m => { modelMap[m.id] = m; });
       setModels(modelMap);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch incidents');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch incidents');
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     fetchIncidents();
-  }, [activeTab]);
+  }, [fetchIncidents]);
 
   const tabs = ['All', 'Active', 'Investigating', 'Fix Generated', 'Resolved'];
 

@@ -76,7 +76,7 @@ export interface ModelVersionCreate {
 }
 
 export const ModelsApi = {
-  getModels: (params?: Record<string, any>) => {
+  getModels: (params?: Record<string, string | number | boolean>) => {
     const searchParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
