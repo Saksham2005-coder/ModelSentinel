@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, Bell, User } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
