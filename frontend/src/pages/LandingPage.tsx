@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { BrainCircuit, Play, AlertCircle, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
