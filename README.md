@@ -86,3 +86,14 @@ uvicorn app.main:app --reload
 **Phase 1 / Premium Product UI Foundation:** Complete. Established central design-token support, Tailwind CSS integrations, and highly modular React components mimicking the amber/orange dark theme of the design reference.
 
 **Phase 2 / Real ML Model Management Foundation:** Complete. Implemented model registry full-stack (SQLAlchemy models for Model, ModelVersion, ModelMetric, FastAPI endpoints, and React frontend API integrations with modals).
+
+**Phase 3 / ML Monitoring & Deterministic Evaluation:** Complete.
+- **Monitoring Architecture**: A synchronous, deterministic monitoring runner in the FastAPI backend that compares current window data to baseline data (CSV).
+- **Supported Metrics**: Classification metrics (Accuracy, Precision, Recall, F1, ROC-AUC).
+- **Drift Methods**: KS Statistic (Numerical features), PSI (Population Stability Index for Numerical, Categorical features, and Prediction drift).
+- **Baseline/Current Concept**: Compares a reference `baseline` dataframe against a recent `current` dataframe to extract drift and performance degradation.
+- **Data Quality**: Evaluates Missing Values, Duplicate Rows, and Invalid Data.
+- **Segment Analysis**: Evaluates standard ML metrics over dynamically filtered segments (e.g. `url_count > 2`).
+- **Monitoring Endpoints**: RESTful `POST /api/v1/models/{id}/monitoring/runs` orchestrates the run and GET variants retrieve the persisted metric, drift, quality, and segment tables.
+- **Demo Dataset**: Seed script generates dummy CSVs `email-spam-classifier_baseline.csv` and `email-spam-classifier_current.csv` with synthetic performance degradation and feature drift for demonstration.
+- **Thresholds**: Defined in `thresholds.py`. Signals are mapped to `healthy`, `warning`, or `critical`. (e.g., PSI > 0.25 is critical).
