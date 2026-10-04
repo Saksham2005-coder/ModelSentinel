@@ -21,7 +21,7 @@ import sys
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.core.config import settings
-from app.models.base import Base
+from app.db.base import Base
 
 target_metadata = Base.metadata
 

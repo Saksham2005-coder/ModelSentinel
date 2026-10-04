@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
+from app.api.v1.endpoints import models
+
 app = FastAPI(
     title="ModelSentinel API",
     version="0.1.0",
@@ -23,6 +25,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(models.router, prefix="/api/v1/models", tags=["models"])
 
 @app.get("/health")
 def health_check():
