@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-modelsentinel}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-modelsentinel_password}
+      - POSTGRES_DB=${POSTGRES_DB:-modelsentinel}
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: 
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_SERVER=db
+      - POSTGRES_USER=${POSTGRES_USER:-modelsentinel}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-modelsentinel_password}
+      - POSTGRES_DB=${POSTGRES_DB:-modelsentinel}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data:
