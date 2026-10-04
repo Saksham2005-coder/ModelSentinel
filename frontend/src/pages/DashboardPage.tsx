@@ -1,4 +1,3 @@
-import React from 'react';
 import { MetricCard } from '@/components/ui/MetricCard';
 import { ChartCard } from '@/components/ui/ChartCard';
 import { Button } from '@/components/ui/Button';
