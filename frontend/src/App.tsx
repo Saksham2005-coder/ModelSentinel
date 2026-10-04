@@ -3,6 +3,7 @@ import { AppLayout } from '@/layouts/AppLayout';
 import { LandingPage } from '@/pages/LandingPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ModelsPage } from '@/pages/ModelsPage';
+import { MonitoringPage } from '@/pages/MonitoringPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/models" element={<ModelsPage />} />
+          <Route path="/models/:modelId/monitoring" element={<MonitoringPage />} />
           <Route path="/incidents" element={<PlaceholderPage title="Incidents" />} />
           <Route path="/investigations" element={<PlaceholderPage title="Investigations" />} />
           <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
@@ -108,6 +109,7 @@ export function ModelsPage() {
                 <TableHead>Task Type</TableHead>
                 <TableHead>Environment</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -138,6 +140,11 @@ export function ModelsPage() {
                     >
                       {model.status.toUpperCase()}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/models/${model.id}/monitoring`}>Monitoring</Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
