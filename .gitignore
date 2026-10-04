@@ -1,0 +1,21 @@
+# Node
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.venv/
+env/
+venv/
+alembic.ini
+
+# OS
+.DS_Store
+Thumbs.db
