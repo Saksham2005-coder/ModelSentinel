@@ -1,0 +1,38 @@
+export const modelsDemo = [
+  {
+    id: 'mod-001',
+    name: 'Email Spam Classifier',
+    type: 'Classification',
+    health: 98.2,
+    latency: '45ms',
+    trend: { value: 1.2, isPositive: true },
+    status: 'healthy',
+  },
+  {
+    id: 'mod-002',
+    name: 'Customer Churn Prediction',
+    type: 'Binary Classification',
+    health: 85.5,
+    latency: '120ms',
+    trend: { value: 5.4, isPositive: false },
+    status: 'warning',
+  },
+  {
+    id: 'mod-003',
+    name: 'Fraud Detection',
+    type: 'Anomaly Detection',
+    health: 72.1,
+    latency: '85ms',
+    trend: { value: 12.5, isPositive: false },
+    status: 'critical',
+  },
+  {
+    id: 'mod-004',
+    name: 'Sales Forecasting',
+    type: 'Regression',
+    health: 95.8,
+    latency: '60ms',
+    trend: { value: 0.5, isPositive: true },
+    status: 'healthy',
+  },
+];
