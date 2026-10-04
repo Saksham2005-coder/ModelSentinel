@@ -143,3 +143,25 @@ def get_segments(
     if run_id:
         query = query.filter(SegmentAnalysisResult.monitoring_run_id == run_id)
     return query.order_by(desc(SegmentAnalysisResult.created_at)).limit(limit).all()
+
+@router.post("/runs/{run_id}/detect-incidents")
+def detect_incidents_from_run(
+    model_id: str,
+    run_id: str,
+    db: Session = Depends(get_db)
+):
+    from app.models.incident import Incident
+    from app.schemas.incident import IncidentResponse
+    from app.incidents.detector import process_monitoring_run
+    
+    run = db.query(MonitoringRun).filter(MonitoringRun.id == run_id, MonitoringRun.model_id == model_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Monitoring run not found")
+        
+    incident = process_monitoring_run(db, run)
+    
+    if incident:
+        # Return as IncidentResponse dict or just the object
+        # Since we just want to know if it was triggered, we can return the incident info
+        return {"message": "Incident detected and processed", "incident_id": incident.id}
+    return {"message": "No incidents detected from this monitoring run."}

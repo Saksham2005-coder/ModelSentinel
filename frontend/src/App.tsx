@@ -4,6 +4,8 @@ import { LandingPage } from '@/pages/LandingPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ModelsPage } from '@/pages/ModelsPage';
 import { MonitoringPage } from '@/pages/MonitoringPage';
+import { IncidentsPage } from '@/pages/IncidentsPage';
+import { IncidentDetailPage } from '@/pages/IncidentDetailPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
 function App() {
@@ -18,7 +20,8 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/models" element={<ModelsPage />} />
           <Route path="/models/:modelId/monitoring" element={<MonitoringPage />} />
-          <Route path="/incidents" element={<PlaceholderPage title="Incidents" />} />
+          <Route path="/incidents" element={<IncidentsPage />} />
+          <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />
           <Route path="/investigations" element={<PlaceholderPage title="Investigations" />} />
           <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />
           <Route path="/regression-tests" element={<PlaceholderPage title="Regression Tests" />} />
