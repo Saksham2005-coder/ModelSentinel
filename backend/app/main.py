@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
-from app.api.v1.endpoints import models
+from app.api.v1.endpoints import models, monitoring
 
 app = FastAPI(
     title="ModelSentinel API",
@@ -27,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(models.router, prefix="/api/v1/models", tags=["models"])
+app.include_router(monitoring.router, prefix="/api/v1/models/{model_id}/monitoring", tags=["monitoring"])
 
 @app.get("/health")
 def health_check():

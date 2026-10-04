@@ -104,6 +104,62 @@ def seed():
         db.add(metric)
 
     db.commit()
+    
+    # Generate deterministic dataset for Email Spam Classifier
+    print("Generating demo CSV datasets...")
+    import pandas as pd
+    import numpy as np
+    import os
+    
+    np.random.seed(42)
+    n_samples = 1000
+    
+    data_dir = os.path.join(os.path.dirname(__file__), 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    
+    # Baseline
+    b_target = np.random.choice([0, 1], p=[0.78, 0.22], size=n_samples)
+    b_url_length = np.where(b_target == 1, np.random.normal(45, 10, n_samples), np.random.normal(25, 5, n_samples))
+    b_url_count = np.where(b_target == 1, np.random.poisson(4, n_samples), np.random.poisson(1, n_samples))
+    b_sender_domain = np.random.choice(['gmail.com', 'yahoo.com', 'corporate.com', 'unknown.io'], p=[0.5, 0.2, 0.2, 0.1], size=n_samples)
+    
+    b_prob = np.where(b_target == 1, np.random.beta(8, 2, n_samples), np.random.beta(2, 8, n_samples))
+    b_pred = (b_prob > 0.5).astype(int)
+    
+    b_df = pd.DataFrame({
+        'target': b_target,
+        'prediction': b_pred,
+        'probability': b_prob,
+        'url_length': b_url_length,
+        'url_count': b_url_count,
+        'sender_domain': b_sender_domain
+    })
+    
+    # Current (Drifted)
+    c_target = np.random.choice([0, 1], p=[0.61, 0.39], size=n_samples) # Shifted class balance
+    c_url_length = np.where(c_target == 1, np.random.normal(60, 15, n_samples), np.random.normal(25, 5, n_samples)) # Drifted
+    c_url_count = np.where(c_target == 1, np.random.poisson(7, n_samples), np.random.poisson(1, n_samples)) # Drifted
+    c_sender_domain = np.random.choice(['gmail.com', 'yahoo.com', 'corporate.com', 'unknown.io'], p=[0.3, 0.1, 0.1, 0.5], size=n_samples) # Drifted categorical
+    
+    # Degraded predictions
+    c_prob = np.where(c_target == 1, np.random.beta(5, 5, n_samples), np.random.beta(4, 6, n_samples))
+    c_pred = (c_prob > 0.5).astype(int)
+    
+    # Introduce some missing values
+    c_url_length[np.random.choice(n_samples, size=int(0.06 * n_samples), replace=False)] = np.nan
+    
+    c_df = pd.DataFrame({
+        'target': c_target,
+        'prediction': c_pred,
+        'probability': c_prob,
+        'url_length': c_url_length,
+        'url_count': c_url_count,
+        'sender_domain': c_sender_domain
+    })
+    
+    b_df.to_csv(os.path.join(data_dir, f'{m1.slug}_baseline.csv'), index=False)
+    c_df.to_csv(os.path.join(data_dir, f'{m1.slug}_current.csv'), index=False)
+
     print("Seeding complete.")
     db.close()
 
