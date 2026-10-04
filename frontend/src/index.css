@@ -3,7 +3,72 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-background-primary text-text-primary font-sans antialiased;
+  :root {
+    /* Backgrounds */
+    --color-bg-base: #060608;
+    --color-bg-primary: #0a0a0c;
+    --color-bg-secondary: #121214;
+    --color-bg-elevated: #1a1a1d;
+    
+    /* Surfaces */
+    --color-surface: #242428;
+    --color-surface-hover: #2d2d32;
+    
+    /* Borders */
+    --color-border: #27272a;
+    --color-border-strong: #3f3f46;
+    
+    /* Text */
+    --color-text-primary: #f8f8f8;
+    --color-text-secondary: #a1a1aa;
+    --color-text-muted: #71717a;
+    --color-text-disabled: #52525b;
+    
+    /* Brand (Amber/Orange accent) */
+    --color-brand: #f59e0b;
+    --color-brand-hover: #d97706;
+    --color-brand-soft: rgba(245, 158, 11, 0.15);
+    
+    /* Status: Success (Green) */
+    --color-success: #10b981;
+    --color-success-soft: rgba(16, 185, 129, 0.15);
+    
+    /* Status: Warning (Amber) */
+    --color-warning: #f59e0b;
+    --color-warning-soft: rgba(245, 158, 11, 0.15);
+    
+    /* Status: Danger (Red) */
+    --color-danger: #ef4444;
+    --color-danger-soft: rgba(239, 68, 68, 0.15);
+    
+    /* Status: Info (Blue) */
+    --color-info: #3b82f6;
+    --color-info-soft: rgba(59, 130, 246, 0.15);
+    
+    /* Chart Colors */
+    --color-chart-production: #f59e0b;
+    --color-chart-baseline: #3b82f6;
+    --color-chart-validation: #10b981;
+    --color-chart-incident: #ef4444;
   }
+
+  body {
+    @apply bg-background-base text-text-primary font-sans antialiased;
+  }
+}
+
+/* Custom Scrollbar for better UI feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong); 
 }
