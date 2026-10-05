@@ -40,7 +40,10 @@ export function IncidentDetailPage() {
     setActionLoading(true);
     try {
       if (action === 'acknowledge') await IncidentApi.acknowledge(incidentId);
-      if (action === 'startInvestigation') await IncidentApi.startInvestigation(incidentId);
+      if (action === 'startInvestigation') {
+        window.location.href = `/incidents/${incidentId}/investigation`;
+        return;
+      }
       if (action === 'resolve') await IncidentApi.resolve(incidentId, 'Resolved via UI');
       if (action === 'suppress') await IncidentApi.suppress(incidentId);
       await fetchIncident();
@@ -114,7 +117,13 @@ export function IncidentDetailPage() {
             className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
               activeTab === t ? 'border-brand text-brand' : 'border-transparent text-text-secondary hover:text-text-primary'
             }`}
-            onClick={() => setActiveTab(t)}
+            onClick={() => {
+              if (t === 'Investigation') {
+                window.location.href = `/incidents/${incidentId}/investigation`;
+              } else {
+                setActiveTab(t);
+              }
+            }}
           >
             {t}
           </button>
