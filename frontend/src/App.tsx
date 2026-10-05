@@ -10,6 +10,7 @@ import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
 import { InvestigationPage } from '@/pages/InvestigationPage';
 import { RepositoryPage } from '@/pages/RepositoryPage';
+import { PatchWorkspacePage } from '@/pages/PatchWorkspacePage';
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
           <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />
           <Route path="/incidents/:incidentId/root-cause" element={<PlaceholderPage title="Root Cause" />} />
           <Route path="/incidents/:incidentId/timeline" element={<PlaceholderPage title="Timeline" />} />
-          <Route path="/incidents/:incidentId/fix" element={<PlaceholderPage title="Proposed Fix" />} />
+          <Route path="/incidents/:incidentId/fix" element={<PatchWorkspacePage />} />
           <Route path="/incidents/:incidentId/validation" element={<PlaceholderPage title="Validation" />} />
         </Route>
       </Routes>
