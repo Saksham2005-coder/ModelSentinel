@@ -40,6 +40,7 @@ class ModelVersion(Base):
     description = Column(Text, nullable=True)
     artifact_uri = Column(String, nullable=True)
     git_commit = Column(String, nullable=True)
+    repository_snapshot_id = Column(String, nullable=True)
     framework_version = Column(String, nullable=True)
     python_version = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

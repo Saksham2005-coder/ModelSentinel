@@ -76,3 +76,14 @@ def suppress_incident(incident_id: str, db: Session = Depends(get_db)):
     if not incident:
         raise HTTPException(status_code=404, detail="Incident not found")
     return IncidentService.suppress(db, incident)
+
+@router.get("/{incident_id}/repository-context")
+def get_incident_repository_context(incident_id: str, db: Session = Depends(get_db)):
+    incident = db.query(Incident).filter(Incident.id == incident_id).first()
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+        
+    from app.repository.service import RepositoryService
+    svc = RepositoryService(db)
+    
+    return svc.get_context_for_incident(incident)
