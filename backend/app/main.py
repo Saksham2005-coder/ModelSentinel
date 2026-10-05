@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
-from app.api.v1.endpoints import models, monitoring, incidents, investigations, repositories, patches
+from app.api.v1.endpoints import models, monitoring, incidents, investigations, repositories, patches, validation
 
 app = FastAPI(
     title="ModelSentinel API",
@@ -32,6 +32,7 @@ app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["incident
 app.include_router(investigations.router, prefix="/api/v1", tags=["investigations"])
 app.include_router(repositories.router, prefix="/api/v1/repositories", tags=["repositories"])
 app.include_router(patches.router, prefix="/api/v1", tags=["patches"])
+app.include_router(validation.router, prefix="/api/v1", tags=["validation"])
 
 from sqlalchemy import text
 from app.db.session import SessionLocal
