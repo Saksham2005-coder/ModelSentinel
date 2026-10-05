@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
-from app.api.v1.endpoints import models, monitoring, incidents
+from app.api.v1.endpoints import models, monitoring, incidents, investigations, repositories
 
 app = FastAPI(
     title="ModelSentinel API",
@@ -29,9 +29,12 @@ app.add_middleware(
 app.include_router(models.router, prefix="/api/v1/models", tags=["models"])
 app.include_router(monitoring.router, prefix="/api/v1/models/{model_id}/monitoring", tags=["monitoring"])
 app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["incidents"])
+app.include_router(investigations.router, prefix="/api/v1", tags=["investigations"])
+app.include_router(repositories.router, prefix="/api/v1/repositories", tags=["repositories"])
 
 from sqlalchemy import text
 from app.db.session import SessionLocal
+from app.ai.service import get_llm_provider
 
 @app.get("/health")
 def health_check():
@@ -51,6 +54,16 @@ def health_check():
         except:
             pass
 
+    provider_status = "unavailable"
+    try:
+        provider = get_llm_provider()
+        if provider.health_check():
+            provider_status = "configured"
+        else:
+            provider_status = "misconfigured"
+    except Exception:
+        provider_status = "unavailable"
+
     return {
         "status": "ok",
         "service": "modelsentinel-api",
@@ -58,5 +71,8 @@ def health_check():
         "database": {
             "status": db_status,
             "engine": db_engine
+        },
+        "ai_provider": {
+            "status": provider_status
         }
     }

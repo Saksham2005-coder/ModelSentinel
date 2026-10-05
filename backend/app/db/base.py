@@ -9,3 +9,5 @@ from app.models.monitoring import (
     SegmentAnalysisResult
 ) # noqa
 from app.models.incident import Incident, IncidentSignal, IncidentEvent, IncidentEvidence # noqa
+from app.models.investigation import Investigation, InvestigationEvent, InvestigationHypothesis, InvestigationEvidence # noqa
+from app.models.repository import Repository, RepositorySnapshot, RepositoryFile, RepositorySymbol, RepositoryDependency # noqa

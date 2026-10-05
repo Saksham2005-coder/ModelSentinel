@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Code, GitBranch, Github, FileArchive, Search, Folder, File, ChevronRight, ChevronDown } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RefreshCw, Code, GitBranch, Github, FileArchive, Search, Folder, File } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Badge } from '@/components/ui/Badge';
+
+
+
+interface SearchResult {
+  file_path: string;
+  symbol_name: string;
+  symbol_type: string;
+  start_line: number;
+}
+
+interface Repository {
+  id: string;
+  name: string;
+  status: string;
+  source_type: string;
+  current_commit?: string;
+  indexed_at?: string;
+}
 
 export const RepositoryPage: React.FC = () => {
-  const [repositories, setRepositories] = useState<any[]>([]);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeRepo, setActiveRepo] = useState<any | null>(null);
+  const [activeRepo, setActiveRepo] = useState<Repository | null>(null);
   
   // Connect Git state
   const [gitUrl, setGitUrl] = useState('');
@@ -17,7 +34,7 @@ export const RepositoryPage: React.FC = () => {
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
   // File Viewer state
@@ -152,7 +169,7 @@ export const RepositoryPage: React.FC = () => {
                           {repo.source_type === 'public_git' ? <Github className="h-4 w-4" /> : <FileArchive className="h-4 w-4" />}
                           {repo.name}
                         </div>
-                        <Badge variant={repo.status === 'ready' ? 'default' : repo.status === 'failed' ? 'destructive' : 'secondary'}>
+                        <Badge variant={repo.status === 'ready' ? 'success' : repo.status === 'failed' ? 'danger' : 'default'}>
                           {repo.status}
                         </Badge>
                       </div>

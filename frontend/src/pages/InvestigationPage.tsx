@@ -6,6 +6,17 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, Play, AlertCircle, CheckCircle, ShieldAlert, FileText, Activity, Clock } from 'lucide-react';
 
+interface RelevantFile {
+  file_path: string;
+  relevance: string;
+  reasons: string[];
+}
+
+interface RepoContext {
+  error?: string;
+  relevant_files?: RelevantFile[];
+}
+
 export function InvestigationPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
   const [incident, setIncident] = useState<IncidentDetail | null>(null);
@@ -13,7 +24,7 @@ export function InvestigationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedHypothesis, setSelectedHypothesis] = useState<string | null>(null);
-  const [repoContext, setRepoContext] = useState<any | null>(null);
+  const [repoContext, setRepoContext] = useState<RepoContext | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!incidentId) return;
@@ -131,9 +142,9 @@ export function InvestigationPage() {
               <h3 className="font-medium mb-3 flex items-center gap-2 text-indigo-400">
                 <FileText className="w-4 h-4" /> Code Relevance
               </h3>
-              {repoContext.relevant_files?.length > 0 ? (
+              {(repoContext.relevant_files?.length ?? 0) > 0 ? (
                 <div className="space-y-3">
-                  {repoContext.relevant_files.map((file: any, i: number) => (
+                  {repoContext.relevant_files!.map((file: RelevantFile, i: number) => (
                     <div key={i} className="p-2 border border-slate-700 rounded bg-slate-800/50 text-xs">
                       <div className="font-mono font-medium text-slate-200 mb-1 truncate" title={file.file_path}>
                         {file.file_path.split('/').pop()}

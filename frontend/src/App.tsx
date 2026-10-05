@@ -8,6 +8,9 @@ import { IncidentsPage } from '@/pages/IncidentsPage';
 import { IncidentDetailPage } from '@/pages/IncidentDetailPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
+import { InvestigationPage } from '@/pages/InvestigationPage';
+import { RepositoryPage } from '@/pages/RepositoryPage';
+
 function App() {
   return (
     <Router>
@@ -26,13 +29,12 @@ function App() {
           <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />
           <Route path="/regression-tests" element={<PlaceholderPage title="Regression Tests" />} />
           <Route path="/deployments" element={<PlaceholderPage title="Deployments" />} />
-          <Route path="/repository" element={<PlaceholderPage title="Repository" />} />
+          <Route path="/repository" element={<RepositoryPage />} />
           <Route path="/incident-memory" element={<PlaceholderPage title="Incident Memory" />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
           
           {/* Incident-specific sub-routes as placeholders */}
-          <Route path="/incidents/:incidentId" element={<PlaceholderPage title="Incident Details" />} />
-          <Route path="/incidents/:incidentId/investigation" element={<PlaceholderPage title="Investigation" />} />
+          <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />
           <Route path="/incidents/:incidentId/root-cause" element={<PlaceholderPage title="Root Cause" />} />
           <Route path="/incidents/:incidentId/timeline" element={<PlaceholderPage title="Timeline" />} />
           <Route path="/incidents/:incidentId/fix" element={<PlaceholderPage title="Proposed Fix" />} />
