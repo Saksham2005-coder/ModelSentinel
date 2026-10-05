@@ -12,3 +12,4 @@ from app.models.incident import Incident, IncidentSignal, IncidentEvent, Inciden
 from app.models.investigation import Investigation, InvestigationEvent, InvestigationHypothesis, InvestigationEvidence # noqa
 from app.models.repository import Repository, RepositorySnapshot, RepositoryFile, RepositorySymbol, RepositoryDependency # noqa
 from app.models.patch import PatchProposal, PatchFileChange, PatchReview # noqa
+from app.models.validation import ValidationRun, ValidationCheck, ValidationMetric, ValidationArtifact # noqa
