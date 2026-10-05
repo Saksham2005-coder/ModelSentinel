@@ -139,12 +139,24 @@ export const PatchWorkspacePage: React.FC = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-slate-100">Patch Proposal</CardTitle>
-                  <Badge variant={
-                    activePatch.status === 'approved' ? 'success' :
-                    activePatch.status === 'rejected' ? 'danger' : 'default'
-                  }>
-                    {activePatch.status.toUpperCase()}
-                  </Badge>
+                  <div className="flex items-center gap-4">
+                    {activePatch.status === 'approved' && (
+                      <Button
+                        size="sm"
+                        onClick={() => navigate(`/incidents/${incidentId}/validation`)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Validate Patch
+                      </Button>
+                    )}
+                    <Badge variant={
+                      activePatch.status === 'approved' ? 'success' :
+                      activePatch.status === 'rejected' ? 'danger' : 'default'
+                    }>
+                      {activePatch.status.toUpperCase()}
+                    </Badge>
+                  </div>
                 </div>
                 <CardDescription>Version {activePatch.version}</CardDescription>
               </CardHeader>
