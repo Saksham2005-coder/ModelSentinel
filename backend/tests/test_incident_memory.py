@@ -23,10 +23,17 @@ def test_eligibility_not_resolved(mock_db_session):
 def test_eligibility_no_patch(mock_db_session):
     incident = Incident(id="inc-1", status="resolved")
     inv = Investigation(id="inv-1", status="completed")
-    inv.patches = []
     incident.investigations = [inv]
     
-    mock_db_session.query.return_value.filter.return_value.first.return_value = incident
+    def query_side_effect(model):
+        m = MagicMock()
+        if model == Incident:
+            m.filter.return_value.first.return_value = incident
+        elif model == PatchProposal:
+            m.filter.return_value.first.return_value = None
+        return m
+        
+    mock_db_session.query.side_effect = query_side_effect
     
     svc = IncidentMemoryService(mock_db_session)
     res = svc.check_eligibility("inc-1")
@@ -37,7 +44,6 @@ def test_eligibility_validation_failed(mock_db_session):
     incident = Incident(id="inc-1", status="resolved")
     patch = PatchProposal(id="patch-1", status="approved")
     inv = Investigation(id="inv-1", status="completed")
-    inv.patches = [patch]
     incident.investigations = [inv]
     
     val = ValidationRun(id="val-1", status="completed", verdict="FAIL")
@@ -47,6 +53,8 @@ def test_eligibility_validation_failed(mock_db_session):
         m = MagicMock()
         if model == Incident:
             m.filter.return_value.first.return_value = incident
+        elif model == PatchProposal:
+            m.filter.return_value.first.return_value = patch
         elif model == ValidationRun:
             m.filter.return_value.order_by.return_value.first.return_value = val
         return m
@@ -62,7 +70,6 @@ def test_eligibility_success(mock_db_session):
     incident = Incident(id="inc-1", status="resolved")
     patch = PatchProposal(id="patch-1", status="approved")
     inv = Investigation(id="inv-1", status="completed")
-    inv.patches = [patch]
     incident.investigations = [inv]
     
     val = ValidationRun(id="val-1", status="completed", verdict="PASS")
@@ -71,6 +78,8 @@ def test_eligibility_success(mock_db_session):
         m = MagicMock()
         if model == Incident:
             m.filter.return_value.first.return_value = incident
+        elif model == PatchProposal:
+            m.filter.return_value.first.return_value = patch
         elif model == ValidationRun:
             m.filter.return_value.order_by.return_value.first.return_value = val
         return m
@@ -85,7 +94,6 @@ def test_create_memory_duplicate(mock_db_session):
     incident = Incident(id="inc-1", status="resolved")
     patch = PatchProposal(id="patch-1", status="approved")
     inv = Investigation(id="inv-1", status="completed")
-    inv.patches = [patch]
     incident.investigations = [inv]
     val = ValidationRun(id="val-1", status="completed", verdict="PASS")
     
@@ -93,6 +101,8 @@ def test_create_memory_duplicate(mock_db_session):
         m = MagicMock()
         if model == Incident:
             m.filter.return_value.first.return_value = incident
+        elif model == PatchProposal:
+            m.filter.return_value.first.return_value = patch
         elif model == ValidationRun:
             m.filter.return_value.order_by.return_value.first.return_value = val
         elif model == IncidentMemory:
