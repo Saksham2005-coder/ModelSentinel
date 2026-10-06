@@ -18,3 +18,4 @@ from app.models.regression import RegressionCase, RegressionRun, RegressionResul
 from app.models.pull_request import PullRequest # noqa
 from app.models.deployment import Deployment # noqa
 from app.models.deployment_verification import DeploymentVerification # noqa
+from app.models.change_risk import ChangeRiskAssessment # noqa
