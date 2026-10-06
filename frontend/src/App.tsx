@@ -19,6 +19,8 @@ import { PullRequestsPage } from '@/pages/PullRequestsPage';
 import { PullRequestDetailPage } from '@/pages/PullRequestDetailPage';
 import { DeploymentGatesPage } from '@/pages/DeploymentGatesPage';
 import { DeploymentGateDetailPage } from '@/pages/DeploymentGateDetailPage';
+import { AnalyticsPage } from '@/pages/AnalyticsPage';
+import { ModelAnalyticsDetailPage } from '@/pages/ModelAnalyticsDetailPage';
 
 function App() {
   return (
@@ -45,6 +47,9 @@ function App() {
           <Route path="/repository" element={<RepositoryPage />} />
           <Route path="/incident-memory" element={<IncidentMemoryPage />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+          
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/analytics/models/:modelId" element={<ModelAnalyticsDetailPage />} />
           
           {/* Incident-specific sub-routes as placeholders */}
           <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />

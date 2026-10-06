@@ -11,6 +11,7 @@ import { ModelsApi, Model } from '@/services/api/models';
 import { IncidentApi, Incident } from '@/services/api/incidents';
 import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
+import { analyticsApi, OverviewMetrics } from '@/services/api/analytics';
 import {
   LineChart,
   Line,
@@ -49,18 +50,20 @@ export function DashboardPage() {
   const [regressionCases, setRegressionCases] = useState<any[]>([]);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [reliability, setReliability] = useState<OverviewMetrics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [incRes, modRes, memRes, regRes, prRes, depRes] = await Promise.all([
+        const [incRes, modRes, memRes, regRes, prRes, depRes, relRes] = await Promise.all([
           IncidentApi.getIncidents({ limit: 5 }),
           ModelsApi.getModels({}),
           fetch('http://localhost:8000/api/v1/memories').then(r => r.json()),
           fetch('http://localhost:8000/api/v1/regression-tests').then(r => r.json()),
           PullRequestApi.getPullRequests(),
           DeploymentApi.getDeployments(),
+          analyticsApi.getOverview(7),
         ]);
         setIncidents(incRes);
         setModels(modRes.items);
@@ -68,6 +71,7 @@ export function DashboardPage() {
         setRegressionCases(regRes || []);
         setPullRequests(prRes || []);
         setDeployments(depRes || []);
+        setReliability(relRes);
       } catch (e) {
         console.error(e);
       } finally {
@@ -95,16 +99,26 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-6">
         <MetricCard
-          title="Total Models"
-          value={models.length}
+          title="Reliability Score (7d)"
+          value={reliability ? reliability.reliability_score : '-'}
+          icon={Box}
+        />
+        <MetricCard
+          title="MTTR (7d)"
+          value={reliability?.mttr_minutes !== null && reliability?.mttr_minutes !== undefined ? `${reliability.mttr_minutes.toFixed(1)}m` : 'N/A'}
           icon={Box}
         />
         <MetricCard
           title="Active Incidents"
           value={activeIncidents.length}
           icon={AlertCircle}
+        />
+        <MetricCard
+          title="Total Models"
+          value={models.length}
+          icon={Box}
         />
         <MetricCard
           title="Incident Memories"
@@ -125,6 +139,11 @@ export function DashboardPage() {
           title="Eligible Deployments"
           value={deployments.filter(d => d.status === 'ELIGIBLE').length}
           icon={Box}
+        />
+        <MetricCard
+          title="Degraded Deployments"
+          value={deployments.filter(d => ['DEGRADED', 'FAILED'].includes(d.status)).length}
+          icon={AlertCircle}
         />
       </div>
 
