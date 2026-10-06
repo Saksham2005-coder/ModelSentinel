@@ -301,13 +301,14 @@ export function IncidentDetailPage() {
             {deployments.map(dep => (
               <div key={dep.id} className="relative pl-8">
                 <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-purple-500" />
-                <div className="text-sm text-text-muted mb-1">{new Date(dep.created_at).toLocaleString()}</div>
-                <div className="font-medium text-text-primary">Deployment Gate Evaluated</div>
+                <div className="text-sm text-text-muted mb-1">{new Date(dep.updated_at || dep.created_at).toLocaleString()}</div>
+                <div className="font-medium text-text-primary">Deployment Status: {dep.status}</div>
                 <p className="text-text-secondary mt-1">
-                  Status: <Badge variant={dep.status === 'ELIGIBLE' ? 'success' : 'danger'}>{dep.status}</Badge>
+                  Current State: <Badge variant={['ELIGIBLE', 'HEALTHY'].includes(dep.status) ? 'success' : ['BLOCKED', 'FAILED'].includes(dep.status) ? 'danger' : 'warning'}>{dep.status}</Badge>
                 </p>
+                {dep.environment && <p className="text-xs text-text-secondary mt-1">Environment: {dep.environment}</p>}
                 {dep.block_reason && <p className="text-status-danger text-sm mt-1">{dep.block_reason}</p>}
-                <Link to={`/deployment-gates/${dep.id}`} className="text-brand text-sm hover:underline mt-1 inline-block">View Gate Details</Link>
+                <Link to={`/deployment-gates/${dep.id}`} className="text-brand text-sm hover:underline mt-1 inline-block">View Deployment Details</Link>
               </div>
             ))}
           </div>

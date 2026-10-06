@@ -46,14 +46,20 @@ export function DeploymentGatesPage() {
   const metrics = {
     eligible: deployments.filter(d => d.status === 'ELIGIBLE').length,
     blocked: deployments.filter(d => d.status === 'BLOCKED').length,
-    waitingForCi: deployments.filter(d => d.gate_result?.ci_passed === false).length,
-    waitingForApproval: deployments.filter(d => d.gate_result?.human_approved === false).length,
+    deployed: deployments.filter(d => ['DEPLOYED', 'VERIFYING', 'HEALTHY', 'DEGRADED', 'FAILED'].includes(d.status)).length,
+    healthy: deployments.filter(d => d.status === 'HEALTHY').length,
+    degradedOrFailed: deployments.filter(d => ['DEGRADED', 'FAILED'].includes(d.status)).length,
     total: deployments.length,
   };
 
   const getStatusBadge = (status: string) => {
     if (status === 'ELIGIBLE') return <Badge variant="success">{status}</Badge>;
     if (status === 'BLOCKED') return <Badge variant="danger">{status}</Badge>;
+    if (status === 'HEALTHY') return <Badge variant="success">{status}</Badge>;
+    if (status === 'DEGRADED') return <Badge variant="warning">{status}</Badge>;
+    if (status === 'FAILED') return <Badge variant="danger">{status}</Badge>;
+    if (status === 'VERIFYING') return <Badge variant="info">{status}</Badge>;
+    if (status === 'DEPLOYED') return <Badge variant="info">{status}</Badge>;
     return <Badge variant="default">{status}</Badge>;
   };
 
@@ -101,7 +107,7 @@ export function DeploymentGatesPage() {
                 <TableHead>Regression</TableHead>
                 <TableHead>CI</TableHead>
                 <TableHead>Approval</TableHead>
-                <TableHead>Gate Result</TableHead>
+                <TableHead>Env / Status</TableHead>
                 <TableHead>Updated</TableHead>
               </TableRow>
             </TableHeader>
@@ -134,7 +140,10 @@ export function DeploymentGatesPage() {
                     <TableCell>{getGateCell(g?.human_approved)}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        {getStatusBadge(dep.status)}
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(dep.status)}
+                          {dep.environment && <span className="text-xs text-text-secondary">({dep.environment})</span>}
+                        </div>
                         {dep.status === 'BLOCKED' && dep.block_reason && (
                           <span className="text-xs text-status-danger mt-1 truncate max-w-[150px]">{dep.block_reason}</span>
                         )}

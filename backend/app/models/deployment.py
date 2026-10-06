@@ -13,9 +13,14 @@ class Deployment(Base):
     incident_id = Column(String, ForeignKey("incidents.id"), nullable=False)
     commit_sha = Column(String, nullable=False)
 
-    status = Column(String, nullable=False) # ELIGIBLE, BLOCKED
+    status = Column(String, nullable=False) # ELIGIBLE, BLOCKED, APPROVED, DEPLOYED, VERIFYING, HEALTHY, DEGRADED, FAILED
     gate_result = Column(String, nullable=False) # JSON dump of gate evaluations
     block_reason = Column(String, nullable=True)
+
+    deployed_at = Column(DateTime, nullable=True)
+    environment = Column(String, nullable=True)
+    deployment_source = Column(String, nullable=True)
+    deployed_by = Column(String, nullable=True)
 
     approved_by = Column(String, nullable=True)
     approved_at = Column(DateTime, nullable=True)
