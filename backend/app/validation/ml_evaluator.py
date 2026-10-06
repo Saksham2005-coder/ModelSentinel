@@ -1,12 +1,14 @@
 import os
 import logging
+import pandas as pd
 from typing import Dict, Any
 
 from sqlalchemy.orm import Session
 from app.models.patch import PatchProposal
 from app.models.incident import Incident
-from app.monitoring.runner import run_monitoring_job
 from app.models.model import ModelVersion
+from app.monitoring.metrics import calculate_classification_metrics
+from app.monitoring.segmentation import analyze_segments
 
 logger = logging.getLogger(__name__)
 
@@ -19,46 +21,54 @@ class MLEvaluator:
     def evaluate(self) -> Dict[str, Any]:
         """
         Executes ML Evaluation on the patched repository.
-        In a real production environment, this would trigger a training/inference pipeline
-        inside the isolated environment and evaluate the resulting predictions.
-        Here we simulate it by running the deterministic monitoring job on a pre-generated patched dataset.
+        Performs a three-way comparison: Healthy (Baseline) vs Current (Incident) vs Patched.
         """
         try:
             model = self.incident.model
-            version = self.db.query(ModelVersion).filter(ModelVersion.id == self.incident.model_version_id).first()
             
-            # Paths
             data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
             baseline_path = os.path.join(data_dir, f"{model.slug}_baseline.csv")
+            current_path = os.path.join(data_dir, f"{model.slug}_current.csv")
             patched_path = os.path.join(data_dir, f"{model.slug}_patched.csv")
             
-            if not os.path.exists(baseline_path) or not os.path.exists(patched_path):
+            if not os.path.exists(baseline_path) or not os.path.exists(current_path) or not os.path.exists(patched_path):
                 return {
                     "status": "skipped",
-                    "reason": "Baseline or patched dataset not found. ML evaluation requires predictions.",
-                    "run_id": None
+                    "reason": "Required datasets (baseline, current, patched) not found."
                 }
                 
-            # Run deterministic evaluation
-            run = run_monitoring_job(
-                db=self.db,
-                model_id=model.id,
-                model_version_id=version.id,
-                baseline_path=baseline_path,
-                current_path=patched_path,
-                target_col="target",
-                pred_col="prediction",
-                prob_col="probability"
-            )
+            b_df = pd.read_csv(baseline_path)
+            c_df = pd.read_csv(current_path)
+            p_df = pd.read_csv(patched_path)
             
+            b_metrics = calculate_classification_metrics(b_df, "target", "prediction", "probability")
+            c_metrics = calculate_classification_metrics(c_df, "target", "prediction", "probability")
+            p_metrics = calculate_classification_metrics(p_df, "target", "prediction", "probability")
+            
+            segments = [
+                {"name": "URL-heavy emails", "condition": "url_count > 2"},
+                {"name": "Normal emails", "condition": "url_count <= 2"}
+            ]
+            
+            b_seg = analyze_segments(b_df, b_df, "target", "prediction", segments)
+            c_seg = analyze_segments(b_df, c_df, "target", "prediction", segments)
+            p_seg = analyze_segments(b_df, p_df, "target", "prediction", segments)
+
             return {
                 "status": "passed",
-                "reason": "ML evaluation completed.",
-                "run_id": run.id
+                "metrics": {
+                    "baseline": b_metrics,
+                    "current": c_metrics,
+                    "patched": p_metrics
+                },
+                "segments": {
+                    "baseline": {s["segment_name"]: s["current_metric_value"] for s in b_seg},
+                    "current": {s["segment_name"]: s["current_metric_value"] for s in c_seg},
+                    "patched": {s["segment_name"]: s["current_metric_value"] for s in p_seg}
+                }
             }
         except Exception as e:
             return {
                 "status": "error",
-                "reason": str(e),
-                "run_id": None
+                "reason": str(e)
             }

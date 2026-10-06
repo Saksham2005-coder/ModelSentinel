@@ -49,6 +49,7 @@ class ValidationRunner:
             self._apply_patch(run)
             
             if run.status == "failed":
+                self._calculate_verdict(run)
                 return run
                 
             # 2. Static validation
@@ -57,6 +58,7 @@ class ValidationRunner:
             self._run_static_validation(run)
             
             if run.status == "failed":
+                self._calculate_verdict(run)
                 return run
                 
             # 3. Tests
@@ -65,6 +67,7 @@ class ValidationRunner:
             self._run_tests(run)
             
             if run.status == "failed":
+                self._calculate_verdict(run)
                 return run
                 
             # 4. ML Evaluation
@@ -85,16 +88,22 @@ class ValidationRunner:
             # Final Verdict
             self._calculate_verdict(run)
             
-            run.status = "completed"
+            if run.status != "failed":
+                run.status = "completed"
             
         except Exception as e:
             logger.error(f"Validation run failed: {traceback.format_exc()}")
             run.status = "failed"
             run.summary = f"Internal error during validation: {str(e)}"
             self._add_check(run, "custom", "Internal Error", "failed", str(e))
+            self._calculate_verdict(run)
         finally:
             run.completed_at = datetime.now(timezone.utc)
-            run.duration_ms = int((run.completed_at - run.started_at).total_seconds() * 1000)
+            start_tz = run.started_at
+            if start_tz and start_tz.tzinfo is None:
+                start_tz = start_tz.replace(tzinfo=timezone.utc)
+            if start_tz:
+                run.duration_ms = int((run.completed_at - start_tz).total_seconds() * 1000)
             self.db.commit()
             if self.env:
                 self.env.teardown()
@@ -153,48 +162,91 @@ class ValidationRunner:
         result = evaluator.evaluate()
         
         if result["status"] == "passed":
-            self._add_check(run, "ml_evaluation", "ML Recovery", "passed", "ML evaluation generated predictions.", result)
-            self._compare_metrics(run, result["run_id"])
+            self._add_check(run, "ml_evaluation", "ML Recovery", "passed", "ML evaluation completed successfully.", result)
+            self._process_metrics_and_segments(run, result)
         elif result["status"] == "skipped":
             self._add_check(run, "ml_evaluation", "ML Recovery", "skipped", result.get("reason", "Skipped"), result)
         else:
             self._add_check(run, "ml_evaluation", "ML Recovery", "failed", result.get("reason", "ML evaluation failed."), result)
             run.status = "failed"
             
-    def _compare_metrics(self, run: ValidationRun, monitoring_run_id: str):
-        # We need to compare metrics: Baseline vs Current (Incident) vs Patched (New Run)
-        # For simplicity, we just look at the new run and compare it to current metric of the model version
-        from app.models.monitoring import MetricResult
+    def _process_metrics_and_segments(self, run: ValidationRun, result: dict):
         from app.models.validation import ValidationMetric
         
-        # New metrics
-        patched_metrics = self.db.query(MetricResult).filter(MetricResult.run_id == monitoring_run_id).all()
+        metrics = result["metrics"]
+        b_m = metrics["baseline"]
+        c_m = metrics["current"]
+        p_m = metrics["patched"]
         
-        for pm in patched_metrics:
-            # Look for the current incident metric in IncidentSignals
-            # Or just check the most recent before this patch
-            # Since this is a demo, let's just use the patched value and assume it's better
+        # Populate Metrics
+        for m_name in b_m.keys():
+            b_val = b_m.get(m_name, 0.0)
+            c_val = c_m.get(m_name, 0.0)
+            p_val = p_m.get(m_name, 0.0)
             
-            # Create ValidationMetric
+            delta = p_val - c_val
+            
+            # Use ML_DEFAULT profile logic: minimum recovery = 0.85
+            # For simplicity, if patched_value is better than current and meets target, it's recovered
+            if p_val >= 0.85:
+                status = "recovered"
+            elif p_val > c_val:
+                status = "recovered" # Improved but maybe didn't hit 0.85
+            else:
+                status = "regressed"
+                
             vm = ValidationMetric(
                 validation_run_id=run.id,
-                metric_name=pm.metric_name,
-                baseline_value=0.0, # We don't have baseline easily accessible without querying
-                current_value=0.0,  # Same
-                patched_value=pm.value,
-                delta=0.0,
-                status="recovered" if pm.status in ["healthy", "passed"] else "regressed"
+                metric_name=m_name,
+                baseline_value=b_val,
+                current_value=c_val,
+                patched_value=p_val,
+                delta=delta,
+                status=status
             )
             self.db.add(vm)
+            
+        # Segments
+        segments = result["segments"]
+        b_s = segments["baseline"]
+        c_s = segments["current"]
+        p_s = segments["patched"]
+        
+        segment_regressed = False
+        for s_name in b_s.keys():
+            b_val = b_s.get(s_name, 0.0)
+            c_val = c_s.get(s_name, 0.0)
+            p_val = p_s.get(s_name, 0.0)
+            delta = p_val - c_val
+            
+            if p_val >= c_val:
+                status = "recovered"
+            else:
+                status = "regressed"
+                segment_regressed = True
+                
+            vm = ValidationMetric(
+                validation_run_id=run.id,
+                metric_name="f1_score",
+                baseline_value=b_val,
+                current_value=c_val,
+                patched_value=p_val,
+                delta=delta,
+                status=status,
+                segment_name=s_name
+            )
+            self.db.add(vm)
+            
         self.db.commit()
         
+        if segment_regressed:
+            self._add_check(run, "segment_regression", "Segment Recovery", "failed", "One or more segments regressed.")
+        else:
+            self._add_check(run, "segment_regression", "Segment Recovery", "passed", "All segments recovered.")
+            
     def _run_segment_regression(self, run: ValidationRun):
-        from app.models.monitoring import SegmentResult
-        from app.models.validation import ValidationMetric
-        
-        # In a real app we'd retrieve segment metrics from patched run and compare with baseline
-        # Here we just mark passed for simplicity in the demo
-        self._add_check(run, "segment_regression", "Segment Recovery", "passed", "All segments recovered.")
+        # Already handled in _process_metrics_and_segments for atomic DB commits
+        pass
         
     def _run_security_scan(self, run: ValidationRun):
         from app.validation.security import SecurityScanner
@@ -207,8 +259,6 @@ class ValidationRunner:
             self._add_check(run, "security", "Security Scan", "skipped", result.get("reason", "Skipped"), result)
         else:
             self._add_check(run, "security", "Security Scan", "failed", result.get("reason", "Security scan failed."), result)
-            # We don't automatically fail the whole run for security if it's just a warning, 
-            # but for this demo let's say we mark the run as failed if status is failed.
             if result["status"] == "failed":
                 run.status = "failed"
         
@@ -219,19 +269,30 @@ class ValidationRunner:
             return
             
         # Deterministic Verdict Logic
-        has_failed = any(c.status == "failed" for c in run.checks)
-        has_regressed = any(m.status == "regressed" for m in run.metrics)
-        has_recovered = any(m.status == "recovered" for m in run.metrics)
+        has_failed_checks = any(c.status == "failed" for c in run.checks)
+        overall_metrics = [m for m in run.metrics if not m.segment_name]
+        segment_metrics = [m for m in run.metrics if m.segment_name]
         
-        if has_failed:
+        primary_metric = next((m for m in overall_metrics if m.metric_name == "f1_score"), None)
+        
+        if has_failed_checks:
             run.verdict = "FAIL"
             run.summary = "Validation failed due to one or more check failures."
-        elif has_regressed and has_recovered:
+            return
+            
+        # Acceptance Criteria
+        if primary_metric:
+            if primary_metric.patched_value < 0.85:
+                run.verdict = "FAIL"
+                run.summary = f"F1 Score ({primary_metric.patched_value:.3f}) did not meet the 0.85 minimum recovery target."
+                return
+                
+        has_regressed_overall = any(m.status == "regressed" for m in overall_metrics)
+        has_regressed_segment = any(m.status == "regressed" for m in segment_metrics)
+        
+        if has_regressed_overall or has_regressed_segment:
             run.verdict = "PARTIAL"
-            run.summary = "Patch provides partial recovery but introduces regressions."
-        elif has_regressed:
-            run.verdict = "FAIL"
-            run.summary = "Patch introduced metric regressions without recovery."
+            run.summary = "Patch provides partial recovery but introduces regressions in secondary metrics or segments."
         else:
             run.verdict = "PASS"
-            run.summary = "All checks passed. Metrics successfully recovered."
+            run.summary = "All checks passed. Metrics successfully recovered without regression."
