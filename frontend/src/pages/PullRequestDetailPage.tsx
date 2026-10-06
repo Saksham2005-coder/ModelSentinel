@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
 import { IncidentApi, Incident } from '@/services/api/incidents';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
+import { changeRiskService, ChangeRiskAssessment } from '@/services/api/changeRisk';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, GitPullRequest, GitBranch, ShieldAlert, CheckCircle, XCircle, Rocket } from 'lucide-react';
@@ -13,6 +14,7 @@ export function PullRequestDetailPage() {
   const [pr, setPr] = useState<PullRequest | null>(null);
   const [incident, setIncident] = useState<Incident | null>(null);
   const [deployment, setDeployment] = useState<Deployment | null>(null);
+  const [riskAssessment, setRiskAssessment] = useState<ChangeRiskAssessment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +27,13 @@ export function PullRequestDetailPage() {
       
       const incData = await IncidentApi.getIncident(prData.incident_id);
       setIncident(incData);
+
+      try {
+        const risk = await changeRiskService.getAssessmentForPatch(prData.patch_proposal_id);
+        setRiskAssessment(risk);
+      } catch (e) {
+        console.warn("Could not load risk assessment");
+      }
 
       const deps = await DeploymentApi.getDeployments();
       const dep = deps.find(d => d.pull_request_id === prData.id);
@@ -182,6 +191,48 @@ export function PullRequestDetailPage() {
               View Full Gate Details
             </Button>
           </section>
+
+          {/* Change Risk */}
+          {riskAssessment && (
+            <section className="bg-surface border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5 text-brand" /> Change Risk
+              </h3>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-2xl font-bold text-text-primary">{riskAssessment.risk_score}</div>
+                <Badge variant={
+                  riskAssessment.risk_level === 'CRITICAL' ? 'danger' :
+                  riskAssessment.risk_level === 'HIGH' ? 'danger' :
+                  riskAssessment.risk_level === 'MODERATE' ? 'warning' : 'success'
+                }>
+                  {riskAssessment.risk_level} RISK
+                </Badge>
+              </div>
+              <div className="space-y-4 text-sm">
+                <div>
+                  <span className="text-text-secondary block mb-1">Blast Radius</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-background-base p-2 rounded text-center">
+                      <div className="text-text-muted text-xs">Files</div>
+                      <div className="font-medium">{riskAssessment.blast_radius.files.length}</div>
+                    </div>
+                    <div className="bg-background-base p-2 rounded text-center">
+                      <div className="text-text-muted text-xs">Models</div>
+                      <div className="font-medium">{riskAssessment.blast_radius.models.length}</div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-text-secondary block mb-1">Risk Factors</span>
+                  <ul className="text-text-primary space-y-1">
+                    {riskAssessment.factors.map((f, i) => (
+                      <li key={i} className="truncate text-xs" title={f.factor}>• {f.factor} (+{f.contribution})</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Incident Context */}
           <section className="bg-surface border border-border rounded-xl p-6">

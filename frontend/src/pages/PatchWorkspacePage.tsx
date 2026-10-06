@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Loader2, Code2, AlertTriangle, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { PatchesApi, PatchProposal } from '@/services/api/patches';
 import { InvestigationsApi } from '@/services/api/investigations';
+import { changeRiskService, ChangeRiskAssessment } from '@/services/api/changeRisk';
 
 export const PatchWorkspacePage: React.FC = () => {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -15,6 +16,7 @@ export const PatchWorkspacePage: React.FC = () => {
   const [investigationId, setInvestigationId] = useState<string | null>(null);
   const [patches, setPatches] = useState<PatchProposal[]>([]);
   const [activePatch, setActivePatch] = useState<PatchProposal | null>(null);
+  const [riskAssessment, setRiskAssessment] = useState<ChangeRiskAssessment | null>(null);
   
   const [generating, setGenerating] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -48,6 +50,16 @@ export const PatchWorkspacePage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (activePatch) {
+      changeRiskService.getAssessmentForPatch(activePatch.id)
+        .then(data => setRiskAssessment(data))
+        .catch(err => console.error("Failed to load risk assessment", err));
+    } else {
+      setRiskAssessment(null);
+    }
+  }, [activePatch]);
 
   const handleProposeFix = async () => {
     if (!investigationId) return;
@@ -185,6 +197,42 @@ export const PatchWorkspacePage: React.FC = () => {
                     </ul>
                   )}
                 </div>
+
+                {riskAssessment && (
+                  <div className="pt-4 border-t border-slate-800">
+                    <h3 className="font-semibold text-slate-300 mb-4">CHANGE RISK</h3>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="text-2xl font-bold text-slate-100">{riskAssessment.risk_score}</div>
+                      <Badge variant={
+                        riskAssessment.risk_level === 'CRITICAL' ? 'danger' :
+                        riskAssessment.risk_level === 'HIGH' ? 'danger' :
+                        riskAssessment.risk_level === 'MODERATE' ? 'warning' : 'success'
+                      }>
+                        {riskAssessment.risk_level} RISK
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-slate-400 block mb-1">Blast Radius</span>
+                        <ul className="text-slate-300 space-y-1">
+                          <li>{riskAssessment.blast_radius.files.length} files</li>
+                          <li>{riskAssessment.blast_radius.models.length} models</li>
+                          <li>{riskAssessment.blast_radius.regression_tests.length} regression tests</li>
+                          <li>{riskAssessment.blast_radius.historical_incidents.length} historical incidents</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block mb-1">Primary Risk Factors</span>
+                        <ul className="text-slate-300 space-y-1">
+                          {riskAssessment.factors.map((f, i) => (
+                            <li key={i} className="truncate" title={f.factor}>• {f.factor} (+{f.contribution})</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
