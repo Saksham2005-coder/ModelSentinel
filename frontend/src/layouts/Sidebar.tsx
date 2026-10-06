@@ -8,6 +8,7 @@ import {
   CheckSquare, 
   Rocket, 
   GitBranch, 
+  GitPullRequest,
   BrainCircuit, 
   Settings 
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Experiments', href: '/experiments', icon: TestTube2 },
   { name: 'Regression Tests', href: '/regression-tests', icon: CheckSquare },
   { name: 'Deployments', href: '/deployments', icon: Rocket },
+  { name: 'Pull Requests', href: '/pull-requests', icon: GitPullRequest },
   { name: 'Repository', href: '/repository', icon: GitBranch },
   { name: 'Incident Memory', href: '/incident-memory', icon: BrainCircuit },
 ];

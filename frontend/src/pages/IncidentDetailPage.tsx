@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { IncidentApi, IncidentDetail, IncidentEvent } from '@/services/api/incidents';
 import { ModelsApi, Model } from '@/services/api/models';
+import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
+import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, BrainCircuit, ShieldCheck, Link as LinkIcon } from 'lucide-react';
@@ -18,6 +20,9 @@ export function IncidentDetailPage() {
   const [similar, setSimilar] = useState<any[]>([]);
   const [eligibility, setEligibility] = useState<{eligible: boolean, reason: string} | null>(null);
   
+  const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
+
   const [activeTab, setActiveTab] = useState('Overview');
 
   const fetchIncident = useCallback(async () => {
@@ -34,6 +39,14 @@ export function IncidentDetailPage() {
         .then(res => res.json())
         .then(data => setSimilar(data || []))
         .catch(() => setSimilar([]));
+
+      PullRequestApi.getPullRequests().then(prs => {
+        setPullRequests(prs.filter(pr => pr.incident_id === incidentId));
+      }).catch(console.error);
+
+      DeploymentApi.getDeployments().then(deps => {
+        setDeployments(deps.filter(dep => dep.incident_id === incidentId));
+      }).catch(console.error);
         
       // Fetch eligibility if resolved
       if (inc.status === 'resolved') {
@@ -95,7 +108,7 @@ export function IncidentDetailPage() {
   if (error) return <div className="p-8 text-status-danger">{error}</div>;
   if (!incident) return <div className="p-8">Incident not found</div>;
 
-  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Timeline'];
+  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -263,6 +276,7 @@ export function IncidentDetailPage() {
             Incident Timeline
           </h2>
           <div className="border-l-2 border-border ml-3 space-y-8 py-4">
+            {/* Standard Events */}
             {incident.events.map((e: IncidentEvent) => (
               <div key={e.id} className="relative pl-8">
                 <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-brand" />
@@ -271,11 +285,36 @@ export function IncidentDetailPage() {
                 <p className="text-text-secondary mt-1">{e.message}</p>
               </div>
             ))}
+            
+            {/* Phase 10 Synthesized Events */}
+            {pullRequests.map(pr => (
+              <div key={pr.id} className="relative pl-8">
+                <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-amber-500" />
+                <div className="text-sm text-text-muted mb-1">{new Date(pr.created_at).toLocaleString()}</div>
+                <div className="font-medium text-text-primary">Pull Request Created</div>
+                <p className="text-text-secondary mt-1">
+                  Branch <span className="font-mono text-xs">{pr.branch_name}</span> generated for patch validation.
+                </p>
+                <Link to={`/pull-requests/${pr.id}`} className="text-brand text-sm hover:underline mt-1 inline-block">View Pull Request</Link>
+              </div>
+            ))}
+            {deployments.map(dep => (
+              <div key={dep.id} className="relative pl-8">
+                <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-purple-500" />
+                <div className="text-sm text-text-muted mb-1">{new Date(dep.created_at).toLocaleString()}</div>
+                <div className="font-medium text-text-primary">Deployment Gate Evaluated</div>
+                <p className="text-text-secondary mt-1">
+                  Status: <Badge variant={dep.status === 'ELIGIBLE' ? 'success' : 'danger'}>{dep.status}</Badge>
+                </p>
+                {dep.block_reason && <p className="text-status-danger text-sm mt-1">{dep.block_reason}</p>}
+                <Link to={`/deployment-gates/${dep.id}`} className="text-brand text-sm hover:underline mt-1 inline-block">View Gate Details</Link>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {['Investigation', 'Root Cause', 'Proposed Fix', 'Validation'].includes(activeTab) && (
+      {['Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery'].includes(activeTab) && (
         <div className="p-16 border border-border border-dashed rounded-xl flex flex-col items-center justify-center text-center">
           <AlertTriangle className="h-10 w-10 text-text-muted mb-4" />
           <h3 className="text-lg font-medium text-text-primary mb-2">
@@ -283,9 +322,14 @@ export function IncidentDetailPage() {
             {activeTab === 'Root Cause' && 'Root cause analysis not yet available'}
             {activeTab === 'Proposed Fix' && 'No fix has been generated'}
             {activeTab === 'Validation' && 'No validation run'}
+            {activeTab === 'Delivery' && (pullRequests.length > 0 ? (
+              <div className="flex flex-col gap-4 mt-4">
+                 <Link to={`/pull-requests/${pullRequests[0].id}`} className="px-4 py-2 bg-brand text-white rounded-md hover:bg-brand/90 transition-colors">Go to Pull Request</Link>
+              </div>
+            ) : 'No delivery artifacts available')}
           </h3>
           <p className="text-text-secondary max-w-sm">
-            This capability will be enabled in future phases of the incident lifecycle.
+            {activeTab !== 'Delivery' && 'This capability will be enabled in future phases of the incident lifecycle.'}
           </p>
         </div>
       )}

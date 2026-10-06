@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Box, AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
 import { ModelsApi, Model } from '@/services/api/models';
 import { IncidentApi, Incident } from '@/services/api/incidents';
+import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
+import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import {
   LineChart,
   Line,
@@ -45,21 +47,27 @@ export function DashboardPage() {
   const [models, setModels] = useState<Model[]>([]);
   const [memories, setMemories] = useState<any[]>([]);
   const [regressionCases, setRegressionCases] = useState<any[]>([]);
+  const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [incRes, modRes, memRes, regRes] = await Promise.all([
+        const [incRes, modRes, memRes, regRes, prRes, depRes] = await Promise.all([
           IncidentApi.getIncidents({ limit: 5 }),
           ModelsApi.getModels({}),
           fetch('http://localhost:8000/api/v1/memories').then(r => r.json()),
-          fetch('http://localhost:8000/api/v1/regression-tests').then(r => r.json())
+          fetch('http://localhost:8000/api/v1/regression-tests').then(r => r.json()),
+          PullRequestApi.getPullRequests(),
+          DeploymentApi.getDeployments(),
         ]);
         setIncidents(incRes);
         setModels(modRes.items);
         setMemories(memRes || []);
         setRegressionCases(regRes || []);
+        setPullRequests(prRes || []);
+        setDeployments(depRes || []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -87,7 +95,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         <MetricCard
           title="Total Models"
           value={models.length}
@@ -106,6 +114,16 @@ export function DashboardPage() {
         <MetricCard
           title="Regression Tests"
           value={regressionCases.length}
+          icon={Box}
+        />
+        <MetricCard
+          title="Pull Requests"
+          value={pullRequests.filter(pr => pr.status === 'CREATED').length}
+          icon={Box}
+        />
+        <MetricCard
+          title="Eligible Deployments"
+          value={deployments.filter(d => d.status === 'ELIGIBLE').length}
           icon={Box}
         />
       </div>

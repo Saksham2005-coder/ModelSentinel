@@ -15,3 +15,5 @@ from app.models.patch import PatchProposal, PatchFileChange, PatchReview # noqa
 from app.models.validation import ValidationRun, ValidationCheck, ValidationMetric, ValidationArtifact # noqa
 from app.models.incident_memory import IncidentMemory # noqa
 from app.models.regression import RegressionCase, RegressionRun, RegressionResult # noqa
+from app.models.pull_request import PullRequest # noqa
+from app.models.deployment import Deployment # noqa

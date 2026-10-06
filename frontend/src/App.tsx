@@ -15,6 +15,10 @@ import { ValidationWorkspacePage } from '@/pages/ValidationWorkspacePage';
 import { IncidentMemoryPage } from '@/pages/IncidentMemoryPage';
 import { RegressionSuitePage } from '@/pages/RegressionSuitePage';
 import { RegressionTestPage } from '@/pages/RegressionTestPage';
+import { PullRequestsPage } from '@/pages/PullRequestsPage';
+import { PullRequestDetailPage } from '@/pages/PullRequestDetailPage';
+import { DeploymentGatesPage } from '@/pages/DeploymentGatesPage';
+import { DeploymentGateDetailPage } from '@/pages/DeploymentGateDetailPage';
 
 function App() {
   return (
@@ -34,7 +38,10 @@ function App() {
           <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />
           <Route path="/regression-tests" element={<RegressionSuitePage />} />
           <Route path="/regression-tests/:id" element={<RegressionTestPage />} />
-          <Route path="/deployments" element={<PlaceholderPage title="Deployments" />} />
+          <Route path="/deployments" element={<DeploymentGatesPage />} />
+          <Route path="/deployment-gates/:id" element={<DeploymentGateDetailPage />} />
+          <Route path="/pull-requests" element={<PullRequestsPage />} />
+          <Route path="/pull-requests/:id" element={<PullRequestDetailPage />} />
           <Route path="/repository" element={<RepositoryPage />} />
           <Route path="/incident-memory" element={<IncidentMemoryPage />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
