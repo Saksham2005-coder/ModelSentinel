@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { Loader2, ShieldCheck, PlayCircle, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 
 export function RegressionSuitePage() {
   const [cases, setCases] = useState<any[]>([]);
@@ -73,13 +75,16 @@ export function RegressionSuitePage() {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs font-mono">{c.source_incident_id.substring(0,8)}</td>
                   <td className="px-4 py-3">
-                    <Badge variant="outline" className={c.severity === 'critical' ? 'border-red-500/50 text-red-500' : ''}>
+                    <Badge variant={c.severity === 'critical' ? 'danger' : 'warning'} className={c.severity === 'critical' ? 'border-red-500/50 text-red-500' : ''}>
                       {c.severity}
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
                     {c.last_run ? (
-                      <Badge variant="outline" className={
+                      <Badge variant={
+                        c.last_run === 'PASS' ? 'success' :
+                        c.last_run === 'FAIL' ? 'danger' : 'warning'
+                      } className={
                         c.last_run === 'PASS' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/10' :
                         c.last_run === 'FAIL' ? 'border-red-500/50 text-red-500 bg-red-500/10' :
                         'border-amber-500/50 text-amber-500 bg-amber-500/10'

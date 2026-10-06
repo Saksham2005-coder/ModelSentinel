@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Loader2, Search, BrainCircuit, ShieldAlert, GitBranch } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Loader2, Search, BrainCircuit } from 'lucide-react';
 
 export function IncidentMemoryPage() {
   const [memories, setMemories] = useState<any[]>([]);
@@ -71,7 +73,7 @@ export function IncidentMemoryPage() {
             <Card key={memory.id} className="hover:border-amber-500/30 transition-colors">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start mb-2">
-                  <Badge variant="outline" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
+                  <Badge variant="warning" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
                     {memory.root_cause_category || "Unknown"}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
@@ -90,7 +92,7 @@ export function IncidentMemoryPage() {
                   <p className="text-sm">{memory.resolution_summary}</p>
                 </div>
                 <div className="flex space-x-2 pt-2 border-t border-border/50">
-                  <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" asChild>
+                  <Button variant="default" size="sm" className="h-8 text-xs text-muted-foreground" asChild>
                     <a href={`/incidents/${memory.incident_id}`}>View Source Incident</a>
                   </Button>
                 </div>

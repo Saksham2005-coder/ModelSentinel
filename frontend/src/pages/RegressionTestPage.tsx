@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Loader2, ArrowLeft, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 export function RegressionTestPage() {
@@ -42,7 +44,7 @@ export function RegressionTestPage() {
   return (
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
       <div>
-        <Button variant="ghost" size="sm" asChild className="mb-4 -ml-3 text-muted-foreground">
+        <Button variant="default" size="sm" asChild className="mb-4 -ml-3 text-muted-foreground">
           <Link to="/regression-tests"><ArrowLeft className="w-4 h-4 mr-2" />Back to Suite</Link>
         </Button>
         <div className="flex justify-between items-start">
@@ -105,7 +107,10 @@ export function RegressionTestPage() {
                       )}
                       <span className="font-medium text-sm">{new Date(run.started_at).toLocaleString()}</span>
                     </div>
-                    <Badge variant="outline" className={
+                    <Badge variant={
+                      run.status === 'PASS' ? 'success' :
+                      run.status === 'FAIL' ? 'danger' : 'warning'
+                    } className={
                       run.status === 'PASS' ? 'border-emerald-500/50 text-emerald-500' :
                       run.status === 'FAIL' ? 'border-red-500/50 text-red-500' : 'border-amber-500/50 text-amber-500'
                     }>

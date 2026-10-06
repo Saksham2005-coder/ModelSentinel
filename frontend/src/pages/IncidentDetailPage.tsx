@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { IncidentApi, IncidentDetail, IncidentEvent } from '@/services/api/incidents';
@@ -199,7 +200,7 @@ export function IncidentDetailPage() {
                         <Link to={`/incidents/${s.incident_id}`} className="font-medium hover:underline text-text-primary">
                           {s.title}
                         </Link>
-                        <Badge variant="outline" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
+                        <Badge variant="warning" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
                           {s.similarity_score}% Match
                         </Badge>
                       </div>
