@@ -11,13 +11,15 @@ import {
   GitPullRequest,
   BrainCircuit, 
   Settings,
-  BarChart2
+  BarChart2,
+  ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Analytics', href: '/analytics', icon: BarChart2 },
+  { name: 'Change Risk', href: '/change-risk', icon: ShieldAlert },
   { name: 'Models', href: '/models', icon: Box },
   { name: 'Incidents', href: '/incidents', icon: AlertCircle },
   { name: 'Investigations', href: '/investigations', icon: Search },

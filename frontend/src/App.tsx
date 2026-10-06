@@ -21,6 +21,7 @@ import { DeploymentGatesPage } from '@/pages/DeploymentGatesPage';
 import { DeploymentGateDetailPage } from '@/pages/DeploymentGateDetailPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
 import { ModelAnalyticsDetailPage } from '@/pages/ModelAnalyticsDetailPage';
+import { ChangeRiskPage } from '@/pages/ChangeRiskPage';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
           
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/analytics/models/:modelId" element={<ModelAnalyticsDetailPage />} />
+          <Route path="/change-risk" element={<ChangeRiskPage />} />
           
           {/* Incident-specific sub-routes as placeholders */}
           <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />
