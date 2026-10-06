@@ -12,6 +12,9 @@ import { InvestigationPage } from '@/pages/InvestigationPage';
 import { RepositoryPage } from '@/pages/RepositoryPage';
 import { PatchWorkspacePage } from '@/pages/PatchWorkspacePage';
 import { ValidationWorkspacePage } from '@/pages/ValidationWorkspacePage';
+import { IncidentMemoryPage } from '@/pages/IncidentMemoryPage';
+import { RegressionSuitePage } from '@/pages/RegressionSuitePage';
+import { RegressionTestPage } from '@/pages/RegressionTestPage';
 
 function App() {
   return (
@@ -29,10 +32,11 @@ function App() {
           <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />
           <Route path="/investigations" element={<PlaceholderPage title="Investigations" />} />
           <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />
-          <Route path="/regression-tests" element={<PlaceholderPage title="Regression Tests" />} />
+          <Route path="/regression-tests" element={<RegressionSuitePage />} />
+          <Route path="/regression-tests/:id" element={<RegressionTestPage />} />
           <Route path="/deployments" element={<PlaceholderPage title="Deployments" />} />
           <Route path="/repository" element={<RepositoryPage />} />
-          <Route path="/incident-memory" element={<PlaceholderPage title="Incident Memory" />} />
+          <Route path="/incident-memory" element={<IncidentMemoryPage />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
           
           {/* Incident-specific sub-routes as placeholders */}

@@ -42,17 +42,23 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [models, setModels] = useState<Model[]>([]);
+  const [memories, setMemories] = useState<any[]>([]);
+  const [regressionCases, setRegressionCases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [incRes, modRes] = await Promise.all([
+        const [incRes, modRes, memRes, regRes] = await Promise.all([
           IncidentApi.getIncidents({ limit: 5 }),
-          ModelsApi.getModels({})
+          ModelsApi.getModels({}),
+          fetch('http://localhost:8000/api/v1/memories').then(r => r.json()),
+          fetch('http://localhost:8000/api/v1/regression-tests').then(r => r.json())
         ]);
         setIncidents(incRes);
         setModels(modRes.items);
+        setMemories(memRes || []);
+        setRegressionCases(regRes || []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -92,14 +98,14 @@ export function DashboardPage() {
           icon={AlertCircle}
         />
         <MetricCard
-          title="Critical Incidents"
-          value={activeIncidents.filter(i => i.severity === 'critical').length}
-          icon={AlertCircle}
+          title="Incident Memories"
+          value={memories.length}
+          icon={Box}
         />
         <MetricCard
-          title="Open PRs"
-          value="Not available"
-          icon={GitPullRequest}
+          title="Regression Tests"
+          value={regressionCases.length}
+          icon={Box}
         />
       </div>
 

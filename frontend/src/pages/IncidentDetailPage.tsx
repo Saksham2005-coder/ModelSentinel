@@ -4,7 +4,7 @@ import { IncidentApi, IncidentDetail, IncidentEvent } from '@/services/api/incid
 import { ModelsApi, Model } from '@/services/api/models';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, BrainCircuit, ShieldCheck, Link as LinkIcon } from 'lucide-react';
 
 export function IncidentDetailPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -13,6 +13,9 @@ export function IncidentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [similar, setSimilar] = useState<any[]>([]);
+  const [eligibility, setEligibility] = useState<{eligible: boolean, reason: string} | null>(null);
   
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -24,6 +27,20 @@ export function IncidentDetailPage() {
       setIncident(inc);
       const mod = await ModelsApi.getModel(inc.model_id);
       setModel(mod);
+      
+      // Fetch similar incidents
+      fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/similar`)
+        .then(res => res.json())
+        .then(data => setSimilar(data || []))
+        .catch(() => setSimilar([]));
+        
+      // Fetch eligibility if resolved
+      if (inc.status === 'resolved') {
+        fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/memory/eligibility`)
+          .then(res => res.json())
+          .then(data => setEligibility(data))
+          .catch(() => setEligibility(null));
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to fetch incident details');
     } finally {
@@ -35,7 +52,7 @@ export function IncidentDetailPage() {
     fetchIncident();
   }, [fetchIncident]);
 
-  const handleAction = async (action: 'acknowledge' | 'startInvestigation' | 'resolve' | 'suppress') => {
+  const handleAction = async (action: 'acknowledge' | 'startInvestigation' | 'resolve' | 'suppress' | 'learn') => {
     if (!incidentId) return;
     setActionLoading(true);
     try {
@@ -46,6 +63,25 @@ export function IncidentDetailPage() {
       }
       if (action === 'resolve') await IncidentApi.resolve(incidentId, 'Resolved via UI');
       if (action === 'suppress') await IncidentApi.suppress(incidentId);
+      if (action === 'learn') {
+        const memRes = await fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/memory`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            title: `Resolved: ${incident?.title}`,
+            resolution_summary: 'Fix restored model performance successfully'
+          })
+        });
+        if (memRes.ok) {
+          const data = await memRes.json();
+          // Create regression test automatically
+          await fetch(`http://localhost:8000/api/v1/memories/${data.id}/regression-case`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})
+          });
+        }
+      }
       await fetchIncident();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : `Failed to ${action} incident`);
@@ -106,6 +142,18 @@ export function IncidentDetailPage() {
                 </Button>
               </>
             )}
+            {incident.status === 'resolved' && eligibility?.eligible && (
+               <Button onClick={() => handleAction('learn')} disabled={actionLoading} className="bg-amber-600 hover:bg-amber-700 text-white">
+                 <BrainCircuit className="w-4 h-4 mr-2" />
+                 Learn From This Incident
+               </Button>
+            )}
+            {incident.status === 'resolved' && eligibility && !eligibility.eligible && eligibility.reason.includes("already exists") && (
+               <Button disabled className="bg-amber-500/20 text-amber-500 border-amber-500/50" variant="outline">
+                 <ShieldCheck className="w-4 h-4 mr-2" />
+                 Regression Coverage Created
+               </Button>
+            )}
           </div>
         </div>
       </div>
@@ -131,11 +179,44 @@ export function IncidentDetailPage() {
       </div>
 
       {activeTab === 'Overview' && (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-in fade-in duration-500">
           <div className="p-6 border border-border rounded-xl bg-surface-50">
             <h2 className="text-lg font-semibold mb-2">Summary</h2>
             <p className="text-text-secondary">{incident.summary || incident.title}</p>
           </div>
+
+          {similar.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <LinkIcon className="w-5 h-5 text-amber-500" />
+                Similar Incidents
+              </h2>
+              <div className="grid grid-cols-1 gap-4">
+                {similar.map((s, idx) => (
+                  <div key={idx} className="p-4 border border-border rounded-xl bg-surface flex justify-between items-center">
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <Link to={`/incidents/${s.incident_id}`} className="font-medium hover:underline text-text-primary">
+                          {s.title}
+                        </Link>
+                        <Badge variant="outline" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
+                          {s.similarity_score}% Match
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-text-secondary">
+                        <span className="font-medium">Previous Fix:</span> {s.resolution_summary || "N/A"}
+                      </p>
+                      <div className="mt-2 text-xs text-text-muted flex gap-2">
+                        {s.reasons.map((r: string, i: number) => (
+                          <span key={i} className="bg-surface-50 px-2 py-1 rounded-md">{r}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
