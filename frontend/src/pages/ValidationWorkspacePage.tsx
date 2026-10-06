@@ -54,18 +54,18 @@ export const ValidationWorkspacePage: React.FC = () => {
     try {
       // Find patch for this incident
       // For this demo, let's fetch the investigations, then patch
-      const invResponse = await fetchApi(`/incidents/${incidentId}/investigations`);
-      const activeInv = invResponse.find((i: {id: string, status: string}) => i.status === 'completed' || i.status === 'in_progress');
+      const invResponse = await fetchApi(`/incidents/${incidentId}/investigations`) as Array<{id: string, status: string}>;
+      const activeInv = invResponse.find(i => i.status === 'completed' || i.status === 'in_progress');
       if (!activeInv) {
         throw new Error('No active investigation found.');
       }
-      const patchResponse = await fetchApi(`/investigations/${activeInv.id}/patches`);
-      const approvedPatch = patchResponse.find((p: {id: string, status: string}) => p.status === 'approved');
+      const patchResponse = await fetchApi(`/investigations/${activeInv.id}/patches`) as Array<{id: string, status: string}>;
+      const approvedPatch = patchResponse.find(p => p.status === 'approved');
       if (!approvedPatch) {
         throw new Error('No approved patch found for validation.');
       }
 
-      const runsResponse = await fetchApi(`/patches/${approvedPatch.id}/validation`);
+      const runsResponse = await fetchApi(`/patches/${approvedPatch.id}/validation`) as ValidationRun[];
       setRuns(runsResponse);
       
       if (runsResponse.length > 0) {
@@ -81,9 +81,9 @@ export const ValidationWorkspacePage: React.FC = () => {
 
   const fetchRunDetails = async (runId: string) => {
     try {
-      const checksData = await fetchApi(`/validation/${runId}/checks`);
+      const checksData = await fetchApi(`/validation/${runId}/checks`) as ValidationCheck[];
       setChecks(checksData);
-      const metricsData = await fetchApi(`/validation/${runId}/metrics`);
+      const metricsData = await fetchApi(`/validation/${runId}/metrics`) as ValidationMetric[];
       setMetrics(metricsData);
     } catch (err) {
       console.error(err);
@@ -94,14 +94,16 @@ export const ValidationWorkspacePage: React.FC = () => {
     setTriggering(true);
     setError(null);
     try {
-      const invResponse = await fetchApi(`/incidents/${incidentId}/investigations`);
-      const activeInv = invResponse.find((i: {id: string, status: string}) => i.status === 'completed' || i.status === 'in_progress');
-      const patchResponse = await fetchApi(`/investigations/${activeInv.id}/patches`);
-      const approvedPatch = patchResponse.find((p: {id: string, status: string}) => p.status === 'approved');
+      const invResponse = await fetchApi(`/incidents/${incidentId}/investigations`) as Array<{id: string, status: string}>;
+      const activeInv = invResponse.find(i => i.status === 'completed' || i.status === 'in_progress');
+      const patchResponse = await fetchApi(`/investigations/${activeInv?.id}/patches`) as Array<{id: string, status: string}>;
+      const approvedPatch = patchResponse.find(p => p.status === 'approved');
       
-      await fetchApi(`/patches/${approvedPatch.id}/validation`, {
-        method: 'POST'
-      });
+      if (approvedPatch) {
+        await fetchApi(`/patches/${approvedPatch.id}/validation`, {
+          method: 'POST'
+        });
+      }
       setTimeout(() => {
         fetchValidationData();
       }, 2000); // Polling for demo
@@ -287,7 +289,7 @@ export const ValidationWorkspacePage: React.FC = () => {
                         {getStatusIcon(run.verdict || run.status)}
                       </div>
                       <div className="text-xs text-slate-500">
-                        {new Date(run.created_at).toLocaleString()}
+                        {new Date(run.started_at).toLocaleString()}
                       </div>
                     </button>
                   ))}
