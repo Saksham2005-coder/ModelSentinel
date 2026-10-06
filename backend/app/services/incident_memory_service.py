@@ -29,7 +29,11 @@ class IncidentMemoryService:
         if not active_inv:
             return {"eligible": False, "reason": "No active investigation found"}
             
-        approved_patch = next((p for p in active_inv.patches if p.status == "approved"), None)
+        from app.models.patch import PatchProposal
+        approved_patch = self.db.query(PatchProposal).filter(
+            PatchProposal.investigation_id == active_inv.id,
+            PatchProposal.status == "approved"
+        ).first()
         if not approved_patch:
             return {"eligible": False, "reason": "No approved patch found"}
             
