@@ -13,3 +13,5 @@ from app.models.investigation import Investigation, InvestigationEvent, Investig
 from app.models.repository import Repository, RepositorySnapshot, RepositoryFile, RepositorySymbol, RepositoryDependency # noqa
 from app.models.patch import PatchProposal, PatchFileChange, PatchReview # noqa
 from app.models.validation import ValidationRun, ValidationCheck, ValidationMetric, ValidationArtifact # noqa
+from app.models.incident_memory import IncidentMemory # noqa
+from app.models.regression import RegressionCase, RegressionRun, RegressionResult # noqa
