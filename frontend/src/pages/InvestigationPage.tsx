@@ -4,7 +4,7 @@ import { InvestigationsApi, InvestigationDetail } from '@/services/api/investiga
 import { IncidentApi, IncidentDetail } from '@/services/api/incidents';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Loader2, ArrowLeft, Play, AlertCircle, CheckCircle, ShieldAlert, FileText, Activity, Clock } from 'lucide-react';
+import { Loader2, ArrowLeft, Play, AlertCircle, CheckCircle, ShieldAlert, FileText, Activity, Clock, BrainCircuit, Link as LinkIcon } from 'lucide-react';
 
 interface RelevantFile {
   file_path: string;
@@ -17,6 +17,21 @@ interface RepoContext {
   relevant_files?: RelevantFile[];
 }
 
+interface SimilarIncident {
+  incident_id: string;
+  incident_key: string;
+  title: string;
+  similarity_score: number;
+  similarity_reasons?: string[];
+  resolution?: {
+    id: string;
+    summary: string;
+    effectiveness_score: number;
+    validation_status: string;
+  };
+  resolution_summary?: string;
+}
+
 export function InvestigationPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
   const [incident, setIncident] = useState<IncidentDetail | null>(null);
@@ -25,6 +40,7 @@ export function InvestigationPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedHypothesis, setSelectedHypothesis] = useState<string | null>(null);
   const [repoContext, setRepoContext] = useState<RepoContext | null>(null);
+  const [similar, setSimilar] = useState<SimilarIncident[]>([]);
 
   const fetchData = useCallback(async () => {
     if (!incidentId) return;
@@ -46,6 +62,16 @@ export function InvestigationPage() {
         }
       } catch (e) {
         console.error("Failed to fetch repository context", e);
+      }
+      
+      try {
+        const simRes = await fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/similar`);
+        if (simRes.ok) {
+          const simData = await simRes.json();
+          setSimilar(simData || []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch similar incidents", e);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -168,6 +194,51 @@ export function InvestigationPage() {
               ) : (
                 <div className="text-sm text-slate-500 italic">No direct code relevance found.</div>
               )}
+            </div>
+          )}
+          
+          {similar.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <h3 className="font-medium mb-3 flex items-center gap-2 text-amber-500">
+                <BrainCircuit className="w-4 h-4" /> Historical Context
+              </h3>
+              <div className="space-y-3">
+                {similar.slice(0, 3).map((s, idx) => (
+                  <div key={idx} className="p-3 border border-border rounded bg-surface-50 text-xs flex flex-col gap-2">
+                    <div className="flex justify-between items-start">
+                      <Link to={`/incidents/${s.incident_id}`} className="font-medium text-text-primary hover:underline" title={s.title}>
+                        {s.title.substring(0, 40)}{s.title.length > 40 ? '...' : ''}
+                      </Link>
+                      <Badge variant="warning" className="text-[10px] px-1 py-0 h-4 border-amber-500/50 text-amber-500 bg-amber-500/10">
+                        {s.similarity_score}%
+                      </Badge>
+                    </div>
+                    {s.resolution && s.resolution.effectiveness_score > 0 && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Badge variant={(s.resolution?.effectiveness_score ?? 0) > 70 ? "success" : "warning"} className="text-[10px] px-1 py-0 h-4">
+                          {s.resolution?.effectiveness_score ?? 0} Effectiveness
+                        </Badge>
+                      </div>
+                    )}
+                    <div className="text-text-secondary mt-1">
+                      <span className="font-medium text-text-muted">Fix:</span> {s.resolution?.summary || s.resolution_summary || "N/A"}
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {s.similarity_reasons && s.similarity_reasons.slice(0, 2).map((r: string, i: number) => (
+                         <span key={i} className="bg-surface border border-border px-1 py-0.5 rounded text-[10px] text-text-muted">{r.replace(/^\+\d+\s/, '')}</span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 text-[10px] mt-1 border-t border-border pt-1">
+                      <Link to={`/incidents/${s.incident_id}`} className="text-brand hover:underline flex items-center gap-1">
+                        <LinkIcon className="w-3 h-3" /> Incident
+                      </Link>
+                      <Link to={`/incidents/${s.incident_id}?tab=Validation`} className="text-brand hover:underline flex items-center gap-1">
+                        <LinkIcon className="w-3 h-3" /> Validation
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

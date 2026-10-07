@@ -119,6 +119,24 @@ class PullRequestService:
         
         self.db.add(pr)
         self.db.commit()
+        
+        from app.services.reliability_service import reliability_service
+        pr_event = reliability_service.emit_event(
+            db=self.db,
+            model_id=incident.model_id,
+            model_version_id=incident.model_version_id,
+            event_type="PULL_REQUEST_CREATED",
+            source_type="pull_request",
+            source_id=pr.id,
+            title="Pull Request Created",
+            summary=f"Automated PR #{pr.provider_pr_id} created for incident {incident.incident_key}",
+            status="active"
+        )
+        
+        val_event = reliability_service.find_event_by_source(self.db, "validation", val_run.id, "VALIDATION_COMPLETED")
+        if val_event:
+            reliability_service.link_events(self.db, val_event.id, pr_event.id, "TRIGGERED_BY")
+            
         return pr
 
     def sync_pr_status(self, pr_id: str):

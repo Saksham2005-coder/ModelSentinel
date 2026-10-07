@@ -16,6 +16,8 @@ class Deployment(Base):
     status = Column(String, nullable=False) # ELIGIBLE, BLOCKED, APPROVED, DEPLOYED, VERIFYING, HEALTHY, DEGRADED, FAILED
     gate_result = Column(String, nullable=False) # JSON dump of gate evaluations
     block_reason = Column(String, nullable=True)
+    policy_result = Column(String, nullable=True) # JSON dump of policy evaluation
+    policy_evaluation_id = Column(String, ForeignKey("policy_evaluations.id"), nullable=True)
 
     deployed_at = Column(DateTime, nullable=True)
     environment = Column(String, nullable=True)

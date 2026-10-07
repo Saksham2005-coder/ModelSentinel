@@ -42,11 +42,19 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
           <Link to="/analytics" className="inline-flex items-center text-sm font-medium text-neutral-400 hover:text-white mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <Activity className="w-8 h-8 text-indigo-400" />
-            Model Reliability Detail
-          </h1>
-          <p className="text-neutral-400 mt-1">Deterministic performance breakdown for the selected model.</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                <Activity className="w-8 h-8 text-indigo-400" />
+                Model Reliability Overview
+              </h1>
+              <p className="text-neutral-400 mt-1">Deterministic performance breakdown for the selected model.</p>
+            </div>
+            <Link to={`/models/${modelId}/reliability`} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors flex items-center gap-2 font-medium">
+              <Clock className="w-4 h-4" />
+              View Reliability Timeline
+            </Link>
+          </div>
         </div>
 
         {/* Score Breakdown */}

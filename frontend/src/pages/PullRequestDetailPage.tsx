@@ -176,6 +176,27 @@ export function PullRequestDetailPage() {
               </div>
             </div>
 
+            {deployment?.policy_result && (
+              <div className="mt-4 pt-4 border-t border-border/50 text-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-text-primary">Policy Evaluation: {deployment.policy_result.matched_policy || 'Default'}</span>
+                  <Badge variant={
+                    deployment.policy_result.result === 'ALLOW' ? 'success' :
+                    deployment.policy_result.result === 'BLOCK' ? 'danger' : 'warning'
+                  }>
+                    {deployment.policy_result.result}
+                  </Badge>
+                </div>
+                {deployment.policy_result.blocking_rules?.length > 0 && (
+                  <ul className="list-disc pl-4 mt-2 text-status-danger text-xs">
+                    {deployment.policy_result.blocking_rules.map((r: Record<string, unknown>, i: number) => (
+                      <li key={i}>{String(r.type)}: expected {String(r.operator)} {String(r.required)}, got {String(r.actual)}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
             <div className="pt-4 border-t border-border/50">
               <p className={`font-bold text-lg text-center ${deployment?.status === 'ELIGIBLE' ? 'text-status-success' : 'text-status-danger'}`}>
                 {deployment?.status === 'ELIGIBLE' ? 'DEPLOYMENT ELIGIBLE' : 'DEPLOYMENT BLOCKED'}

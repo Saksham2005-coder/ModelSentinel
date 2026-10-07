@@ -41,6 +41,24 @@ class RegressionService:
         self.db.add(case)
         self.db.commit()
         self.db.refresh(case)
+        
+        from app.services.reliability_service import reliability_service
+        reg_event = reliability_service.emit_event(
+            db=self.db,
+            model_id=memory.model_id,
+            model_version_id=memory.model_version_id,
+            event_type="REGRESSION_LEARNED",
+            source_type="regression_case",
+            source_id=case.id,
+            title="Regression Test Learned",
+            summary=f"Incident memory captured as a formal regression test: {case.name}",
+            status="active"
+        )
+        
+        inc_event = reliability_service.find_event_by_source(self.db, "incident", memory.incident_id, "INCIDENT_CREATED")
+        if inc_event:
+            reliability_service.link_events(self.db, inc_event.id, reg_event.id, "RESULTED_IN")
+            
         return case
 
     def record_run_result(self, case_id: str, validation_run_id: str, evaluator_result: Dict[str, Any]) -> RegressionRun:

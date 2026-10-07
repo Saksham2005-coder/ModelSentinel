@@ -29,6 +29,7 @@ export interface Deployment {
   status: string;
   gate_result: DeploymentGateResult;
   block_reason?: string;
+  policy_result?: any;
   approved_by?: string;
   deployed_at?: string;
   environment?: string;

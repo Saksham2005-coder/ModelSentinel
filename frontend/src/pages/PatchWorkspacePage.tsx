@@ -7,6 +7,21 @@ import { Loader2, Code2, AlertTriangle, CheckCircle2, XCircle, RefreshCw } from 
 import { PatchesApi, PatchProposal } from '@/services/api/patches';
 import { InvestigationsApi } from '@/services/api/investigations';
 import { changeRiskService, ChangeRiskAssessment } from '@/services/api/changeRisk';
+import { fetchApi } from '@/services/api/client';
+
+export interface PolicyRule {
+  type: string;
+  operator: string;
+  required: string | number | boolean;
+  actual?: string | number | boolean;
+  value?: string | number | boolean;
+}
+
+export interface PolicyEvalResult {
+  matched_policy: string;
+  result: string;
+  blocking_rules: PolicyRule[];
+}
 
 export const PatchWorkspacePage: React.FC = () => {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -17,6 +32,7 @@ export const PatchWorkspacePage: React.FC = () => {
   const [patches, setPatches] = useState<PatchProposal[]>([]);
   const [activePatch, setActivePatch] = useState<PatchProposal | null>(null);
   const [riskAssessment, setRiskAssessment] = useState<ChangeRiskAssessment | null>(null);
+  const [policyResult, setPolicyResult] = useState<PolicyEvalResult | null>(null);
   
   const [generating, setGenerating] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -55,9 +71,14 @@ export const PatchWorkspacePage: React.FC = () => {
     if (activePatch) {
       changeRiskService.getAssessmentForPatch(activePatch.id)
         .then(data => setRiskAssessment(data))
-        .catch(err => console.error("Failed to load risk assessment", err));
+        .catch((err: unknown) => console.error("Failed to load risk assessment", err));
+        
+      fetchApi<PolicyEvalResult>(`/policies/evaluate-patch/${activePatch.id}`, { method: 'POST' })
+        .then(res => setPolicyResult(res))
+        .catch((err: unknown) => console.error("Failed to evaluate policy", err));
     } else {
       setRiskAssessment(null);
+      setPolicyResult(null);
     }
   }, [activePatch]);
 
@@ -197,6 +218,37 @@ export const PatchWorkspacePage: React.FC = () => {
                     </ul>
                   )}
                 </div>
+
+                {policyResult && (
+                  <div className="pt-4 border-t border-slate-800">
+                    <h3 className="font-semibold text-slate-300 mb-2">Policy Check</h3>
+                    <div className="flex items-center justify-between bg-slate-950 p-4 rounded-md border border-slate-800">
+                      <div>
+                        <span className="text-slate-400 text-sm block">Evaluated by: {policyResult.matched_policy || 'Default'}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="font-semibold text-slate-200">Result:</span>
+                          <Badge variant={
+                            policyResult.result === 'ALLOW' ? 'success' :
+                            policyResult.result === 'BLOCK' ? 'danger' : 'warning'
+                          }>
+                            {policyResult.result}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      {policyResult.blocking_rules?.length > 0 && (
+                        <div className="text-sm">
+                          <span className="text-rose-400 block mb-1">Failed Rules:</span>
+                          <ul className="list-disc pl-4 text-slate-400">
+                            {policyResult.blocking_rules.map((r: PolicyRule, i: number) => (
+                              <li key={i}>{r.type}: expected {r.operator} {r.required}, got {r.actual}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {riskAssessment && (
                   <div className="pt-4 border-t border-slate-800">

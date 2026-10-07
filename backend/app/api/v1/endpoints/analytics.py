@@ -66,3 +66,10 @@ def get_fix_effectiveness(
     time_range_days: Optional[int] = Query(None)
 ) -> Any:
     return ReliabilityAnalyticsService.get_fix_effectiveness(db, time_range_days)
+
+@router.get("/policies")
+def get_policy_metrics(
+    db: Session = Depends(get_db),
+    time_range_days: Optional[int] = Query(None)
+) -> Any:
+    return ReliabilityAnalyticsService.get_policy_metrics(db, time_range_days)

@@ -7,8 +7,10 @@ import datetime
 from app.db.session import SessionLocal
 from app.services.incident_memory_service import IncidentMemoryService
 from app.services.similarity_service import SimilarityService
+from app.services.resolution_memory_service import resolution_memory_service
 from app.models.incident import Incident
 from app.models.incident_memory import IncidentMemory
+from app.models.resolution_memory import ResolutionMemory
 
 router = APIRouter()
 
@@ -44,7 +46,13 @@ def list_memories(db: Session = Depends(get_db)):
             "model_id": m.model_id,
             "affected_segments": m.affected_segments,
             "resolution_summary": m.resolution_summary,
-            "created_at": m.created_at.isoformat() if m.created_at else None
+            "created_at": m.created_at.isoformat() if m.created_at else None,
+            "resolution": {
+                "effectiveness_score": m.resolution[0].effectiveness_score if m.resolution else 0,
+                "validation_status": m.resolution[0].validation_status if m.resolution else None,
+                "deployment_status": m.resolution[0].deployment_status if m.resolution else None,
+                "post_deployment_status": m.resolution[0].post_deployment_status if m.resolution else None,
+            } if m.resolution else None
         } for m in memories
     ]
 
@@ -71,20 +79,30 @@ def get_similar_incidents(incident_id: str, db: Session = Depends(get_db)):
     if not incident:
         raise HTTPException(status_code=404, detail="Incident not found")
         
-    svc = SimilarityService(db)
-    results = svc.find_similar_memories_for_incident(incident)
-    
-    # Format for frontend
-    out = []
-    for r in results:
-        mem = r["memory"]
-        out.append({
-            "incident_id": mem.incident_id,
-            "memory_id": mem.id,
-            "title": mem.title,
-            "similarity_score": r["similarity_score"],
-            "reasons": r["reasons"],
-            "root_cause": mem.root_cause,
-            "resolution_summary": mem.resolution_summary
-        })
-    return out
+    results = resolution_memory_service.get_similar_incidents(db, incident_id)
+    return results
+
+@router.get("/incidents/{incident_id}/resolution-memory")
+def get_incident_resolution_memory(incident_id: str, db: Session = Depends(get_db)):
+    # Get the memory for the incident, if it exists
+    memory = db.query(IncidentMemory).filter(IncidentMemory.incident_id == incident_id).first()
+    if not memory:
+        raise HTTPException(status_code=404, detail="No incident memory found for this incident")
+        
+    rm = resolution_memory_service.generate_resolution_memory(db, memory.id)
+    if not rm:
+        raise HTTPException(status_code=404, detail="Resolution memory could not be generated")
+        
+    return rm
+
+@router.get("/resolution-memory")
+def list_resolution_memories(db: Session = Depends(get_db)):
+    rms = db.query(ResolutionMemory).order_by(ResolutionMemory.created_at.desc()).all()
+    return rms
+
+@router.get("/resolution-memory/{id}")
+def get_resolution_memory(id: str, db: Session = Depends(get_db)):
+    rm = db.query(ResolutionMemory).filter(ResolutionMemory.id == id).first()
+    if not rm:
+        raise HTTPException(status_code=404, detail="Resolution memory not found")
+    return rm

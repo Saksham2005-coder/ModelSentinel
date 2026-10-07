@@ -8,6 +8,7 @@ from app.models.incident_memory import IncidentMemory
 from app.models.regression import RegressionCase
 from app.models.patch import PatchProposal
 from app.models.validation import ValidationRun
+from app.models.investigation import Investigation
 from app.services.reliability_analytics_service import ReliabilityAnalyticsService
 import uuid
 
@@ -40,7 +41,16 @@ def create_incident(db: Session, status="resolved", severity="high", age_days=1,
     db.commit()
     return inc
 
+def cleanup(db: Session):
+    db.query(Incident).delete()
+    db.query(Investigation).delete()
+    db.query(Deployment).delete()
+    db.query(PatchProposal).delete()
+    db.query(ValidationRun).delete()
+    db.commit()
+
 def test_overview_metrics_empty(db: Session):
+    cleanup(db)
     res = ReliabilityAnalyticsService.get_overview_metrics(db)
     assert res["total_incidents"] == 0
     assert res["mttd_minutes"] is None
@@ -48,6 +58,7 @@ def test_overview_metrics_empty(db: Session):
     assert res["reliability_score"] == 100
 
 def test_overview_metrics_populated(db: Session):
+    cleanup(db)
     i1 = create_incident(db, status="resolved", severity="critical", age_days=2)
     i2 = create_incident(db, status="investigating", severity="high", age_days=1, model_id=i1.model_id)
 
@@ -66,14 +77,17 @@ def test_model_reliability_empty(db: Session):
     assert isinstance(res, list)
 
 def test_root_cause_trends_empty(db: Session):
+    cleanup(db)
     res = ReliabilityAnalyticsService.get_root_cause_trends(db)
     assert res == []
 
 def test_deployment_health_empty(db: Session):
+    cleanup(db)
     res = ReliabilityAnalyticsService.get_deployment_health(db)
     assert res["total_deployments"] == 0
 
 def test_fix_effectiveness_empty(db: Session):
+    cleanup(db)
     res = ReliabilityAnalyticsService.get_fix_effectiveness(db)
     assert res["patch_validation_success_rate"] == 0
     assert res["full_loop_completion_rate"] == 0

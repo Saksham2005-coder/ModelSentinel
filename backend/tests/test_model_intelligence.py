@@ -154,3 +154,32 @@ def test_feature_and_segment_health(db, test_model):
     s_health = model_intelligence_service.get_segment_health(db, m.id)
     assert len(s_health) == 1
     assert s_health[0]["segment_name"] == "age>50"
+
+def test_model_health_history(db, test_model):
+    from datetime import datetime, timedelta, timezone
+    m, mv = test_model
+    now = datetime.now(timezone.utc)
+    
+    # Run 1: 10 days ago
+    run1 = MonitoringRun(model_id=m.id, model_version_id=mv.id, run_type="batch", status="completed", completed_at=now - timedelta(days=10))
+    db.add(run1)
+    db.commit()
+    
+    # Run 2: 5 days ago
+    run2 = MonitoringRun(model_id=m.id, model_version_id=mv.id, run_type="batch", status="completed", completed_at=now - timedelta(days=5))
+    db.add(run2)
+    db.commit()
+    
+    # Add an incident around run 2
+    inc = Incident(model_id=m.id, model_version_id=mv.id, incident_key="INC-HIST1", title="Hist", severity="high", status="active", category="data_drift", created_at=now - timedelta(days=5, hours=2))
+    db.add(inc)
+    db.commit()
+    
+    history = model_intelligence_service.get_model_health_history(db, m.id, days=30)
+    assert len(history) == 2
+    
+    # First run history should have 0 incidents created
+    assert history[0]["incidents_created"] == 0
+    
+    # Second run history should have 1 incident created
+    assert history[1]["incidents_created"] == 1

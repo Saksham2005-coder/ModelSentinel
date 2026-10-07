@@ -12,6 +12,14 @@ export interface ModelHealth {
   };
 }
 
+export interface ModelHealthHistory {
+  timestamp: string;
+  score: number;
+  status: 'HEALTHY' | 'STABLE' | 'DEGRADED' | 'CRITICAL';
+  incidents_created: number;
+  deployments: number;
+}
+
 export interface FeatureHealth {
   feature_name: string;
   feature_type: string;
@@ -47,16 +55,18 @@ export interface VersionComparisonResult {
 
 export interface ModelIntelligence {
   health: ModelHealth;
+  history: ModelHealthHistory[];
   features: FeatureHealth[];
   segments: SegmentHealth[];
 }
 
 export class IntelligenceApi {
-  static async getModelIntelligence(modelId: string): Promise<ModelIntelligence> {
-    return fetchApi(`/models/${modelId}/intelligence`);
+  static async getModelIntelligence(modelId: string, days: number = 30): Promise<ModelIntelligence> {
+    return fetchApi(`/models/${modelId}/intelligence?days=${days}`);
   }
 
   static async getVersionComparison(modelId: string, v1: string, v2: string): Promise<VersionComparisonResult> {
     return fetchApi(`/models/${modelId}/versions/compare?v1=${v1}&v2=${v2}`);
   }
 }
+

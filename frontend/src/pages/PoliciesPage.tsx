@@ -1,13 +1,32 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { ShieldCheck, ShieldAlert, Plus, Activity } from 'lucide-react';
-import { api } from '@/lib/api';
+import { fetchApi } from '@/services/api/client';
+
+export interface PolicyRule {
+  type: string;
+  operator: string;
+  required?: string | number | boolean;
+  actual?: string | number | boolean;
+  value?: string | number | boolean;
+}
+
+export interface ReliabilityPolicy {
+  id: string;
+  name: string;
+  description: string;
+  scope: string;
+  environment?: string;
+  priority: number;
+  enabled: boolean;
+  rules: PolicyRule[];
+}
 
 export function PoliciesPage() {
-  const [policies, setPolicies] = useState<any[]>([]);
+  const [policies, setPolicies] = useState<ReliabilityPolicy[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,7 +35,7 @@ export function PoliciesPage() {
 
   const fetchPolicies = async () => {
     try {
-      const { data } = await api.get('/policies');
+      const data = await fetchApi<ReliabilityPolicy[]>('/policies');
       setPolicies(data);
     } catch (err) {
       console.error(err);
@@ -92,11 +111,11 @@ export function PoliciesPage() {
                     </Link>
                   </CardTitle>
                   <div className="flex gap-2 mt-2">
-                    <Badge variant={policy.enabled ? 'default' : 'secondary'}>
+                    <Badge variant={policy.enabled ? 'default' : 'default'}>
                       {policy.enabled ? 'Enabled' : 'Disabled'}
                     </Badge>
-                    <Badge variant="outline">{policy.scope}</Badge>
-                    {policy.environment && <Badge variant="outline">{policy.environment}</Badge>}
+                    <Badge variant="default">{policy.scope}</Badge>
+                    {policy.environment && <Badge variant="default">{policy.environment}</Badge>}
                   </div>
                 </div>
                 <Button variant="outline" asChild>

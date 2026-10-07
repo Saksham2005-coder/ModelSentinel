@@ -13,7 +13,8 @@ import {
   Settings,
   BarChart2,
   ShieldAlert,
-  ShieldCheck
+  ShieldCheck,
+  Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +24,7 @@ const navigation = [
   { name: 'Change Risk', href: '/change-risk', icon: ShieldAlert },
   { name: 'Policies', href: '/policies', icon: ShieldCheck },
   { name: 'Models', href: '/models', icon: Box },
+  { name: 'Telemetry', href: '/telemetry', icon: Activity },
   { name: 'Incidents', href: '/incidents', icon: AlertCircle },
   { name: 'Investigations', href: '/investigations', icon: Search },
   { name: 'Experiments', href: '/experiments', icon: TestTube2 },

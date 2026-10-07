@@ -28,6 +28,7 @@ import { TelemetryWorkspacePage } from '@/pages/TelemetryWorkspacePage';
 import { TelemetryDetailPage } from '@/pages/TelemetryDetailPage';
 import ReliabilityTimelinePage from '@/pages/model/ReliabilityTimelinePage';
 import { ModelIntelligencePage } from '@/pages/model/ModelIntelligencePage';
+import { VersionComparisonPage } from '@/pages/model/VersionComparisonPage';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="/models" element={<ModelsPage />} />
           <Route path="/models/:modelId/monitoring" element={<MonitoringPage />} />
           <Route path="/models/:modelId/intelligence" element={<ModelIntelligencePage />} />
+          <Route path="/models/:modelId/compare" element={<VersionComparisonPage />} />
           <Route path="/models/:id/reliability" element={<ReliabilityTimelinePage />} />
           <Route path="/incidents" element={<IncidentsPage />} />
           <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />

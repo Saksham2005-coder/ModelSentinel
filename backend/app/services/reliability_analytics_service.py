@@ -11,7 +11,9 @@ from app.models.regression import RegressionRun, RegressionCase
 from app.models.deployment import Deployment
 from app.models.deployment_verification import DeploymentVerification
 from app.models.model import Model
+from app.models.model import Model
 from app.models.incident_memory import IncidentMemory
+from app.models.policy import PolicyEvaluation
 
 class ReliabilityAnalyticsService:
 
@@ -263,4 +265,25 @@ class ReliabilityAnalyticsService:
                 "deployed": deployed,
                 "verified_healthy": verified_healthy
             }
+        }
+
+    @classmethod
+    def get_policy_metrics(cls, db: Session, time_range_days: Optional[int] = None) -> Dict[str, Any]:
+        q_eval = db.query(PolicyEvaluation)
+        q_eval = cls._apply_time_filter(q_eval, PolicyEvaluation.evaluated_at, time_range_days)
+        
+        total = q_eval.count()
+        allowed = q_eval.filter(PolicyEvaluation.result == "ALLOW").count()
+        blocked = q_eval.filter(PolicyEvaluation.result == "BLOCK").count()
+        review_required = q_eval.filter(PolicyEvaluation.result == "REVIEW_REQUIRED").count()
+        
+        # Breakdown by target type
+        target_dist = db.query(PolicyEvaluation.target_type, func.count(PolicyEvaluation.id)).group_by(PolicyEvaluation.target_type).all()
+        
+        return {
+            "total_evaluations": total,
+            "allowed": allowed,
+            "blocked": blocked,
+            "review_required": review_required,
+            "target_distribution": [{"name": s[0], "value": s[1]} for s in target_dist]
         }

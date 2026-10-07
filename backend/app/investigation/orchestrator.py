@@ -94,6 +94,23 @@ class InvestigationOrchestrator:
             
             self._add_event("status_change", "Investigation Started", "The AI investigation engine has started.")
 
+            from app.services.reliability_service import reliability_service
+            inv_event = reliability_service.emit_event(
+                db=self.db,
+                model_id=self.incident.model_id,
+                model_version_id=self.incident.model_version_id,
+                event_type="INVESTIGATION_STARTED",
+                source_type="investigation",
+                source_id=self.investigation_id,
+                title="AI Investigation Started",
+                summary="AI investigation engine launched to find root cause.",
+                status="running"
+            )
+            # Link to incident
+            inc_event = reliability_service.find_event_by_source(self.db, "incident", self.incident.id, "INCIDENT_CREATED")
+            if inc_event:
+                reliability_service.link_events(self.db, inc_event.id, inv_event.id, "RESULTED_IN")
+
             # 1. LOAD INCIDENT
             if not self.incident:
                 raise ValueError("Incident not found")
@@ -222,6 +239,22 @@ class InvestigationOrchestrator:
             if has_supported:
                 self.inv.status = "completed"
                 self._add_event("investigation_completed", "Investigation Completed", "Completed with sufficient evidence.")
+                
+                from app.services.reliability_service import reliability_service
+                rc_event = reliability_service.emit_event(
+                    db=self.db,
+                    model_id=self.incident.model_id,
+                    model_version_id=self.incident.model_version_id,
+                    event_type="ROOT_CAUSE_IDENTIFIED",
+                    source_type="investigation",
+                    source_id=self.investigation_id,
+                    title="Root Cause Identified",
+                    summary=self.inv.summary or "Root cause found by AI investigation.",
+                    status="success"
+                )
+                inv_event_start = reliability_service.find_event_by_source(self.db, "investigation", self.investigation_id, "INVESTIGATION_STARTED")
+                if inv_event_start:
+                    reliability_service.link_events(self.db, inv_event_start.id, rc_event.id, "RESULTED_IN")
             else:
                 self.inv.status = "completed_with_insufficient_evidence"
                 self._add_event("investigation_completed", "Investigation Completed (Insufficient Evidence)", "Completed but lacked evidence to support hypotheses.")

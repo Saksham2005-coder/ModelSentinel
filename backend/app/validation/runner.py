@@ -108,6 +108,22 @@ class ValidationRunner:
             if self.env:
                 self.env.teardown()
                 
+            from app.services.reliability_service import reliability_service
+            val_event = reliability_service.emit_event(
+                db=self.db,
+                model_id=self.patch.incident.model_id,
+                model_version_id=self.patch.incident.model_version_id,
+                event_type="VALIDATION_COMPLETED",
+                source_type="validation",
+                source_id=run.id,
+                title=f"Validation {run.verdict or 'FAILED'}",
+                summary=run.summary or f"Validation finished with status {run.status}",
+                status="success" if run.verdict == "PASS" else ("warning" if run.verdict == "PARTIAL" else "error")
+            )
+            patch_event = reliability_service.find_event_by_source(self.db, "patch", self.patch.id, "PATCH_PROPOSED")
+            if patch_event:
+                reliability_service.link_events(self.db, patch_event.id, val_event.id, "VALIDATED_BY")
+                
         return run
 
     def _apply_patch(self, run: ValidationRun):

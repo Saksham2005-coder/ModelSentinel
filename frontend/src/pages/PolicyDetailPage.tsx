@@ -1,31 +1,61 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle2, AlertCircle, Info } from 'lucide-react';
-import { api } from '@/lib/api';
-import { formatDistanceToNow } from 'date-fns';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { fetchApi } from '@/services/api/client';
+
+export interface PolicyRule {
+  type: string;
+  operator: string;
+  required?: string | number | boolean;
+  actual?: string | number | boolean;
+  value?: string | number | boolean;
+}
+
+export interface ReliabilityPolicy {
+  id: string;
+  name: string;
+  description: string;
+  scope: string;
+  environment?: string;
+  priority: number;
+  enabled: boolean;
+  rules: PolicyRule[];
+}
+
+export interface PolicyEvaluation {
+  id: string;
+  target_type: string;
+  target_id: string;
+  evaluated_at: string;
+  result: string;
+}
+
+export interface PolicyDetailData {
+  policy: ReliabilityPolicy;
+  recent_evaluations: PolicyEvaluation[];
+}
 
 export function PolicyDetailPage() {
   const { id } = useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<PolicyDetailData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchPolicy = async () => {
+      try {
+        const res = await fetchApi<PolicyDetailData>(`/policies/${id}`);
+        setData(res);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchPolicy();
   }, [id]);
-
-  const fetchPolicy = async () => {
-    try {
-      const res = await api.get(`/policies/${id}`);
-      setData(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return <div className="p-8">Loading policy details...</div>;
@@ -46,12 +76,12 @@ export function PolicyDetailPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{policy.name}</h1>
           <div className="flex gap-2 mt-2">
-            <Badge variant={policy.enabled ? 'default' : 'secondary'}>
+            <Badge variant={policy.enabled ? 'default' : 'default'}>
               {policy.enabled ? 'Enabled' : 'Disabled'}
             </Badge>
-            <Badge variant="outline">Scope: {policy.scope}</Badge>
-            {policy.environment && <Badge variant="outline">Env: {policy.environment}</Badge>}
-            <Badge variant="outline">Priority: {policy.priority}</Badge>
+            <Badge variant="default">Scope: {policy.scope}</Badge>
+            {policy.environment && <Badge variant="default">Env: {policy.environment}</Badge>}
+            <Badge variant="default">Priority: {policy.priority}</Badge>
           </div>
         </div>
       </div>
@@ -62,7 +92,7 @@ export function PolicyDetailPage() {
             <CardTitle>Policy Rules</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {policy.rules && policy.rules.map((rule: any, i: number) => (
+            {policy.rules && policy.rules.map((rule: PolicyRule, i: number) => (
               <div key={i} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
                 <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5" />
                 <div>
@@ -86,17 +116,17 @@ export function PolicyDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {recent_evaluations && recent_evaluations.length > 0 ? (
-              recent_evaluations.map((evalItem: any) => (
+              recent_evaluations.map((evalItem: PolicyEvaluation) => (
                 <div key={evalItem.id} className="p-3 border rounded-lg flex items-center justify-between">
                   <div>
                     <div className="font-medium">{evalItem.target_type} : {evalItem.target_id.slice(0, 8)}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {formatDistanceToNow(new Date(evalItem.evaluated_at), { addSuffix: true })}
+                      {new Date(evalItem.evaluated_at).toLocaleString()}
                     </div>
                   </div>
                   <Badge variant={
-                    evalItem.result === 'ALLOW' ? 'default' : 
-                    evalItem.result === 'BLOCK' ? 'destructive' : 'secondary'
+                    evalItem.result === 'ALLOW' ? 'success' : 
+                    evalItem.result === 'BLOCK' ? 'danger' : 'warning'
                   }>
                     {evalItem.result}
                   </Badge>

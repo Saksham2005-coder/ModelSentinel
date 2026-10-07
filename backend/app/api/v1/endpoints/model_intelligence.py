@@ -3,11 +3,18 @@ from sqlalchemy.orm import Session
 from typing import Any, List, Optional
 import uuid
 
-from app.db.session import get_db
+from app.db.session import SessionLocal
 from app.services.model_intelligence_service import model_intelligence_service
 from app.models.model import Model
 
 router = APIRouter()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @router.get("/{model_id}/health")
 def get_model_health(
@@ -59,18 +66,35 @@ def get_segment_health(
         
     return model_intelligence_service.get_segment_health(db, model_id)
 
+@router.get("/{model_id}/health/history")
+def get_model_health_history(
+    model_id: str,
+    days: int = Query(30, description="Number of days to look back"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """Get the time-series history of model health."""
+    model = db.query(Model).filter(Model.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail="Model not found")
+        
+    return model_intelligence_service.get_model_health_history(db, model_id, days)
+
 @router.get("/{model_id}/intelligence")
 def get_model_intelligence(
     model_id: str,
+    days: int = Query(30, description="Number of days for history"),
     db: Session = Depends(get_db)
 ) -> Any:
-    """Get comprehensive model intelligence including health, features, and segments."""
+    """Get comprehensive model intelligence including health, history, features, and segments."""
     health = model_intelligence_service.calculate_model_health(db, model_id)
+    history = model_intelligence_service.get_model_health_history(db, model_id, days)
     features = model_intelligence_service.get_feature_health(db, model_id)
     segments = model_intelligence_service.get_segment_health(db, model_id)
     
     return {
         "health": health,
+        "history": history,
         "features": features,
         "segments": segments
     }
+

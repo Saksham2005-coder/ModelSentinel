@@ -7,7 +7,9 @@ import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, BrainCircuit, ShieldCheck, Link as LinkIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, BrainCircuit, ShieldCheck, Link as LinkIcon, Activity } from 'lucide-react';
+import { ReliabilityApi, CausalGraph } from '@/services/api/reliability';
+import { SimpleGraphRenderer } from '@/components/reliability/CausalGraphModal';
 
 export function IncidentDetailPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -22,6 +24,8 @@ export function IncidentDetailPage() {
   
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [causalGraph, setCausalGraph] = useState<CausalGraph | null>(null);
+  const [causalGraphLoading, setCausalGraphLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -66,6 +70,16 @@ export function IncidentDetailPage() {
     fetchIncident();
   }, [fetchIncident]);
 
+  useEffect(() => {
+    if (activeTab === 'Reliability Timeline' && incidentId && model) {
+      setCausalGraphLoading(true);
+      ReliabilityApi.getIncidentGraphByIncidentId(model.id, incidentId)
+        .then(graph => setCausalGraph(graph))
+        .catch(console.error)
+        .finally(() => setCausalGraphLoading(false));
+    }
+  }, [activeTab, incidentId, model]);
+
   const handleAction = async (action: 'acknowledge' | 'startInvestigation' | 'resolve' | 'suppress' | 'learn') => {
     if (!incidentId) return;
     setActionLoading(true);
@@ -108,7 +122,7 @@ export function IncidentDetailPage() {
   if (error) return <div className="p-8 text-status-danger">{error}</div>;
   if (!incident) return <div className="p-8">Incident not found</div>;
 
-  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline'];
+  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline', 'Reliability Timeline'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -202,29 +216,54 @@ export function IncidentDetailPage() {
           {similar.length > 0 && (
             <div>
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <LinkIcon className="w-5 h-5 text-amber-500" />
-                Similar Incidents
+                <BrainCircuit className="w-5 h-5 text-amber-500" />
+                Historical Resolution Intelligence
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 {similar.map((s, idx) => (
-                  <div key={idx} className="p-4 border border-border rounded-xl bg-surface flex justify-between items-center">
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <Link to={`/incidents/${s.incident_id}`} className="font-medium hover:underline text-text-primary">
-                          {s.title}
-                        </Link>
-                        <Badge variant="warning" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
-                          {s.similarity_score}% Match
-                        </Badge>
+                  <div key={idx} className="p-4 border border-border rounded-xl bg-surface flex flex-col gap-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <Link to={`/incidents/${s.incident_id}`} className="font-medium hover:underline text-text-primary text-lg">
+                            {s.title}
+                          </Link>
+                          <Badge variant="warning" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
+                            {s.similarity_score}% Match
+                          </Badge>
+                          {s.resolution?.effectiveness_score > 0 && (
+                            <Badge variant={s.resolution.effectiveness_score > 70 ? "success" : "warning"} className="ml-2">
+                              {s.resolution.effectiveness_score} Effectiveness
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-text-secondary">
+                          <span className="font-medium">Previous Fix:</span> {s.resolution?.summary || s.resolution_summary || "N/A"}
+                        </p>
                       </div>
-                      <p className="text-sm text-text-secondary">
-                        <span className="font-medium">Previous Fix:</span> {s.resolution_summary || "N/A"}
-                      </p>
-                      <div className="mt-2 text-xs text-text-muted flex gap-2">
-                        {s.reasons.map((r: string, i: number) => (
-                          <span key={i} className="bg-surface-50 px-2 py-1 rounded-md">{r}</span>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Why it matched</p>
+                      <div className="text-xs text-text-secondary flex flex-wrap gap-2">
+                        {s.similarity_reasons && s.similarity_reasons.map((r: string, i: number) => (
+                          <span key={i} className="bg-surface-50 border border-border px-2 py-1 rounded-md">{r}</span>
                         ))}
                       </div>
+                    </div>
+                    
+                    <div>
+                       <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 flex items-center gap-1">
+                         <LinkIcon className="w-3 h-3" /> Provenance
+                       </p>
+                       <div className="flex gap-4 text-sm">
+                         <Link to={`/incidents/${s.incident_id}`} className="text-brand hover:underline flex items-center gap-1">
+                           Original Incident
+                         </Link>
+                         <Link to={`/incidents/${s.incident_id}?tab=Validation`} className="text-brand hover:underline flex items-center gap-1">
+                           Validation Report
+                         </Link>
+                       </div>
                     </div>
                   </div>
                 ))}
@@ -311,6 +350,24 @@ export function IncidentDetailPage() {
                 <Link to={`/deployment-gates/${dep.id}`} className="text-brand text-sm hover:underline mt-1 inline-block">View Deployment Details</Link>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'Reliability Timeline' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Activity className="w-5 h-5 text-brand" />
+            Causal Incident Graph
+          </h2>
+          <div className="p-8 border border-border rounded-xl bg-surface flex justify-center overflow-auto max-h-[800px] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDUpIi8+Cjwvc3ZnPg==')]">
+            {causalGraphLoading ? (
+              <div className="flex justify-center items-center h-64 text-gray-400"><Loader2 className="h-8 w-8 animate-spin" /></div>
+            ) : causalGraph && causalGraph.nodes.length > 0 ? (
+              <SimpleGraphRenderer graph={causalGraph} />
+            ) : (
+              <div className="text-gray-500">No causal connections found for this incident.</div>
+            )}
           </div>
         </div>
       )}

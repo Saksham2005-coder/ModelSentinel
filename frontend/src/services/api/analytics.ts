@@ -67,6 +67,14 @@ export interface FixEffectiveness {
   };
 }
 
+export interface PolicyMetrics {
+  total_evaluations: number;
+  allowed: number;
+  blocked: number;
+  review_required: number;
+  target_distribution: { name: string; value: number }[];
+}
+
 export const analyticsApi = {
   getOverview: (days?: number, modelId?: string) => {
     const params = new URLSearchParams();
@@ -109,5 +117,11 @@ export const analyticsApi = {
     const params = new URLSearchParams();
     if (days) params.append('time_range_days', days.toString());
     return fetchApi<FixEffectiveness>(`/analytics/fix-effectiveness?${params.toString()}`);
+  },
+
+  getPolicyMetrics: (days?: number) => {
+    const params = new URLSearchParams();
+    if (days) params.append('time_range_days', days.toString());
+    return fetchApi<PolicyMetrics>(`/analytics/policies?${params.toString()}`);
   }
 };

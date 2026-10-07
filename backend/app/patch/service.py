@@ -172,6 +172,25 @@ class PatchService:
 
         self.db.commit()
         self.db.refresh(proposal)
+        
+        from app.services.reliability_service import reliability_service
+        patch_event = reliability_service.emit_event(
+            db=self.db,
+            model_id=investigation.incident.model_id,
+            model_version_id=investigation.incident.model_version_id,
+            event_type="PATCH_PROPOSED",
+            source_type="patch",
+            source_id=proposal.id,
+            title="Patch Proposed",
+            summary=proposal.summary,
+            status="review"
+        )
+        
+        # Link to root cause or investigation
+        rc_event = reliability_service.find_event_by_source(self.db, "investigation", investigation.id, "ROOT_CAUSE_IDENTIFIED")
+        if rc_event:
+            reliability_service.link_events(self.db, rc_event.id, patch_event.id, "FIXED_BY")
+        
         return proposal
 
     def review_patch(self, patch_id: str, reviewer_type: str, decision: str, comment: Optional[str] = None) -> PatchProposal:

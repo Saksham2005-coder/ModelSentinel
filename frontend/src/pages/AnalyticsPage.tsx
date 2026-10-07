@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { analyticsApi, OverviewMetrics, IncidentAnalytics, ModelReliability, RootCauseTrend, DeploymentHealth, FixEffectiveness } from '../services/api/analytics';
+import { analyticsApi, OverviewMetrics, IncidentAnalytics, ModelReliability, RootCauseTrend, DeploymentHealth, FixEffectiveness, PolicyMetrics } from '../services/api/analytics';
 import { Link } from 'react-router-dom';
-import { Activity, BarChart2, Shield, GitMerge } from 'lucide-react';
+import { Activity, BarChart2, Shield, GitMerge, ShieldCheck } from 'lucide-react';
 
 export const AnalyticsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -17,18 +17,20 @@ export const AnalyticsPage: React.FC = () => {
     if (deployments) console.debug('Deployments:', deployments);
   }, [incidents, deployments]);
   const [fixEffectiveness, setFixEffectiveness] = useState<FixEffectiveness | null>(null);
+  const [policyMetrics, setPolicyMetrics] = useState<PolicyMetrics | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [ovData, incData, modData, rcData, depData, fixData] = await Promise.all([
+        const [ovData, incData, modData, rcData, depData, fixData, polData] = await Promise.all([
           analyticsApi.getOverview(days),
           analyticsApi.getIncidents(days),
           analyticsApi.getModels(days),
           analyticsApi.getRootCauses(days),
           analyticsApi.getDeployments(days),
-          analyticsApi.getFixEffectiveness(days)
+          analyticsApi.getFixEffectiveness(days),
+          analyticsApi.getPolicyMetrics(days)
         ]);
         setOverview(ovData);
         setIncidents(incData);
@@ -36,6 +38,7 @@ export const AnalyticsPage: React.FC = () => {
         setRootCauses(rcData);
         setDeployments(depData);
         setFixEffectiveness(fixData);
+        setPolicyMetrics(polData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -180,6 +183,36 @@ export const AnalyticsPage: React.FC = () => {
                 </table>
               </div>
             </div>
+
+            {/* Policy Enforcement */}
+            {policyMetrics && (
+              <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl shadow-xl overflow-hidden">
+                <div className="p-6 border-b border-neutral-700/50">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                    Policy Enforcement
+                  </h2>
+                </div>
+                <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                  <div>
+                    <h3 className="text-sm text-neutral-400 mb-1">Total Evaluations</h3>
+                    <div className="text-3xl font-bold text-white">{policyMetrics.total_evaluations}</div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-neutral-400 mb-1">Allowed</h3>
+                    <div className="text-3xl font-bold text-emerald-400">{policyMetrics.allowed}</div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-neutral-400 mb-1">Blocked</h3>
+                    <div className="text-3xl font-bold text-rose-400">{policyMetrics.blocked}</div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-neutral-400 mb-1">Review Required</h3>
+                    <div className="text-3xl font-bold text-yellow-400">{policyMetrics.review_required}</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Root Causes */}

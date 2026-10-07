@@ -20,3 +20,6 @@ from app.models.deployment import Deployment # noqa
 from app.models.deployment_verification import DeploymentVerification # noqa
 from app.models.change_risk import ChangeRiskAssessment # noqa
 from app.models.policy import ReliabilityPolicy, PolicyEvaluation # noqa
+from app.models.telemetry import ProductionTelemetry # noqa
+from app.models.reliability import ReliabilityEvent, ReliabilityEdge
+from app.models.resolution_memory import ResolutionMemory # noqa

@@ -35,7 +35,8 @@ def list_deployments(db: Session = Depends(get_db)) -> Any:
             "deployed_at": d.deployed_at,
             "environment": d.environment,
             "deployment_source": d.deployment_source,
-            "created_at": d.created_at
+            "created_at": d.created_at,
+            "policy_result": json.loads(d.policy_result) if getattr(d, 'policy_result', None) else None
         }
         res.append(d_dict)
     return res
@@ -53,6 +54,7 @@ def evaluate_deployment_gate(pr_id: str, db: Session = Depends(get_db)) -> Any:
             "status": deployment.status,
             "gate_result": json.loads(deployment.gate_result) if deployment.gate_result else {},
             "block_reason": deployment.block_reason,
+            "policy_result": json.loads(deployment.policy_result) if getattr(deployment, 'policy_result', None) else None,
             "created_at": deployment.created_at
         }
     except Exception as e:
@@ -118,6 +120,7 @@ def get_deployment(id: str, db: Session = Depends(get_db)):
         "environment": d.environment,
         "deployment_source": d.deployment_source,
         "created_at": d.created_at,
+        "policy_result": json.loads(d.policy_result) if getattr(d, 'policy_result', None) else None,
         "verifications": [
             {
                 "id": v.id,

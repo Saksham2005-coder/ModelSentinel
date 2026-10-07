@@ -10,12 +10,7 @@ from app.models.deployment_verification import DeploymentVerification
 
 class ModelIntelligenceService:
     
-    def calculate_model_health(self, db: Session, model_id: str) -> Dict[str, Any]:
-        """
-        Calculates a deterministic model health score (0-100) based on:
-        Performance (35%), Data Quality (20%), Feature Drift (20%), 
-        Prediction Stability (10%), Incident State (15%)
-        """
+    def _calculate_health_for_run(self, db: Session, model_id: str, run: Optional[MonitoringRun], timestamp: datetime) -> Dict[str, Any]:
         base_scores = {
             "performance": 35,
             "data_quality": 20,
@@ -26,15 +21,9 @@ class ModelIntelligenceService:
         
         scores = base_scores.copy()
         
-        # 1. Evaluate from latest completed monitoring run
-        latest_run = db.query(MonitoringRun).filter(
-            MonitoringRun.model_id == model_id,
-            MonitoringRun.status == "completed"
-        ).order_by(desc(MonitoringRun.completed_at)).first()
-        
-        if latest_run:
+        if run:
             # Performance
-            metrics = db.query(MetricResult).filter(MetricResult.monitoring_run_id == latest_run.id).all()
+            metrics = db.query(MetricResult).filter(MetricResult.monitoring_run_id == run.id).all()
             for m in metrics:
                 if m.status == "critical":
                     scores["performance"] = max(0, scores["performance"] - 10)
@@ -42,7 +31,7 @@ class ModelIntelligenceService:
                     scores["performance"] = max(0, scores["performance"] - 5)
             
             # Data Quality
-            dq_results = db.query(DataQualityResult).filter(DataQualityResult.monitoring_run_id == latest_run.id).all()
+            dq_results = db.query(DataQualityResult).filter(DataQualityResult.monitoring_run_id == run.id).all()
             for dq in dq_results:
                 if dq.status == "critical":
                     scores["data_quality"] = max(0, scores["data_quality"] - 10)
@@ -50,7 +39,7 @@ class ModelIntelligenceService:
                     scores["data_quality"] = max(0, scores["data_quality"] - 5)
                     
             # Feature Drift
-            features = db.query(FeatureMonitoringResult).filter(FeatureMonitoringResult.monitoring_run_id == latest_run.id).all()
+            features = db.query(FeatureMonitoringResult).filter(FeatureMonitoringResult.monitoring_run_id == run.id).all()
             for f in features:
                 if f.status == "critical":
                     scores["feature_drift"] = max(0, scores["feature_drift"] - 5)
@@ -58,17 +47,19 @@ class ModelIntelligenceService:
                     scores["feature_drift"] = max(0, scores["feature_drift"] - 2)
                     
             # Prediction Stability
-            preds = db.query(PredictionMonitoringResult).filter(PredictionMonitoringResult.monitoring_run_id == latest_run.id).all()
+            preds = db.query(PredictionMonitoringResult).filter(PredictionMonitoringResult.monitoring_run_id == run.id).all()
             for p in preds:
                 if p.status == "critical":
                     scores["prediction_stability"] = max(0, scores["prediction_stability"] - 5)
                 elif p.status == "warning":
                     scores["prediction_stability"] = max(0, scores["prediction_stability"] - 2)
                     
-        # 2. Evaluate Incident State
+        # Evaluate Incident State at the given timestamp
+        # Incidents created before/at timestamp, and either not resolved OR resolved after timestamp
         active_incidents = db.query(Incident).filter(
             Incident.model_id == model_id,
-            Incident.status != "resolved"
+            Incident.created_at <= timestamp,
+            (Incident.status != "resolved") | (Incident.updated_at > timestamp)
         ).all()
         
         if active_incidents:
@@ -106,6 +97,59 @@ class ModelIntelligenceService:
             "status": status,
             "breakdown": scores
         }
+
+    def calculate_model_health(self, db: Session, model_id: str) -> Dict[str, Any]:
+        """
+        Calculates a deterministic model health score (0-100) based on latest run.
+        """
+        latest_run = db.query(MonitoringRun).filter(
+            MonitoringRun.model_id == model_id,
+            MonitoringRun.status == "completed"
+        ).order_by(desc(MonitoringRun.completed_at)).first()
+        
+        now = datetime.now(timezone.utc)
+        return self._calculate_health_for_run(db, model_id, latest_run, now)
+
+    def get_model_health_history(self, db: Session, model_id: str, days: int = 30) -> List[Dict[str, Any]]:
+        """
+        Generates a time-series history of model health.
+        """
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+        runs = db.query(MonitoringRun).filter(
+            MonitoringRun.model_id == model_id,
+            MonitoringRun.status == "completed",
+            MonitoringRun.completed_at >= cutoff_date
+        ).order_by(MonitoringRun.completed_at.asc()).all()
+
+        history = []
+        for run in runs:
+            if not run.completed_at:
+                continue
+            health = self._calculate_health_for_run(db, model_id, run, run.completed_at)
+            
+            # Find any incidents created near this run (within 12h)
+            incidents_near = db.query(Incident).filter(
+                Incident.model_id == model_id,
+                Incident.created_at >= run.completed_at - timedelta(hours=12),
+                Incident.created_at <= run.completed_at + timedelta(hours=12)
+            ).count()
+
+            # Find deployments near this run
+            deployments_near = db.query(Deployment).join(Incident).filter(
+                Incident.model_id == model_id,
+                Deployment.deployed_at >= run.completed_at - timedelta(hours=12),
+                Deployment.deployed_at <= run.completed_at + timedelta(hours=12)
+            ).count()
+            
+            history.append({
+                "timestamp": run.completed_at.isoformat(),
+                "score": health["score"],
+                "status": health["status"],
+                "incidents_created": incidents_near,
+                "deployments": deployments_near
+            })
+
+        return history
         
     def get_version_comparison(self, db: Session, model_id: str, version_a_id: str, version_b_id: str) -> Dict[str, Any]:
         """Compares two model versions based on their latest monitoring runs and lifecycle records."""

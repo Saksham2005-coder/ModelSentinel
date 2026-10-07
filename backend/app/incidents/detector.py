@@ -117,4 +117,41 @@ def process_monitoring_run(db: Session, run: MonitoringRun):
         
         db.commit()
         db.refresh(incident)
+        
+        from app.services.reliability_service import reliability_service
+        # Emit DEGRADATION_DETECTED event linked to MONITORING_COMPLETED
+        # For simplicity, we just use the incident creation as the trigger
+        deg_event = reliability_service.emit_event(
+            db=db,
+            model_id=run.model_id,
+            model_version_id=run.model_version_id,
+            event_type="DEGRADATION_DETECTED",
+            source_type="monitoring_run",
+            source_id=run.id,
+            title="Performance Degradation Detected",
+            summary=f"Detected {len(signals)} signals indicating degradation.",
+            severity=severity,
+            status="detected"
+        )
+        
+        inc_event = reliability_service.emit_event(
+            db=db,
+            model_id=run.model_id,
+            model_version_id=run.model_version_id,
+            event_type="INCIDENT_CREATED",
+            source_type="incident",
+            source_id=incident.id,
+            title=title,
+            summary=f"Incident {incident.incident_key} created.",
+            severity=severity,
+            status="active"
+        )
+        
+        reliability_service.link_events(db, deg_event.id, inc_event.id, "RESULTED_IN")
+        
+        # Link monitoring run to degradation
+        mon_event = reliability_service.find_event_by_source(db, "monitoring_run", run.id, "MONITORING_COMPLETED")
+        if mon_event:
+            reliability_service.link_events(db, mon_event.id, deg_event.id, "TRIGGERED_BY")
+            
         return incident

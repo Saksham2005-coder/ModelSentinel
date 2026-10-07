@@ -4,7 +4,17 @@ import { IntelligenceApi, ModelIntelligence } from '@/services/api/intelligence'
 import { ModelsApi, Model } from '@/services/api/models';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Loader2, ArrowLeft, BrainCircuit, Activity, ShieldCheck, TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { Loader2, ArrowLeft, BrainCircuit, Activity, ShieldCheck, TrendingDown, TrendingUp, Minus, History } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine
+} from 'recharts';
 
 export function ModelIntelligencePage() {
   const { modelId } = useParams<{ modelId: string }>();
@@ -74,6 +84,16 @@ export function ModelIntelligencePage() {
     return <Minus className="w-4 h-4 text-text-muted" />;
   };
 
+  const formatChartDate = (val: string | number) => {
+    if (!val) return '';
+    try {
+      const d = new Date(val);
+      return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+    } catch {
+      return String(val);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -93,6 +113,14 @@ export function ModelIntelligencePage() {
               Health, version analytics, and behavioral insights for {model.name}
             </p>
           </div>
+        </div>
+        <div>
+          <Link to={`/models/${modelId}/compare`}>
+            <Button variant="outline" size="sm">
+              <Activity className="w-4 h-4 mr-2" />
+              Compare Versions
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -153,6 +181,56 @@ export function ModelIntelligencePage() {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
+          <div className="bg-surface rounded-xl border border-border-subtle p-6">
+            <h3 className="font-medium text-text-primary flex items-center gap-2 mb-4">
+              <History className="w-4 h-4" /> Model Health History
+            </h3>
+            {intelligence.history && intelligence.history.length > 0 ? (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={intelligence.history} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
+                    <XAxis 
+                      dataKey="timestamp" 
+                      tickFormatter={formatChartDate} 
+                      stroke="#9ca3af" 
+                      fontSize={12} 
+                      tickLine={false} 
+                    />
+                    <YAxis 
+                      domain={[0, 100]} 
+                      stroke="#9ca3af" 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem' }}
+                      itemStyle={{ color: '#e5e7eb' }}
+                      labelFormatter={formatChartDate}
+                    />
+                    <ReferenceLine y={90} stroke="#3b82f6" strokeDasharray="3 3" />
+                    <ReferenceLine y={75} stroke="#f59e0b" strokeDasharray="3 3" />
+                    <ReferenceLine y={50} stroke="#ef4444" strokeDasharray="3 3" />
+                    <Line 
+                      type="monotone" 
+                      dataKey="score" 
+                      stroke="#10b981" 
+                      strokeWidth={3} 
+                      dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#1f2937' }} 
+                      activeDot={{ r: 6 }} 
+                      name="Health Score"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center text-text-secondary">
+                No historical health data available.
+              </div>
+            )}
+          </div>
+
           <div className="bg-surface rounded-xl border border-border-subtle overflow-hidden">
             <div className="p-4 border-b border-border-subtle bg-surface-hover">
               <h3 className="font-medium text-text-primary flex items-center gap-2">
