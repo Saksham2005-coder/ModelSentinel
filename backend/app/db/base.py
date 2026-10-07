@@ -23,3 +23,4 @@ from app.models.policy import ReliabilityPolicy, PolicyEvaluation # noqa
 from app.models.telemetry import ProductionTelemetry # noqa
 from app.models.reliability import ReliabilityEvent, ReliabilityEdge
 from app.models.resolution_memory import ResolutionMemory # noqa
+from app.models.workflow import WorkflowRun, WorkflowStepRun, WorkflowApproval # noqa
