@@ -115,4 +115,34 @@ patched_df = pd.DataFrame({
 })
 patched_df.to_csv(os.path.join(data_dir, f'{m.slug}_patched.csv'), index=False)
 
+from app.models.monitoring import MonitoringRun, MetricResult, FeatureMonitoringResult, SegmentAnalysisResult, DataQualityResult, PredictionMonitoringResult
+
+run = MonitoringRun(
+    id=str(uuid.uuid4()),
+    model_id=m.id,
+    model_version_id=v.id,
+    run_type='scheduled',
+    status='completed',
+    completed_at=datetime.utcnow(),
+    created_at=datetime.utcnow()
+)
+db.add(run)
+db.commit()
+db.refresh(run)
+
+mr1 = MetricResult(monitoring_run_id=run.id, metric_name='accuracy', metric_value=0.82, metric_type='performance', status='warning')
+mr2 = MetricResult(monitoring_run_id=run.id, metric_name='f1_score', metric_value=0.74, metric_type='performance', status='warning')
+db.add_all([mr1, mr2])
+
+fr1 = FeatureMonitoringResult(monitoring_run_id=run.id, feature_name='url_length', feature_type='numeric', drift_method='PSI', drift_score=0.45, status='critical')
+fr2 = FeatureMonitoringResult(monitoring_run_id=run.id, feature_name='sender_domain', feature_type='categorical', drift_method='PSI', drift_score=0.1, status='healthy')
+db.add_all([fr1, fr2])
+
+sr1 = SegmentAnalysisResult(monitoring_run_id=run.id, segment_name='url_length>100', sample_count=200, primary_metric='f1_score', current_metric_value=0.55, change=-0.25, status='critical')
+db.add(sr1)
+
+dq1 = DataQualityResult(monitoring_run_id=run.id, metric_name='missing_values', value=0.01, status='healthy')
+db.add(dq1)
+db.commit()
+
 print(f"Setup complete. Incident ID: {inc.id}, Patch ID: {patch.id}")
