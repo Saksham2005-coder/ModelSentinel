@@ -51,6 +51,34 @@ export interface PatchPlan {
   assumptions: string[];
 }
 
+export interface PatchChangeIntelligence {
+  changed_files: {
+    path: string;
+    symbols_changed: string[];
+    ml_category: string;
+    confidence: string;
+    status?: string;
+  }[];
+  affected_dependencies: string[];
+  ml_impact: {
+    component: string;
+    impact: string;
+    reason: string;
+  }[];
+  historical_evidence: {
+    type: string;
+    evidence: string;
+    description: string;
+  }[];
+  affected_models: {
+    model_id: string;
+    version_id: string;
+  }[];
+  blast_radius: string;
+  risk_score: number;
+  risk_factors: string[];
+}
+
 export const PatchesApi = {
   plan: (investigationId: string) => 
     fetchApi<PatchPlan>(`/investigations/${investigationId}/patches/plan`, { method: 'POST' }),
@@ -79,5 +107,8 @@ export const PatchesApi = {
     fetchApi<PatchProposal>(`/patches/${patchId}/review`, {
       method: 'POST',
       body: JSON.stringify({ decision, comment, reviewer_type: 'human' })
-    })
+    }),
+    
+  getChangeIntelligence: (patchId: string) =>
+    fetchApi<PatchChangeIntelligence>(`/patches/${patchId}/change-intelligence`)
 };

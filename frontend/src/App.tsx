@@ -29,6 +29,7 @@ import { TelemetryDetailPage } from '@/pages/TelemetryDetailPage';
 import ReliabilityTimelinePage from '@/pages/model/ReliabilityTimelinePage';
 import { ModelIntelligencePage } from '@/pages/model/ModelIntelligencePage';
 import { VersionComparisonPage } from '@/pages/model/VersionComparisonPage';
+import { ChangeIntelligencePage } from '@/pages/ChangeIntelligencePage';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/analytics/models/:modelId" element={<ModelAnalyticsDetailPage />} />
           <Route path="/change-risk" element={<ChangeRiskPage />} />
+          <Route path="/change-intelligence" element={<ChangeIntelligencePage />} />
           <Route path="/policies" element={<PoliciesPage />} />
           <Route path="/policies/:id" element={<PolicyDetailPage />} />
           <Route path="/telemetry" element={<TelemetryWorkspacePage />} />

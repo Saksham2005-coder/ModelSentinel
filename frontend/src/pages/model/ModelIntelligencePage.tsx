@@ -84,7 +84,8 @@ export function ModelIntelligencePage() {
     return <Minus className="w-4 h-4 text-text-muted" />;
   };
 
-  const formatChartDate = (val: string | number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formatChartDate = (val: any) => {
     if (!val) return '';
     try {
       const d = new Date(val);

@@ -22,6 +22,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Analytics', href: '/analytics', icon: BarChart2 },
   { name: 'Change Risk', href: '/change-risk', icon: ShieldAlert },
+  { name: 'Change Intelligence', href: '/change-intelligence', icon: Activity },
   { name: 'Policies', href: '/policies', icon: ShieldCheck },
   { name: 'Models', href: '/models', icon: Box },
   { name: 'Telemetry', href: '/telemetry', icon: Activity },
