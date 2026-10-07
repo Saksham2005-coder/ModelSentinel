@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, BrainCircuit, ShieldCheck, Link as LinkIcon, Activity } from 'lucide-react';
 import { ReliabilityApi, CausalGraph } from '@/services/api/reliability';
 import { SimpleGraphRenderer } from '@/components/reliability/CausalGraphModal';
+import { workflowsApi, WorkflowRun } from '@/services/api/workflows';
 
 export function IncidentDetailPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -26,6 +27,7 @@ export function IncidentDetailPage() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [causalGraph, setCausalGraph] = useState<CausalGraph | null>(null);
   const [causalGraphLoading, setCausalGraphLoading] = useState(false);
+  const [workflows, setWorkflows] = useState<WorkflowRun[]>([]);
 
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -50,6 +52,10 @@ export function IncidentDetailPage() {
 
       DeploymentApi.getDeployments().then(deps => {
         setDeployments(deps.filter(dep => dep.incident_id === incidentId));
+      }).catch(console.error);
+
+      workflowsApi.listWorkflows().then(wfs => {
+        setWorkflows(wfs.filter(wf => wf.entity_type === 'incident' && wf.entity_id === incidentId));
       }).catch(console.error);
         
       // Fetch eligibility if resolved
@@ -118,11 +124,27 @@ export function IncidentDetailPage() {
     }
   };
 
+  const handleStartWorkflow = async () => {
+    if (!incidentId || !incident) return;
+    setActionLoading(true);
+    try {
+      const wf = await workflowsApi.createWorkflow(`Recovery ${incident.id.substring(0,8)}`, 'INCIDENT_RECOVERY', 'incident', incidentId);
+      await workflowsApi.startWorkflow(wf.id);
+      await fetchIncident();
+      window.location.href = `/workflows/${wf.id}`;
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to start workflow');
+      setActionLoading(false);
+    }
+  };
+
   if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-text-secondary" /></div>;
   if (error) return <div className="p-8 text-status-danger">{error}</div>;
   if (!incident) return <div className="p-8">Incident not found</div>;
 
-  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline', 'Reliability Timeline'];
+  if (!incident) return <div className="p-8">Incident not found</div>;
+
+  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline', 'Reliability Timeline', 'Workflows'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -157,6 +179,11 @@ export function IncidentDetailPage() {
             {['detected', 'acknowledged'].includes(incident.status) && (
               <Button onClick={() => handleAction('startInvestigation')} disabled={actionLoading}>
                 Start Investigation
+              </Button>
+            )}
+            {workflows.length === 0 && (
+              <Button variant="outline" onClick={handleStartWorkflow} disabled={actionLoading} className="border-brand text-brand hover:bg-brand hover:text-white">
+                Start Recovery Workflow
               </Button>
             )}
             {!['resolved', 'suppressed'].includes(incident.status) && (
@@ -369,6 +396,38 @@ export function IncidentDetailPage() {
               <div className="text-gray-500">No causal connections found for this incident.</div>
             )}
           </div>
+        </div>
+      )}
+
+      {activeTab === 'Workflows' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Activity className="w-5 h-5 text-brand" />
+            Reliability Workflows
+          </h2>
+          {workflows.length === 0 ? (
+             <div className="p-16 border border-border border-dashed rounded-xl flex flex-col items-center justify-center text-center">
+                <AlertTriangle className="h-10 w-10 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">No active workflows</h3>
+                <Button onClick={handleStartWorkflow} disabled={actionLoading} className="mt-4 bg-brand hover:bg-brand/90 text-white">
+                  Start Recovery Workflow
+                </Button>
+             </div>
+          ) : (
+            <div className="space-y-4">
+              {workflows.map(wf => (
+                <div key={wf.id} className="p-4 border border-border rounded-xl bg-surface flex justify-between items-center">
+                  <div>
+                    <h3 className="font-medium text-white">{wf.name}</h3>
+                    <p className="text-sm text-slate-400">Status: {wf.status} | ID: {wf.id}</p>
+                  </div>
+                  <Link to={`/workflows/${wf.id}`} className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">
+                    View Workflow
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

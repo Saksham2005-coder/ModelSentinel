@@ -12,6 +12,8 @@ import { IncidentApi, Incident } from '@/services/api/incidents';
 import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import { analyticsApi, OverviewMetrics } from '@/services/api/analytics';
+import { workflowsApi, WorkflowRun } from '@/services/api/workflows';
+import { Activity } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -50,19 +52,21 @@ export function DashboardPage() {
   const [regressionCases, setRegressionCases] = useState<any[]>([]);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowRun[]>([]);
   const [reliability, setReliability] = useState<OverviewMetrics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [incRes, modRes, memRes, regRes, prRes, depRes, relRes] = await Promise.all([
+        const [incRes, modRes, memRes, regRes, prRes, depRes, wfRes, relRes] = await Promise.all([
           IncidentApi.getIncidents({ limit: 5 }),
           ModelsApi.getModels({}),
           fetch('http://localhost:8000/api/v1/memories').then(r => r.json()),
           fetch('http://localhost:8000/api/v1/regression-tests').then(r => r.json()),
           PullRequestApi.getPullRequests(),
           DeploymentApi.getDeployments(),
+          workflowsApi.listWorkflows(),
           analyticsApi.getOverview(7),
         ]);
         setIncidents(incRes);
@@ -71,6 +75,7 @@ export function DashboardPage() {
         setRegressionCases(regRes || []);
         setPullRequests(prRes || []);
         setDeployments(depRes || []);
+        setWorkflows(wfRes || []);
         setReliability(relRes);
       } catch (e) {
         console.error(e);
@@ -141,9 +146,9 @@ export function DashboardPage() {
           icon={Box}
         />
         <MetricCard
-          title="Degraded Deployments"
-          value={deployments.filter(d => ['DEGRADED', 'FAILED'].includes(d.status)).length}
-          icon={AlertCircle}
+          title="Active Workflows"
+          value={workflows.filter(w => !['COMPLETED', 'FAILED', 'CANCELLED'].includes(w.status)).length}
+          icon={Activity}
         />
       </div>
 

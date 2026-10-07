@@ -14,7 +14,8 @@ import {
   BarChart2,
   ShieldAlert,
   ShieldCheck,
-  Activity
+  Activity,
+  GitCommit
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Change Risk', href: '/change-risk', icon: ShieldAlert },
   { name: 'Change Intelligence', href: '/change-intelligence', icon: Activity },
   { name: 'Policies', href: '/policies', icon: ShieldCheck },
+  { name: 'Workflows', href: '/workflows', icon: GitCommit },
   { name: 'Models', href: '/models', icon: Box },
   { name: 'Telemetry', href: '/telemetry', icon: Activity },
   { name: 'Incidents', href: '/incidents', icon: AlertCircle },
