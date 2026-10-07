@@ -24,6 +24,11 @@ import { ModelAnalyticsDetailPage } from '@/pages/ModelAnalyticsDetailPage';
 import { ChangeRiskPage } from '@/pages/ChangeRiskPage';
 import { PoliciesPage } from '@/pages/PoliciesPage';
 import { PolicyDetailPage } from '@/pages/PolicyDetailPage';
+import { TelemetryWorkspacePage } from '@/pages/TelemetryWorkspacePage';
+import { TelemetryDetailPage } from '@/pages/TelemetryDetailPage';
+import ReliabilityTimelinePage from '@/pages/model/ReliabilityTimelinePage';
+import { ModelIntelligencePage } from '@/pages/model/ModelIntelligencePage';
+
 function App() {
   return (
     <Router>
@@ -36,6 +41,8 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/models" element={<ModelsPage />} />
           <Route path="/models/:modelId/monitoring" element={<MonitoringPage />} />
+          <Route path="/models/:modelId/intelligence" element={<ModelIntelligencePage />} />
+          <Route path="/models/:id/reliability" element={<ReliabilityTimelinePage />} />
           <Route path="/incidents" element={<IncidentsPage />} />
           <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />
           <Route path="/investigations" element={<PlaceholderPage title="Investigations" />} />
@@ -55,6 +62,8 @@ function App() {
           <Route path="/change-risk" element={<ChangeRiskPage />} />
           <Route path="/policies" element={<PoliciesPage />} />
           <Route path="/policies/:id" element={<PolicyDetailPage />} />
+          <Route path="/telemetry" element={<TelemetryWorkspacePage />} />
+          <Route path="/telemetry/:id" element={<TelemetryDetailPage />} />
           
           {/* Incident-specific sub-routes as placeholders */}
           <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />

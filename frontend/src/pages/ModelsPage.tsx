@@ -142,9 +142,20 @@ export function ModelsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to={`/models/${model.id}/monitoring`}>Monitoring</Link>
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/models/${model.id}/intelligence`}>Intelligence</Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/models/${model.id}/monitoring`}>Monitoring</Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/models/${model.id}/reliability`}>Timeline</Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/analytics/models/${model.id}`}>Analytics</Link>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
