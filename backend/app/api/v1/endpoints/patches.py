@@ -129,3 +129,15 @@ def review_patch(
         return proposal
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/patches/{patch_id}/change-intelligence")
+def get_patch_change_intelligence(
+    patch_id: str,
+    db: Session = Depends(get_db)
+) -> Any:
+    from app.repository.change_intelligence import ChangeIntelligenceService
+    service = ChangeIntelligenceService(db)
+    result = service.analyze_patch(patch_id)
+    if "error" in result:
+        raise HTTPException(status_code=404, detail=result["error"])
+    return result
