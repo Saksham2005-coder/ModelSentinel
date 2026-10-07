@@ -131,7 +131,8 @@ class RepositoryIndexer:
                             "source_id": repo_file.id,
                             "source_path": rel_path,
                             "target": dep.target,
-                            "type": dep.type
+                            "type": dep.type,
+                            "source_symbol": getattr(dep, 'source_symbol', None)
                         })
 
         # Resolve dependencies loosely
@@ -139,18 +140,36 @@ class RepositoryIndexer:
             target = dep["target"]
             # Convert import path to a plausible file path
             target_path = target.replace(".", "/") + ".py"
-            resolved_id = None
-            if target_path in path_to_file_id:
-                resolved_id = path_to_file_id[target_path]
-            elif target_path.replace("/py", ".py") in path_to_file_id:
-                 pass # Simple matching
+            resolved_file_id = None
+            resolved_symbol_id = None
+            target_symbol_name = target
+            
+            if dep["type"] in ("call", "method_call"):
+                # For calls, the target is usually a function/method in the same file or imported.
+                # Try to resolve to a symbol in the same file first.
+                local_sym = self.db.query(RepositorySymbol).filter(
+                    RepositorySymbol.repository_file_id == dep["source_id"],
+                    RepositorySymbol.name == target
+                ).first()
+                if local_sym:
+                    resolved_file_id = dep["source_id"]
+                    resolved_symbol_id = local_sym.id
+            else:
+                # Import
+                if target_path in path_to_file_id:
+                    resolved_file_id = path_to_file_id[target_path]
+                elif target_path.replace("/py", ".py") in path_to_file_id:
+                    pass # Simple matching
                  
             self.db.add(RepositoryDependency(
                 repository_snapshot_id=snapshot.id,
                 source_file_id=dep["source_id"],
+                source_symbol_name=dep["source_symbol"],
                 target_reference=target,
+                target_symbol_name=target_symbol_name,
                 dependency_type=dep["type"],
-                resolved_target_file_id=resolved_id
+                resolved_target_file_id=resolved_file_id,
+                resolved_target_symbol_id=resolved_symbol_id
             ))
 
         snapshot.file_count = file_count

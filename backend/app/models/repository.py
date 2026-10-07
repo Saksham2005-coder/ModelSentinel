@@ -81,10 +81,14 @@ class RepositoryDependency(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     repository_snapshot_id = Column(String(36), ForeignKey("repository_snapshots.id"), nullable=False, index=True)
     source_file_id = Column(String(36), ForeignKey("repository_files.id"), nullable=False, index=True)
+    source_symbol_name = Column(String, nullable=True, index=True)
     target_reference = Column(String)
-    dependency_type = Column(String) # import
+    target_symbol_name = Column(String, nullable=True, index=True)
+    dependency_type = Column(String) # import, call, reference
     resolved_target_file_id = Column(String(36), ForeignKey("repository_files.id"), nullable=True)
+    resolved_target_symbol_id = Column(String(36), ForeignKey("repository_symbols.id"), nullable=True)
 
     snapshot = relationship("RepositorySnapshot", back_populates="dependencies")
     source_file = relationship("RepositoryFile", foreign_keys=[source_file_id])
     resolved_target_file = relationship("RepositoryFile", foreign_keys=[resolved_target_file_id])
+    resolved_target_symbol = relationship("RepositorySymbol", foreign_keys=[resolved_target_symbol_id])

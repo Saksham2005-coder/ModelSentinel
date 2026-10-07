@@ -19,9 +19,10 @@ class SymbolInfo:
         return self.name
 
 class DependencyInfo:
-    def __init__(self, target: str, type: str = "import"):
+    def __init__(self, target: str, type: str = "import", source_symbol: Optional[str] = None):
         self.target = target
         self.type = type
+        self.source_symbol = source_symbol
 
 class RepositoryParser:
     @staticmethod
@@ -34,10 +35,12 @@ class RepositoryParser:
             class Visitor(ast.NodeVisitor):
                 def __init__(self):
                     self.current_class = None
+                    self.current_func = None
 
                 def visit_Import(self, node):
                     for alias in node.names:
-                        dependencies.append(DependencyInfo(target=alias.name, type="import"))
+                        caller = getattr(self, 'current_func', getattr(self, 'current_class', None))
+                        dependencies.append(DependencyInfo(target=alias.name, type="import", source_symbol=caller))
                         symbols.append(SymbolInfo(
                             name=alias.name,
                             symbol_type="import",
@@ -48,7 +51,8 @@ class RepositoryParser:
 
                 def visit_ImportFrom(self, node):
                     if node.module:
-                        dependencies.append(DependencyInfo(target=node.module, type="import_from"))
+                        caller = getattr(self, 'current_func', getattr(self, 'current_class', None))
+                        dependencies.append(DependencyInfo(target=node.module, type="import_from", source_symbol=caller))
                         for alias in node.names:
                             symbols.append(SymbolInfo(
                                 name=alias.name,
@@ -85,9 +89,33 @@ class RepositoryParser:
                         parent=self.current_class,
                         signature=signature
                     ))
-                    # Do not enter function to prevent capturing inner functions unless we want them
-                    # Actually we can use generic_visit if we want nested functions
-                    # But for now let's just visit inner nodes for anything else
+                    
+                    prev_func = getattr(self, 'current_func', None)
+                    self.current_func = node.name
+                    self.generic_visit(node)
+                    self.current_func = prev_func
+
+                def visit_Call(self, node):
+                    if isinstance(node.func, ast.Name):
+                        func_name = node.func.id
+                        caller = getattr(self, 'current_func', getattr(self, 'current_class', None))
+                        
+                        dependencies.append(DependencyInfo(
+                            target=func_name,
+                            type="call",
+                            source_symbol=caller
+                        ))
+                    elif isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+                        # obj.method() -> maybe capture method as dependency
+                        func_name = node.func.attr
+                        caller = getattr(self, 'current_func', getattr(self, 'current_class', None))
+                        
+                        dependencies.append(DependencyInfo(
+                            target=func_name,
+                            type="method_call",
+                            source_symbol=caller
+                        ))
+                    self.generic_visit(node)
                     
             visitor = Visitor()
             visitor.visit(tree)
