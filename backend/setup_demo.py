@@ -58,6 +58,16 @@ inc = Incident(
 db.add(inc)
 db.commit()
 
+from app.models.investigation import Investigation
+inv = Investigation(
+    id="dummy-inv",
+    incident_id=inc.id,
+    status="completed",
+    summary="Data drift investigation"
+)
+db.add(inv)
+db.commit()
+
 # Create patch
 patch = PatchProposal(
     investigation_id="dummy-inv",
