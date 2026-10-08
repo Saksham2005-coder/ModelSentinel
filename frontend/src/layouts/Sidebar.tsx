@@ -37,6 +37,8 @@ const navigation = [
   { name: 'Repository', href: '/repository', icon: GitBranch },
   { name: 'Incident Memory', href: '/incident-memory', icon: BrainCircuit },
   { name: 'Integrations', href: '/integrations', icon: Search },
+  { name: 'SLOs', href: '/slo', icon: Activity },
+  { name: 'Alerts', href: '/alerts', icon: AlertCircle },
 ];
 
 export function Sidebar() {

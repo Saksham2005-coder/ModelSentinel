@@ -52,6 +52,9 @@ from app.api.v1.endpoints import ci, auth, audit
 app.include_router(ci.router, prefix="/api/v1/ci", tags=["ci"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["audit"], dependencies=[Depends(deps.get_current_active_user)])
+from app.api.v1.endpoints import slo, alerts
+app.include_router(slo.router, prefix="/api/v1/slo", tags=["slo"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["alerts"], dependencies=[Depends(deps.get_current_active_user)])
 from sqlalchemy import text
 from app.db.session import SessionLocal
 from app.ai.service import get_llm_provider

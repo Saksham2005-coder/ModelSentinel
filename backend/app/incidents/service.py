@@ -14,6 +14,42 @@ class IncidentService:
         db.add(event)
         
     @staticmethod
+    def create_incident(db: Session, incident_create: "app.schemas.incident.IncidentCreate") -> Incident:
+        existing_incident = db.query(Incident).filter(
+            Incident.incident_key == incident_create.incident_key,
+            Incident.status.notin_(['resolved', 'suppressed'])
+        ).first()
+        
+        if existing_incident:
+            # Check for escalation
+            if existing_incident.severity != incident_create.severity:
+                existing_incident.severity = incident_create.severity
+                IncidentService._add_event(db, existing_incident, 'severity_changed', f"Severity changed to {incident_create.severity}.")
+                
+            IncidentService._add_event(db, existing_incident, 'signal_added', "Incident signal detected again.")
+            existing_incident.last_seen_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(existing_incident)
+            return existing_incident
+            
+        incident = Incident(
+            incident_key=incident_create.incident_key,
+            model_id=incident_create.model_id,
+            model_version_id=incident_create.model_version_id,
+            title=incident_create.title,
+            summary=incident_create.summary,
+            severity=incident_create.severity,
+            status='detected',
+            category=incident_create.category
+        )
+        db.add(incident)
+        db.flush()
+        IncidentService._add_event(db, incident, 'incident_detected', "Incident created from integration or SLO.")
+        db.commit()
+        db.refresh(incident)
+        return incident
+
+    @staticmethod
     def acknowledge(db: Session, incident: Incident):
         if incident.status == 'detected':
             incident.status = 'acknowledged'

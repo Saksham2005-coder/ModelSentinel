@@ -64,3 +64,12 @@ class IncidentDetailResponse(IncidentResponse):
 
 class IncidentResolution(BaseModel):
     resolution_note: Optional[str] = None
+
+class IncidentCreate(BaseModel):
+    incident_key: str
+    model_id: str
+    model_version_id: Optional[str] = "latest"
+    title: str
+    summary: Optional[str] = None
+    severity: str
+    category: str

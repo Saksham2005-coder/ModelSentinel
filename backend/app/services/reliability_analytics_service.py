@@ -287,3 +287,65 @@ class ReliabilityAnalyticsService:
             "review_required": review_required,
             "target_distribution": [{"name": s[0], "value": s[1]} for s in target_dist]
         }
+
+    @classmethod
+    def get_slo_analytics(cls, db: Session, time_range_days: Optional[int] = None, model_id: Optional[str] = None) -> Dict[str, Any]:
+        from app.models.slo import ReliabilityObjective, SLOEvaluation, Alert
+        
+        # Objectives
+        q_obj = db.query(ReliabilityObjective).filter(ReliabilityObjective.enabled == True)
+        if model_id:
+            q_obj = q_obj.filter(ReliabilityObjective.model_id == model_id)
+        total_objectives = q_obj.count()
+        
+        # Evaluations (latest per objective)
+        # For simplicity, we just aggregate all recent evaluations
+        q_eval = db.query(SLOEvaluation)
+        q_eval = cls._apply_time_filter(q_eval, SLOEvaluation.evaluated_at, time_range_days)
+        if model_id:
+            q_eval = q_eval.filter(SLOEvaluation.model_id == model_id)
+            
+        total_evals = q_eval.count()
+        breached_evals = q_eval.filter(SLOEvaluation.status == "BREACHED").count()
+        slo_compliance_rate = ((total_evals - breached_evals) / total_evals * 100) if total_evals > 0 else 100.0
+        
+        avg_budget_remaining = db.query(func.avg(SLOEvaluation.error_budget_remaining)).filter(
+            SLOEvaluation.error_budget_remaining.isnot(None)
+        )
+        if model_id:
+            avg_budget_remaining = avg_budget_remaining.filter(SLOEvaluation.model_id == model_id)
+        avg_budget_remaining = avg_budget_remaining.scalar() or 0.0
+        
+        exhausted_budgets = q_eval.filter(SLOEvaluation.error_budget_remaining <= 0).count()
+        
+        # Alerts
+        q_alert = db.query(Alert)
+        q_alert = cls._apply_time_filter(q_alert, Alert.triggered_at, time_range_days)
+        if model_id:
+            q_alert = q_alert.filter(Alert.model_id == model_id)
+            
+        total_alerts = q_alert.count()
+        active_alerts = q_alert.filter(Alert.status == "OPEN").count()
+        
+        alerts_with_incident = q_alert.filter(Alert.incident_id.isnot(None)).count()
+        alert_to_incident_conversion = (alerts_with_incident / total_alerts * 100) if total_alerts > 0 else 0.0
+        
+        resolved_alerts = q_alert.filter(Alert.resolved_at.isnot(None), Alert.triggered_at.isnot(None)).all()
+        mttr_list = [(a.resolved_at - a.triggered_at).total_seconds() for a in resolved_alerts]
+        alert_mttr_minutes = (sum(mttr_list) / len(mttr_list) / 60.0) if mttr_list else None
+        
+        ack_alerts = q_alert.filter(Alert.acknowledged_at.isnot(None), Alert.triggered_at.isnot(None)).all()
+        mtta_list = [(a.acknowledged_at - a.triggered_at).total_seconds() for a in ack_alerts]
+        alert_mtta_minutes = (sum(mtta_list) / len(mtta_list) / 60.0) if mtta_list else None
+        
+        return {
+            "total_objectives": total_objectives,
+            "slo_compliance_rate": slo_compliance_rate,
+            "exhausted_budgets": exhausted_budgets,
+            "average_remaining_budget": avg_budget_remaining,
+            "total_alerts": total_alerts,
+            "active_alerts": active_alerts,
+            "alert_to_incident_conversion_rate": alert_to_incident_conversion,
+            "alert_mtta_minutes": alert_mtta_minutes,
+            "alert_mttr_minutes": alert_mttr_minutes
+        }

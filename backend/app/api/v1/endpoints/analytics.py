@@ -73,3 +73,11 @@ def get_policy_metrics(
     time_range_days: Optional[int] = Query(None)
 ) -> Any:
     return ReliabilityAnalyticsService.get_policy_metrics(db, time_range_days)
+
+@router.get("/slo")
+def get_slo_analytics(
+    db: Session = Depends(get_db),
+    time_range_days: Optional[int] = Query(None),
+    model_id: Optional[str] = Query(None)
+) -> Any:
+    return ReliabilityAnalyticsService.get_slo_analytics(db, time_range_days, model_id)

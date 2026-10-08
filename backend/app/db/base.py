@@ -27,3 +27,4 @@ from app.models.workflow import WorkflowRun, WorkflowStepRun, WorkflowApproval #
 from app.models.integration import Integration, WebhookEvent, ExternalCheck # noqa
 from app.models.user import User # noqa
 from app.models.audit import AuditEvent # noqa
+from app.models.slo import ReliabilityObjective, SLOEvaluation, AlertRule, Alert # noqa

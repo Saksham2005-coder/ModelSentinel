@@ -33,6 +33,8 @@ import { ChangeIntelligencePage } from '@/pages/ChangeIntelligencePage';
 import Workflows from '@/pages/Workflows';
 import WorkflowDetail from '@/pages/WorkflowDetail';
 import { IntegrationsPage } from '@/pages/IntegrationsPage';
+import { SLOPage } from '@/pages/slo/SLOPage';
+import { AlertsPage } from '@/pages/alerts/AlertsPage';
 
 import { AuthProvider } from '@/AuthContext';
 import { LoginPage } from '@/pages/LoginPage';
@@ -78,6 +80,8 @@ function App() {
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/audit" element={<AuditPage />} />
               <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+              <Route path="/slo" element={<SLOPage />} />
+              <Route path="/alerts" element={<AlertsPage />} />
               
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/analytics/models/:modelId" element={<ModelAnalyticsDetailPage />} />
