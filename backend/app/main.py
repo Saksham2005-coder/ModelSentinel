@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
-from app.api.v1.endpoints import models, monitoring, incidents, investigations, repositories, patches, validation, memory, regression, pull_requests, deployments, analytics, change_risk, policies, telemetry, reliability, model_intelligence, workflows
+from app.api.v1.endpoints import models, monitoring, incidents, investigations, repositories, patches, validation, memory, regression, pull_requests, deployments, analytics, change_risk, policies, telemetry, reliability, model_intelligence, workflows, integrations
 
 app = FastAPI(
     title="ModelSentinel API",
@@ -44,6 +44,9 @@ app.include_router(telemetry.router, prefix="/api/v1/telemetry", tags=["telemetr
 app.include_router(reliability.router, prefix="/api/v1/models/{model_id}/reliability", tags=["reliability"])
 app.include_router(model_intelligence.router, prefix="/api/v1/models", tags=["intelligence"])
 app.include_router(workflows.router, prefix="/api/v1/workflows", tags=["workflows"])
+app.include_router(integrations.router, prefix="/api/v1/integrations", tags=["integrations"])
+from app.api.v1.endpoints import ci
+app.include_router(ci.router, prefix="/api/v1/ci", tags=["ci"])
 from sqlalchemy import text
 from app.db.session import SessionLocal
 from app.ai.service import get_llm_provider

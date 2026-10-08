@@ -24,3 +24,4 @@ from app.models.telemetry import ProductionTelemetry # noqa
 from app.models.reliability import ReliabilityEvent, ReliabilityEdge
 from app.models.resolution_memory import ResolutionMemory # noqa
 from app.models.workflow import WorkflowRun, WorkflowStepRun, WorkflowApproval # noqa
+from app.models.integration import Integration, WebhookEvent, ExternalCheck # noqa

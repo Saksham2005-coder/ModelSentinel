@@ -25,8 +25,9 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "")
 
-    GITHUB_TOKEN: str = os.getenv("GITHUB_TOKEN", "")
-    GITHUB_API_URL: str = os.getenv("GITHUB_API_URL", "https://api.github.com")
+    MODELSENTINEL_GITHUB_TOKEN: str = os.getenv("MODELSENTINEL_GITHUB_TOKEN", os.getenv("GITHUB_TOKEN", ""))
+    MODELSENTINEL_GITHUB_API_URL: str = os.getenv("MODELSENTINEL_GITHUB_API_URL", os.getenv("GITHUB_API_URL", "https://api.github.com"))
+    MODELSENTINEL_GITHUB_WEBHOOK_SECRET: str = os.getenv("MODELSENTINEL_GITHUB_WEBHOOK_SECRET", "")
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
