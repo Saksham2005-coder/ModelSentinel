@@ -39,18 +39,18 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
         
         {/* Header */}
         <div>
-          <Link to="/analytics" className="inline-flex items-center text-sm font-medium text-neutral-400 hover:text-white mb-4 transition-colors">
+          <Link to="/analytics" className="inline-flex items-center text-sm font-medium text-neutral-400 hover:text-text-primary mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+              <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary flex items-center gap-3">
                 <Activity className="w-8 h-8 text-indigo-400" />
                 Model Reliability Overview
               </h1>
               <p className="text-neutral-400 mt-1">Deterministic performance breakdown for the selected model.</p>
             </div>
-            <Link to={`/models/${modelId}/reliability`} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors flex items-center gap-2 font-medium">
+            <Link to={`/models/${modelId}/reliability`} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-text-primary rounded-lg transition-colors flex items-center gap-2 font-medium">
               <Clock className="w-4 h-4" />
               View Reliability Timeline
             </Link>
@@ -87,7 +87,7 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
               <ShieldAlert className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">Incidents</span>
             </div>
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-text-primary">
               {overview.total_incidents}
             </div>
             <div className="text-xs text-red-400 mt-1">{overview.critical_incidents} Critical</div>
@@ -98,7 +98,7 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
               <Clock className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">MTTR</span>
             </div>
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-text-primary">
               {overview.mttr_minutes !== null ? `${overview.mttr_minutes.toFixed(1)}m` : 'N/A'}
             </div>
             <div className="text-xs text-neutral-500 mt-1">Mean Time to Resolve</div>
@@ -109,7 +109,7 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
               <Crosshair className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">Coverage</span>
             </div>
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-text-primary">
               {overview.regression_coverage.toFixed(1)}%
             </div>
             <div className="text-xs text-neutral-500 mt-1">Regression Defense</div>
@@ -120,7 +120,7 @@ export const ModelAnalyticsDetailPage: React.FC = () => {
               <GitCommit className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">Degradation</span>
             </div>
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-text-primary">
               {overview.deployment_degradation_rate.toFixed(1)}%
             </div>
             <div className="text-xs text-neutral-500 mt-1">Post-Deploy Failure</div>

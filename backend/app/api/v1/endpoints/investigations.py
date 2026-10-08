@@ -35,11 +35,17 @@ def create_investigation(
     return inv
 
 @router.get("/incidents/{incident_id}/investigations", response_model=List[InvestigationResponse])
-def list_investigations(
+def list_incident_investigations(
     incident_id: str,
     db: Session = Depends(get_db)
 ):
     return db.query(Investigation).filter(Investigation.incident_id == incident_id).order_by(Investigation.created_at.desc()).all()
+
+@router.get("/investigations", response_model=List[InvestigationResponse])
+def list_all_investigations(
+    db: Session = Depends(get_db)
+):
+    return db.query(Investigation).order_by(Investigation.created_at.desc()).all()
 
 @router.get("/investigations/{investigation_id}", response_model=InvestigationDetailResponse)
 def get_investigation(

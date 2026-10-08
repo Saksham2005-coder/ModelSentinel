@@ -136,7 +136,7 @@ export function DeploymentGateDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight text-text-primary">Deployment: {deployment.id.substring(0,8)}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Deployment: {deployment.id.substring(0,8)}</h1>
               <Badge variant={getStatusVariant(deployment.status)}>
                 {deployment.status}
               </Badge>

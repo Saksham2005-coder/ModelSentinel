@@ -63,35 +63,35 @@ const ReliabilityTimelinePage: React.FC = () => {
     if (['DEGRADATION_DETECTED', 'INCIDENT_CREATED'].includes(type)) return 'bg-red-500/10 border-red-500/20 text-red-400';
     if (['ROOT_CAUSE_IDENTIFIED', 'PATCH_PROPOSED', 'VALIDATION_COMPLETED', 'DEPLOYMENT_COMPLETED', 'VERIFICATION_COMPLETED'].includes(type)) return 'bg-green-500/10 border-green-500/20 text-green-400';
     if (['INVESTIGATION_STARTED', 'REGRESSION_LEARNED'].includes(type)) return 'bg-blue-500/10 border-blue-500/20 text-blue-400';
-    return 'bg-gray-800 border-gray-700 text-gray-300';
+    return 'bg-background-secondary border-border-strong text-gray-300';
   };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white flex items-center">
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary flex items-center">
           <span className="mr-2">⏳</span> Reliability Timeline
         </h1>
         <button
           onClick={loadTimeline}
-          className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+          className="px-4 py-2 bg-background-secondary text-text-primary rounded hover:bg-gray-700 transition"
         >
           Refresh
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64 text-gray-400">Loading timeline...</div>
+        <div className="flex justify-center items-center h-64 text-text-secondary">Loading timeline...</div>
       ) : events.length === 0 ? (
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center text-gray-400">
+        <div className="bg-background-secondary border border-border-strong rounded-lg p-8 text-center text-text-secondary">
           No reliability events found for this model.
         </div>
       ) : (
-        <div className="relative border-l-2 border-gray-700 ml-4 pl-8 space-y-8">
+        <div className="relative border-l-2 border-border-strong ml-4 pl-8 space-y-8">
           {events.map((event) => (
             <div key={event.id} className="relative">
               {/* Timeline marker */}
-              <div className="absolute -left-11 top-1 w-6 h-6 rounded-full bg-gray-900 border-2 border-gray-600 flex items-center justify-center text-xs shadow-lg shadow-black/50">
+              <div className="absolute -left-11 top-1 w-6 h-6 rounded-full bg-background-primary border-2 border-gray-600 flex items-center justify-center text-xs shadow-lg shadow-black/50">
                 {getEventIcon(event.event_type)}
               </div>
               
@@ -117,7 +117,7 @@ const ReliabilityTimelinePage: React.FC = () => {
                       {!!(event.metadata_json as Record<string, unknown>).category && (
                         <div>
                           <span className="opacity-60 text-xs uppercase tracking-wider block mb-1">Category</span>
-                          <span className="font-medium text-amber-400">{String((event.metadata_json as Record<string, unknown>).category)}</span>
+                          <span className="font-medium text-brand-hover">{String((event.metadata_json as Record<string, unknown>).category)}</span>
                         </div>
                       )}
                       {!!(event.metadata_json as Record<string, unknown>).explanation && (

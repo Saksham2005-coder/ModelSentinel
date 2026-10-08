@@ -58,10 +58,10 @@ export function IntegrationsPage() {
     <div className="flex flex-col gap-8 pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-text-primary">Integrations</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Integrations</h1>
           <p className="text-text-secondary mt-1">Connect engineering systems to ModelSentinel.</p>
         </div>
-        <Button>
+        <Button disabled title="Integration configuration is managed via environment variables for security.">
           <Plus className="h-4 w-4 mr-2" /> Add Integration
         </Button>
       </div>

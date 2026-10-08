@@ -71,7 +71,7 @@ export function DeploymentGatesPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-text-primary">Deployment Gates</h1>
+        <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Deployment Gates</h1>
         <p className="text-text-secondary mt-1">Review operational deployment eligibility for patches.</p>
       </div>
 
@@ -79,7 +79,7 @@ export function DeploymentGatesPage() {
         {Object.entries(metrics).map(([key, value]) => (
           <div key={key} className="bg-surface border border-border rounded-lg p-4 flex flex-col">
             <span className="text-sm text-text-secondary capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-            <span className="text-2xl font-bold text-text-primary mt-1">{value}</span>
+            <span className="text-2xl font-semibold tracking-tight text-text-primary mt-1">{value}</span>
           </div>
         ))}
       </div>

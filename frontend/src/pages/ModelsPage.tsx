@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
+import { PageHeader, EmptyState } from '@/components/ui/Layout';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Plus, Search, Filter, Box, Loader2, AlertCircle } from 'lucide-react';
 import { ModelsApi, Model } from '@/services/api/models';
 import { AddModelModal } from '@/features/models/components/AddModelModal';
@@ -42,22 +44,19 @@ export function ModelsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-text-primary">Models</h1>
-          <p className="text-text-secondary mt-1">Manage and monitor all your ML models.</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={handleRefresh}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Refresh
-          </Button>
-          <Button variant="primary" className="gap-2" onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Model
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title="Models" 
+        description="Manage and monitor all your ML models."
+      >
+        <Button variant="outline" onClick={handleRefresh}>
+          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+          Refresh
+        </Button>
+        <Button variant="primary" className="gap-2" onClick={() => setIsAddModalOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add Model
+        </Button>
+      </PageHeader>
 
       <div className="flex flex-col md:flex-row items-center gap-4">
         <div className="relative flex-1">
@@ -89,17 +88,17 @@ export function ModelsPage() {
             <p>Loading models...</p>
           </div>
         ) : models.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-text-secondary text-center">
-            <div className="h-12 w-12 rounded-full bg-surface-hover flex items-center justify-center mb-4">
-              <Box className="h-6 w-6 text-text-muted" />
-            </div>
-            <h3 className="text-lg font-medium text-text-primary">No models found</h3>
-            <p className="max-w-sm mt-1">You haven't added any models yet. Add your first model to start monitoring.</p>
-            <Button variant="primary" className="mt-4 gap-2" onClick={() => setIsAddModalOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Add Model
-            </Button>
-          </div>
+          <EmptyState
+            title="No models found"
+            description="You haven't added any models yet. Add your first model to start monitoring."
+            icon={<Box className="h-8 w-8" />}
+            action={
+              <Button variant="primary" className="gap-2" onClick={() => setIsAddModalOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Add Model
+              </Button>
+            }
+          />
         ) : (
           <Table>
             <TableHeader>
@@ -132,14 +131,7 @@ export function ModelsPage() {
                     <Badge variant="default" className="capitalize">{model.environment}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={
-                        model.status === 'active' ? 'success' : 
-                        model.status === 'warning' || model.status === 'degraded' ? 'warning' : 'default'
-                      }
-                    >
-                      {model.status.toUpperCase()}
-                    </Badge>
+                    <StatusBadge status={model.status} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

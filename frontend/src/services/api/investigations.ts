@@ -65,6 +65,9 @@ export const InvestigationsApi = {
   getInvestigations: (incidentId: string) => 
     fetchApi<Investigation[]>(`/incidents/${incidentId}/investigations`),
     
+  getAllInvestigations: () =>
+    fetchApi<Investigation[]>(`/investigations`),
+    
   getInvestigation: (investigationId: string) => 
     fetchApi<InvestigationDetail>(`/investigations/${investigationId}`),
     

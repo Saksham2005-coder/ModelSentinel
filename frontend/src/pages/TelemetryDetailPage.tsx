@@ -50,7 +50,7 @@ export function TelemetryDetailPage() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-text-primary flex items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary flex items-center gap-3">
             Telemetry Window
             {telemetry.status === 'PROCESSED' || telemetry.status === 'VALID' ? (
               <Badge variant="success">PROCESSED</Badge>

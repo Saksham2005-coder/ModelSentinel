@@ -99,7 +99,7 @@ export function PullRequestDetailPage() {
         </Button>
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">Pull Request: {pr.id.substring(0,8)}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Pull Request: {pr.id.substring(0,8)}</h1>
             <Badge variant={pr.status === 'PASSED' ? 'success' : pr.status === 'FAILED' ? 'danger' : 'info'}>
               {pr.status}
             </Badge>
@@ -259,7 +259,7 @@ export function PullRequestDetailPage() {
                 <ShieldAlert className="h-5 w-5 text-brand" /> Change Risk
               </h3>
               <div className="flex items-center gap-4 mb-4">
-                <div className="text-2xl font-bold text-text-primary">{riskAssessment.risk_score}</div>
+                <div className="text-2xl font-semibold tracking-tight text-text-primary">{riskAssessment.risk_score}</div>
                 <Badge variant={
                   riskAssessment.risk_level === 'CRITICAL' ? 'danger' :
                   riskAssessment.risk_level === 'HIGH' ? 'danger' :

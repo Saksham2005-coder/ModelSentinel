@@ -6,9 +6,9 @@ import { ModelsPage } from '@/pages/ModelsPage';
 import { MonitoringPage } from '@/pages/MonitoringPage';
 import { IncidentsPage } from '@/pages/IncidentsPage';
 import { IncidentDetailPage } from '@/pages/IncidentDetailPage';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
 import { InvestigationPage } from '@/pages/InvestigationPage';
+import { GlobalInvestigationsPage } from '@/pages/GlobalInvestigationsPage';
 import { RepositoryPage } from '@/pages/RepositoryPage';
 import { PatchWorkspacePage } from '@/pages/PatchWorkspacePage';
 import { ValidationWorkspacePage } from '@/pages/ValidationWorkspacePage';
@@ -44,11 +44,14 @@ import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
 import { AuditPage } from '@/pages/AuditPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
+import { NotFoundPage } from '@/pages/NotFoundPage';
+import { PageTitleManager } from '@/components/PageTitleManager';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <PageTitleManager />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -66,8 +69,7 @@ function App() {
               <Route path="/models/:id/reliability" element={<ReliabilityTimelinePage />} />
               <Route path="/incidents" element={<IncidentsPage />} />
               <Route path="/incidents/:incidentId" element={<IncidentDetailPage />} />
-              <Route path="/investigations" element={<PlaceholderPage title="Investigations" />} />
-              <Route path="/experiments" element={<PlaceholderPage title="Experiments" />} />
+              <Route path="/investigations" element={<GlobalInvestigationsPage />} />
               <Route path="/regression-tests" element={<RegressionSuitePage />} />
               <Route path="/regression-tests/:id" element={<RegressionTestPage />} />
               <Route path="/deployments" element={<DeploymentGatesPage />} />
@@ -80,7 +82,7 @@ function App() {
               <Route path="/workflows/:id" element={<WorkflowDetail />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/audit" element={<AuditPage />} />
-              <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+
               <Route path="/slo" element={<SLOPage />} />
               <Route path="/alerts" element={<AlertsPage />} />
               
@@ -96,12 +98,13 @@ function App() {
               
               {/* Incident-specific sub-routes as placeholders */}
               <Route path="/incidents/:incidentId/investigation" element={<InvestigationPage />} />
-              <Route path="/incidents/:incidentId/root-cause" element={<PlaceholderPage title="Root Cause" />} />
-              <Route path="/incidents/:incidentId/timeline" element={<PlaceholderPage title="Timeline" />} />
               <Route path="/incidents/:incidentId/fix" element={<PatchWorkspacePage />} />
               <Route path="/incidents/:incidentId/validation" element={<ValidationWorkspacePage />} />
+              
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </AuthProvider>

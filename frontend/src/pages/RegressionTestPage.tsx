@@ -5,7 +5,8 @@ import { useParams, Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Loader2, ArrowLeft, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, PlayCircle, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { fetchApi } from '@/services/api/client';
 
 export function RegressionTestPage() {
   const { id } = useParams();
@@ -13,11 +14,16 @@ export function RegressionTestPage() {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const loadTest = () => {
-    fetch(`http://localhost:8000/api/v1/regression-tests/${id}`)
-      .then(res => res.json())
+    fetchApi<any>(`/regression-tests/${id}`)
       .then(data => {
         setTest(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message || 'Failed to load test');
         setLoading(false);
       });
   };
@@ -28,17 +34,22 @@ export function RegressionTestPage() {
 
   const runTest = () => {
     setRunning(true);
-    fetch(`http://localhost:8000/api/v1/regression-tests/${id}/run`, { method: 'POST' })
+    fetchApi(`/regression-tests/${id}/run`, { method: 'POST' })
       .then(() => {
         // Poll for completion (simulation)
         setTimeout(() => {
           loadTest();
           setRunning(false);
         }, 2000);
+      })
+      .catch(err => {
+        setError(err.message || 'Failed to run test');
+        setRunning(false);
       });
   };
 
   if (loading) return <div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (error) return <div className="p-12"><div className="text-status-danger p-4 bg-status-danger/10 rounded-lg border border-status-danger/20 flex items-center"><AlertCircle className="w-5 h-5 mr-2" />{error}</div></div>;
   if (!test) return <div className="p-12 text-center">Test not found</div>;
 
   return (
@@ -49,14 +60,14 @@ export function RegressionTestPage() {
         </Button>
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">{test.name}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight tracking-tight mb-2">{test.name}</h1>
             <div className="flex space-x-3 text-sm text-muted-foreground">
               <span>Source Incident: <Link to={`/incidents/${test.source_incident_id}`} className="text-emerald-500 hover:underline">{test.source_incident_id.substring(0,8)}</Link></span>
               <span>•</span>
               <span>Segments: {test.affected_segments?.join(', ') || 'Global'}</span>
             </div>
           </div>
-          <Button onClick={runTest} disabled={running} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button onClick={runTest} disabled={running} className="bg-emerald-600 hover:bg-emerald-700 text-text-primary">
             {running ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <PlayCircle className="w-4 h-4 mr-2" />}
             {running ? 'Running...' : 'Run Regression Test'}
           </Button>
@@ -103,7 +114,7 @@ export function RegressionTestPage() {
                       ) : run.status === 'FAIL' ? (
                         <XCircle className="w-5 h-5 text-red-500" />
                       ) : (
-                        <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+                        <Loader2 className="w-5 h-5 text-brand animate-spin" />
                       )}
                       <span className="font-medium text-sm">{new Date(run.started_at).toLocaleString()}</span>
                     </div>
@@ -112,7 +123,7 @@ export function RegressionTestPage() {
                       run.status === 'FAIL' ? 'danger' : 'warning'
                     } className={
                       run.status === 'PASS' ? 'border-emerald-500/50 text-emerald-500' :
-                      run.status === 'FAIL' ? 'border-red-500/50 text-red-500' : 'border-amber-500/50 text-amber-500'
+                      run.status === 'FAIL' ? 'border-red-500/50 text-red-500' : 'border-brand/50 text-brand'
                     }>
                       {run.status}
                     </Badge>

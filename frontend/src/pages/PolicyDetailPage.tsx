@@ -74,7 +74,7 @@ export function PolicyDetailPage() {
           <Link to="/policies"><ArrowLeft className="h-5 w-5" /></Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{policy.name}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight">{policy.name}</h1>
           <div className="flex gap-2 mt-2">
             <Badge variant={policy.enabled ? 'default' : 'default'}>
               {policy.enabled ? 'Enabled' : 'Disabled'}

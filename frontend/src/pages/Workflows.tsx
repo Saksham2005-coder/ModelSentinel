@@ -26,27 +26,27 @@ const Workflows: React.FC = () => {
       case 'COMPLETED': return <CheckCircle className="w-5 h-5 text-emerald-400" />;
       case 'FAILED': return <XCircle className="w-5 h-5 text-red-400" />;
       case 'RUNNING': return <Activity className="w-5 h-5 text-blue-400" />;
-      case 'WAITING_APPROVAL': return <AlertCircle className="w-5 h-5 text-amber-400" />;
-      default: return <Clock className="w-5 h-5 text-slate-400" />;
+      case 'WAITING_APPROVAL': return <AlertCircle className="w-5 h-5 text-brand-hover" />;
+      default: return <Clock className="w-5 h-5 text-text-secondary" />;
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-slate-400">Loading workflows...</div>;
+    return <div className="p-8 text-text-secondary">Loading workflows...</div>;
   }
 
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-2">Workflow Orchestration</h1>
-          <p className="text-slate-400">Manage and observe automated reliability workflows.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-text-primary mb-2">Workflow Orchestration</h1>
+          <p className="text-text-secondary">Manage and observe automated reliability workflows.</p>
         </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+      <div className="bg-background-primary border border-border rounded-xl overflow-hidden">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-800/50 text-slate-400">
+          <thead className="bg-background-secondary/50 text-text-secondary">
             <tr>
               <th className="px-6 py-4 font-medium">Status</th>
               <th className="px-6 py-4 font-medium">Workflow</th>
@@ -55,16 +55,16 @@ const Workflows: React.FC = () => {
               <th className="px-6 py-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800 text-slate-300">
+          <tbody className="divide-y divide-border text-text-primary">
             {workflows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                   No workflows found
                 </td>
               </tr>
             ) : (
               workflows.map(wf => (
-                <tr key={wf.id} className="hover:bg-slate-800/50 transition-colors">
+                <tr key={wf.id} className="hover:bg-background-secondary/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(wf.status)}
@@ -72,15 +72,15 @@ const Workflows: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium text-slate-200">{wf.name}</div>
-                    <div className="text-xs text-slate-500 mt-1">{wf.id}</div>
+                    <div className="font-medium text-text-primary">{wf.name}</div>
+                    <div className="text-xs text-text-muted mt-1">{wf.id}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 text-xs">
+                    <span className="px-2 py-1 rounded bg-background-secondary text-text-primary text-xs">
                       {wf.entity_type}: {wf.entity_id}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-400">
+                  <td className="px-6 py-4 text-text-secondary">
                     {wf.started_at ? new Date(wf.started_at).toLocaleString() : 'Not started'}
                   </td>
                   <td className="px-6 py-4 text-right">

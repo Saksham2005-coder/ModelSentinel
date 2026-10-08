@@ -11,6 +11,10 @@ import { Loader2, ArrowLeft, Clock, AlertTriangle, ShieldAlert, CheckCircle, Bra
 import { ReliabilityApi, CausalGraph } from '@/services/api/reliability';
 import { SimpleGraphRenderer } from '@/components/reliability/CausalGraphModal';
 import { workflowsApi, WorkflowRun } from '@/services/api/workflows';
+import { fetchApi } from '@/services/api/client';
+import { CopyButton } from '@/components/ui/CopyButton';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { useToast } from '@/contexts/ToastContext';
 
 export function IncidentDetailPage() {
   const { incidentId } = useParams<{ incidentId: string }>();
@@ -19,6 +23,7 @@ export function IncidentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
   
   const [similar, setSimilar] = useState<any[]>([]);
   const [eligibility, setEligibility] = useState<{eligible: boolean, reason: string} | null>(null);
@@ -41,8 +46,7 @@ export function IncidentDetailPage() {
       setModel(mod);
       
       // Fetch similar incidents
-      fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/similar`)
-        .then(res => res.json())
+      fetchApi<any[]>(`/incidents/${incidentId}/similar`)
         .then(data => setSimilar(data || []))
         .catch(() => setSimilar([]));
 
@@ -60,17 +64,18 @@ export function IncidentDetailPage() {
         
       // Fetch eligibility if resolved
       if (inc.status === 'resolved') {
-        fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/memory/eligibility`)
-          .then(res => res.json())
+        fetchApi<{eligible: boolean, reason: string}>(`/incidents/${incidentId}/memory/eligibility`)
           .then(data => setEligibility(data))
           .catch(() => setEligibility(null));
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch incident details');
+      const msg = err instanceof Error ? err.message : 'Failed to fetch incident details';
+      setError(msg);
+      addToast('error', msg);
     } finally {
       setLoading(false);
     }
-  }, [incidentId]);
+  }, [incidentId, addToast]);
 
   useEffect(() => {
     fetchIncident();
@@ -90,35 +95,44 @@ export function IncidentDetailPage() {
     if (!incidentId) return;
     setActionLoading(true);
     try {
-      if (action === 'acknowledge') await IncidentApi.acknowledge(incidentId);
+      if (action === 'acknowledge') {
+        await IncidentApi.acknowledge(incidentId);
+        addToast('success', 'Incident acknowledged.');
+      }
       if (action === 'startInvestigation') {
         window.location.href = `/incidents/${incidentId}/investigation`;
         return;
       }
-      if (action === 'resolve') await IncidentApi.resolve(incidentId, 'Resolved via UI');
-      if (action === 'suppress') await IncidentApi.suppress(incidentId);
+      if (action === 'resolve') {
+        await IncidentApi.resolve(incidentId, 'Resolved via UI');
+        addToast('success', 'Incident resolved.');
+      }
+      if (action === 'suppress') {
+        await IncidentApi.suppress(incidentId);
+        addToast('info', 'Incident suppressed.');
+      }
       if (action === 'learn') {
-        const memRes = await fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/memory`, {
+        const data = await fetchApi<any>(`/incidents/${incidentId}/memory`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             title: `Resolved: ${incident?.title}`,
             resolution_summary: 'Fix restored model performance successfully'
           })
         });
-        if (memRes.ok) {
-          const data = await memRes.json();
+        if (data) {
           // Create regression test automatically
-          await fetch(`http://localhost:8000/api/v1/memories/${data.id}/regression-case`, {
+          await fetchApi(`/memories/${data.id}/regression-case`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({})
           });
+          addToast('success', 'Learned from incident and created regression test.');
         }
       }
       await fetchIncident();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : `Failed to ${action} incident`);
+      const msg = err instanceof Error ? err.message : `Failed to ${action} incident`;
+      setError(msg);
+      addToast('error', msg);
     } finally {
       setActionLoading(false);
     }
@@ -130,21 +144,24 @@ export function IncidentDetailPage() {
     try {
       const wf = await workflowsApi.createWorkflow(`Recovery ${incident.id.substring(0,8)}`, 'INCIDENT_RECOVERY', 'incident', incidentId);
       await workflowsApi.startWorkflow(wf.id);
+      addToast('success', 'Recovery workflow started.');
       await fetchIncident();
       window.location.href = `/workflows/${wf.id}`;
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to start workflow');
+      const msg = err instanceof Error ? err.message : 'Failed to start workflow';
+      setError(msg);
+      addToast('error', msg);
       setActionLoading(false);
     }
   };
 
-  if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-text-secondary" /></div>;
+  if (loading) return <LoadingState text="Loading incident details..." className="py-20" />;
   if (error) return <div className="p-8 text-status-danger">{error}</div>;
   if (!incident) return <div className="p-8">Incident not found</div>;
 
   if (!incident) return <div className="p-8">Incident not found</div>;
 
-  const tabs = ['Overview', 'Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery', 'Timeline', 'Reliability Timeline', 'Workflows'];
+  const tabs = ['Overview', 'Investigation', 'Proposed Fix', 'Validation', 'Timeline', 'Reliability Timeline', 'Workflows'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -155,8 +172,9 @@ export function IncidentDetailPage() {
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold tracking-tight text-text-primary">
+              <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary flex items-center gap-2">
                 Incident <span className="font-mono text-xl text-text-secondary">#{incident.id.substring(0,8)}</span>
+                <CopyButton value={incident.id} label="Copy incident ID" />
               </h1>
               <Badge variant={incident.severity === 'critical' ? 'danger' : 'warning'} className="uppercase">
                 {incident.severity}
@@ -182,7 +200,7 @@ export function IncidentDetailPage() {
               </Button>
             )}
             {workflows.length === 0 && (
-              <Button variant="outline" onClick={handleStartWorkflow} disabled={actionLoading} className="border-brand text-brand hover:bg-brand hover:text-white">
+              <Button variant="outline" onClick={handleStartWorkflow} disabled={actionLoading} className="border-brand text-brand hover:bg-brand hover:text-text-primary">
                 Start Recovery Workflow
               </Button>
             )}
@@ -191,20 +209,20 @@ export function IncidentDetailPage() {
                 <Button variant="outline" onClick={() => handleAction('suppress')} disabled={actionLoading}>
                   Suppress
                 </Button>
-                <Button variant="primary" className="bg-status-success hover:bg-status-success/90 text-white" onClick={() => handleAction('resolve')} disabled={actionLoading}>
+                <Button variant="primary" className="bg-status-success hover:bg-status-success/90 text-text-primary" onClick={() => handleAction('resolve')} disabled={actionLoading}>
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Resolve
                 </Button>
               </>
             )}
             {incident.status === 'resolved' && eligibility?.eligible && (
-               <Button onClick={() => handleAction('learn')} disabled={actionLoading} className="bg-amber-600 hover:bg-amber-700 text-white">
+               <Button onClick={() => handleAction('learn')} disabled={actionLoading} className="bg-amber-600 hover:bg-amber-700 text-text-primary">
                  <BrainCircuit className="w-4 h-4 mr-2" />
                  Learn From This Incident
                </Button>
             )}
             {incident.status === 'resolved' && eligibility && !eligibility.eligible && eligibility.reason.includes("already exists") && (
-               <Button disabled className="bg-amber-500/20 text-amber-500 border-amber-500/50" variant="outline">
+               <Button disabled className="bg-brand/20 text-brand border-brand/50" variant="outline">
                  <ShieldCheck className="w-4 h-4 mr-2" />
                  Regression Coverage Created
                </Button>
@@ -223,6 +241,10 @@ export function IncidentDetailPage() {
             onClick={() => {
               if (t === 'Investigation') {
                 window.location.href = `/incidents/${incidentId}/investigation`;
+              } else if (t === 'Proposed Fix') {
+                window.location.href = `/incidents/${incidentId}/fix`;
+              } else if (t === 'Validation') {
+                window.location.href = `/incidents/${incidentId}/validation`;
               } else {
                 setActiveTab(t);
               }
@@ -243,7 +265,7 @@ export function IncidentDetailPage() {
           {similar.length > 0 && (
             <div>
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <BrainCircuit className="w-5 h-5 text-amber-500" />
+                <BrainCircuit className="w-5 h-5 text-brand" />
                 Historical Resolution Intelligence
               </h2>
               <div className="grid grid-cols-1 gap-4">
@@ -255,7 +277,7 @@ export function IncidentDetailPage() {
                           <Link to={`/incidents/${s.incident_id}`} className="font-medium hover:underline text-text-primary text-lg">
                             {s.title}
                           </Link>
-                          <Badge variant="warning" className="border-amber-500/50 text-amber-500 bg-amber-500/10">
+                          <Badge variant="warning" className="border-brand/50 text-brand bg-brand/10">
                             {s.similarity_score}% Match
                           </Badge>
                           {s.resolution?.effectiveness_score > 0 && (
@@ -309,7 +331,7 @@ export function IncidentDetailPage() {
                   <div className="text-xs text-text-muted uppercase tracking-wider mb-1 font-semibold">{s.source_type.replace('_', ' ')}</div>
                   <div className="font-medium mb-2">{s.signal_name}</div>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-2xl font-bold">{s.observed_value !== null ? s.observed_value?.toFixed(4) : 'N/A'}</span>
+                    <span className="text-2xl font-semibold tracking-tight">{s.observed_value !== null ? s.observed_value?.toFixed(4) : 'N/A'}</span>
                     {s.threshold !== null && (
                       <span className="text-sm text-text-secondary">
                         (Threshold: {s.comparison} {s.threshold})
@@ -355,7 +377,7 @@ export function IncidentDetailPage() {
             {/* Phase 10 Synthesized Events */}
             {pullRequests.map(pr => (
               <div key={pr.id} className="relative pl-8">
-                <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-amber-500" />
+                <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-surface bg-brand" />
                 <div className="text-sm text-text-muted mb-1">{new Date(pr.created_at).toLocaleString()}</div>
                 <div className="font-medium text-text-primary">Pull Request Created</div>
                 <p className="text-text-secondary mt-1">
@@ -389,11 +411,11 @@ export function IncidentDetailPage() {
           </h2>
           <div className="p-8 border border-border rounded-xl bg-surface flex justify-center overflow-auto max-h-[800px] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDUpIi8+Cjwvc3ZnPg==')]">
             {causalGraphLoading ? (
-              <div className="flex justify-center items-center h-64 text-gray-400"><Loader2 className="h-8 w-8 animate-spin" /></div>
+              <div className="flex justify-center items-center h-64 text-text-secondary"><Loader2 className="h-8 w-8 animate-spin" /></div>
             ) : causalGraph && causalGraph.nodes.length > 0 ? (
               <SimpleGraphRenderer graph={causalGraph} />
             ) : (
-              <div className="text-gray-500">No causal connections found for this incident.</div>
+              <div className="text-text-muted">No causal connections found for this incident.</div>
             )}
           </div>
         </div>
@@ -409,7 +431,7 @@ export function IncidentDetailPage() {
              <div className="p-16 border border-border border-dashed rounded-xl flex flex-col items-center justify-center text-center">
                 <AlertTriangle className="h-10 w-10 text-text-muted mb-4" />
                 <h3 className="text-lg font-medium text-text-primary mb-2">No active workflows</h3>
-                <Button onClick={handleStartWorkflow} disabled={actionLoading} className="mt-4 bg-brand hover:bg-brand/90 text-white">
+                <Button onClick={handleStartWorkflow} disabled={actionLoading} className="mt-4 bg-brand hover:bg-brand/90 text-text-primary">
                   Start Recovery Workflow
                 </Button>
              </div>
@@ -418,10 +440,10 @@ export function IncidentDetailPage() {
               {workflows.map(wf => (
                 <div key={wf.id} className="p-4 border border-border rounded-xl bg-surface flex justify-between items-center">
                   <div>
-                    <h3 className="font-medium text-white">{wf.name}</h3>
-                    <p className="text-sm text-slate-400">Status: {wf.status} | ID: {wf.id}</p>
+                    <h3 className="font-medium text-text-primary">{wf.name}</h3>
+                    <p className="text-sm text-text-secondary">Status: {wf.status} | ID: {wf.id}</p>
                   </div>
-                  <Link to={`/workflows/${wf.id}`} className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">
+                  <Link to={`/workflows/${wf.id}`} className="px-4 py-2 bg-background-secondary text-text-primary rounded-lg hover:bg-background-elevated transition-colors">
                     View Workflow
                   </Link>
                 </div>
@@ -431,25 +453,7 @@ export function IncidentDetailPage() {
         </div>
       )}
 
-      {['Investigation', 'Root Cause', 'Proposed Fix', 'Validation', 'Delivery'].includes(activeTab) && (
-        <div className="p-16 border border-border border-dashed rounded-xl flex flex-col items-center justify-center text-center">
-          <AlertTriangle className="h-10 w-10 text-text-muted mb-4" />
-          <h3 className="text-lg font-medium text-text-primary mb-2">
-            {activeTab === 'Investigation' && 'Investigation not started'}
-            {activeTab === 'Root Cause' && 'Root cause analysis not yet available'}
-            {activeTab === 'Proposed Fix' && 'No fix has been generated'}
-            {activeTab === 'Validation' && 'No validation run'}
-            {activeTab === 'Delivery' && (pullRequests.length > 0 ? (
-              <div className="flex flex-col gap-4 mt-4">
-                 <Link to={`/pull-requests/${pullRequests[0].id}`} className="px-4 py-2 bg-brand text-white rounded-md hover:bg-brand/90 transition-colors">Go to Pull Request</Link>
-              </div>
-            ) : 'No delivery artifacts available')}
-          </h3>
-          <p className="text-text-secondary max-w-sm">
-            {activeTab !== 'Delivery' && 'This capability will be enabled in future phases of the incident lifecycle.'}
-          </p>
-        </div>
-      )}
+
     </div>
   );
 }

@@ -73,7 +73,7 @@ export function MonitoringPage() {
     <div className="p-8 space-y-8">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Monitoring: {model.name}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight mb-2">Monitoring: {model.name}</h1>
           <div className="flex gap-2">
             <Badge variant="default">Version: {activeVersion?.version || 'N/A'}</Badge>
             <Badge variant="default">{model.environment}</Badge>
@@ -97,8 +97,8 @@ export function MonitoringPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-4 border rounded-lg bg-surface-50">
               <div className="text-sm text-text-secondary mb-1">Model Performance (F1)</div>
-              <div className="text-2xl font-bold">{f1Metric ? (f1Metric.metric_value * 100).toFixed(1) + '%' : 'N/A'}</div>
-              <div className={`text-sm ${f1Metric?.status === 'healthy' ? 'text-green-500' : 'text-amber-500'}`}>
+              <div className="text-2xl font-semibold tracking-tight">{f1Metric ? (f1Metric.metric_value * 100).toFixed(1) + '%' : 'N/A'}</div>
+              <div className={`text-sm ${f1Metric?.status === 'healthy' ? 'text-green-500' : 'text-brand'}`}>
                 {f1Metric?.status || 'Unknown'}
               </div>
             </div>
@@ -108,8 +108,8 @@ export function MonitoringPage() {
                 const dq = dataQuality.find(d => d.monitoring_run_id === latestRun.id && d.metric_name === 'missing_value_percentage');
                 return (
                   <>
-                    <div className="text-2xl font-bold">{dq ? dq.value.toFixed(2) + '%' : '0%'}</div>
-                    <div className={`text-sm ${dq?.status === 'healthy' ? 'text-green-500' : 'text-amber-500'}`}>{dq?.status || 'Healthy'}</div>
+                    <div className="text-2xl font-semibold tracking-tight">{dq ? dq.value.toFixed(2) + '%' : '0%'}</div>
+                    <div className={`text-sm ${dq?.status === 'healthy' ? 'text-green-500' : 'text-brand'}`}>{dq?.status || 'Healthy'}</div>
                   </>
                 );
               })()}
@@ -120,8 +120,8 @@ export function MonitoringPage() {
                 const pd = predictionDrift.find(d => d.monitoring_run_id === latestRun.id && d.prediction_metric === 'class_drift_psi');
                 return (
                   <>
-                    <div className="text-2xl font-bold">{pd ? pd.value.toFixed(3) : 'N/A'}</div>
-                    <div className={`text-sm ${pd?.status === 'healthy' ? 'text-green-500' : 'text-amber-500'}`}>{pd?.status || 'Unknown'}</div>
+                    <div className="text-2xl font-semibold tracking-tight">{pd ? pd.value.toFixed(3) : 'N/A'}</div>
+                    <div className={`text-sm ${pd?.status === 'healthy' ? 'text-green-500' : 'text-brand'}`}>{pd?.status || 'Unknown'}</div>
                   </>
                 );
               })()}

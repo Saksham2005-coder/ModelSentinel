@@ -21,28 +21,28 @@ export const ChangeRiskPage: React.FC = () => {
 
   const getRiskColor = (level: string) => {
     switch (level) {
-      case 'CRITICAL': return 'bg-red-500 text-white';
-      case 'HIGH': return 'bg-orange-500 text-white';
+      case 'CRITICAL': return 'bg-red-500 text-text-primary';
+      case 'HIGH': return 'bg-orange-500 text-text-primary';
       case 'MODERATE': return 'bg-yellow-500 text-black';
-      case 'LOW': return 'bg-green-500 text-white';
-      default: return 'bg-gray-500 text-white';
+      case 'LOW': return 'bg-green-500 text-text-primary';
+      default: return 'bg-gray-500 text-text-primary';
     }
   };
 
   if (loading) {
     return (
-      <div className="p-8 text-white">
-        <h1 className="text-2xl font-bold mb-6">Change Risk Intelligence</h1>
-        <div className="text-gray-400">Loading risk assessments...</div>
+      <div className="p-8 text-text-primary">
+        <h1 className="text-2xl font-semibold tracking-tight mb-6">Change Risk Intelligence</h1>
+        <div className="text-text-secondary">Loading risk assessments...</div>
       </div>
     );
   }
 
   if (assessments.length === 0) {
     return (
-      <div className="p-8 text-white">
-        <h1 className="text-2xl font-bold mb-6">Change Risk Intelligence</h1>
-        <div className="bg-gray-800 p-8 rounded-lg text-center text-gray-400">
+      <div className="p-8 text-text-primary">
+        <h1 className="text-2xl font-semibold tracking-tight mb-6">Change Risk Intelligence</h1>
+        <div className="bg-background-secondary p-8 rounded-lg text-center text-text-secondary">
           No change risk assessments found.
         </div>
       </div>
@@ -50,22 +50,22 @@ export const ChangeRiskPage: React.FC = () => {
   }
 
   return (
-    <div className="p-8 text-white">
-      <h1 className="text-2xl font-bold mb-6 text-amber-500">Change Risk Intelligence</h1>
-      <p className="text-gray-400 mb-8">
+    <div className="p-8 text-text-primary">
+      <h1 className="text-2xl font-semibold tracking-tight mb-6 text-brand">Change Risk Intelligence</h1>
+      <p className="text-text-secondary mb-8">
         Review deterministic risk scores and blast radius calculations for recent patch proposals.
       </p>
 
       <div className="space-y-6">
         {assessments.map((a) => (
-          <div key={a.id} className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+          <div key={a.id} className="bg-background-secondary border border-border-strong rounded-lg p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-lg font-medium">Patch {a.patch_proposal_id.substring(0, 8)}</h3>
-                <div className="text-sm text-gray-400 mt-1">Evaluated on {new Date(a.created_at).toLocaleString()}</div>
+                <div className="text-sm text-text-secondary mt-1">Evaluated on {new Date(a.created_at).toLocaleString()}</div>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="text-2xl font-bold">{a.risk_score}/100</div>
+                <div className="text-2xl font-semibold tracking-tight">{a.risk_score}/100</div>
                 <div className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(a.risk_level)}`}>
                   {a.risk_level}
                 </div>
@@ -77,9 +77,9 @@ export const ChangeRiskPage: React.FC = () => {
                 <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Risk Factors</h4>
                 <ul className="space-y-2">
                   {a.factors.map((f, i) => (
-                    <li key={i} className="flex justify-between items-center text-sm bg-gray-900 p-2 rounded">
+                    <li key={i} className="flex justify-between items-center text-sm bg-background-primary p-2 rounded">
                       <span className="text-gray-300">{f.factor}</span>
-                      <span className="text-amber-500 font-mono">+{f.contribution}</span>
+                      <span className="text-brand font-mono">+{f.contribution}</span>
                     </li>
                   ))}
                 </ul>
@@ -88,30 +88,30 @@ export const ChangeRiskPage: React.FC = () => {
               <div>
                 <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Blast Radius</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-gray-900 p-3 rounded">
-                    <div className="text-gray-400">Files</div>
+                  <div className="bg-background-primary p-3 rounded">
+                    <div className="text-text-secondary">Files</div>
                     <div className="text-xl font-medium">{a.blast_radius.files.length}</div>
                   </div>
-                  <div className="bg-gray-900 p-3 rounded">
-                    <div className="text-gray-400">Models</div>
+                  <div className="bg-background-primary p-3 rounded">
+                    <div className="text-text-secondary">Models</div>
                     <div className="text-xl font-medium">{a.blast_radius.models.length}</div>
                   </div>
-                  <div className="bg-gray-900 p-3 rounded">
-                    <div className="text-gray-400">Features</div>
+                  <div className="bg-background-primary p-3 rounded">
+                    <div className="text-text-secondary">Features</div>
                     <div className="text-xl font-medium">{a.blast_radius.features.length}</div>
                   </div>
-                  <div className="bg-gray-900 p-3 rounded">
-                    <div className="text-gray-400">Historical Incidents</div>
+                  <div className="bg-background-primary p-3 rounded">
+                    <div className="text-text-secondary">Historical Incidents</div>
                     <div className="text-xl font-medium">{a.blast_radius.historical_incidents.length}</div>
                   </div>
                 </div>
                 
                 {a.recommended_regressions.length > 0 && (
                   <div className="mt-4">
-                    <h5 className="text-xs font-semibold text-gray-400 mb-1">Recommended Regressions</h5>
+                    <h5 className="text-xs font-semibold text-text-secondary mb-1">Recommended Regressions</h5>
                     <div className="flex flex-wrap gap-2">
                       {a.recommended_regressions.map(r => (
-                        <span key={r} className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">
+                        <span key={r} className="text-xs bg-brand/20 text-amber-300 px-2 py-1 rounded">
                           {r.substring(0, 8)}
                         </span>
                       ))}

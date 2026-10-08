@@ -58,14 +58,14 @@ export const EngineeringIntelligencePage: React.FC = () => {
   }, [days]);
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-neutral-100 p-8 pt-24 font-sans selection:bg-amber-500/30">
+    <div className="min-h-screen bg-neutral-900 text-neutral-100 p-8 pt-24 font-sans selection:bg-brand/30">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header & Filters */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-              <Brain className="w-8 h-8 text-amber-500" />
+            <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary flex items-center gap-3">
+              <Brain className="w-8 h-8 text-brand" />
               Engineering Intelligence
             </h1>
             <p className="text-neutral-400 mt-1">Advanced reliability analytics & engineering hotspots.</p>
@@ -75,7 +75,7 @@ export const EngineeringIntelligencePage: React.FC = () => {
               <button
                 key={d || 'all'}
                 onClick={() => setDays(d)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${days === d ? 'bg-amber-500/20 text-amber-400' : 'text-neutral-400 hover:text-white hover:bg-neutral-700/50'}`}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${days === d ? 'bg-brand/20 text-brand-hover' : 'text-neutral-400 hover:text-text-primary hover:bg-neutral-700/50'}`}
               >
                 {d ? `${d} Days` : 'All Time'}
               </button>
@@ -96,11 +96,11 @@ export const EngineeringIntelligencePage: React.FC = () => {
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-amber-400" />
+                    <Activity className="w-4 h-4 text-brand-hover" />
                     Overall Reliability
                   </h3>
                   <div className="flex items-end gap-2">
-                    <span className={`text-4xl font-bold tracking-tight ${overview.reliability_score > 80 ? 'text-emerald-400' : overview.reliability_score > 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                    <span className={`text-4xl font-bold tracking-tight ${overview.reliability_score > 80 ? 'text-emerald-400' : overview.reliability_score > 50 ? 'text-brand-hover' : 'text-red-400'}`}>
                       {overview.reliability_score}
                     </span>
                     <span className="text-neutral-500 mb-1">/ 100</span>
@@ -110,33 +110,33 @@ export const EngineeringIntelligencePage: React.FC = () => {
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2 flex items-center gap-2">
-                    <AlertOctagon className="w-4 h-4 text-amber-400" />
+                    <AlertOctagon className="w-4 h-4 text-brand-hover" />
                     Models At Risk
                   </h3>
                   <div className="flex items-end gap-2">
-                    <span className="text-4xl font-bold tracking-tight text-white">{overview.models_at_risk}</span>
+                    <span className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">{overview.models_at_risk}</span>
                   </div>
                 </div>
 
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2 flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-amber-400" />
+                    <ShieldAlert className="w-4 h-4 text-brand-hover" />
                     Total Incidents
                   </h3>
                   <div className="flex items-end gap-2">
-                    <span className="text-4xl font-bold tracking-tight text-white">{overview.total_incidents}</span>
+                    <span className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">{overview.total_incidents}</span>
                   </div>
                 </div>
                 
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2 flex items-center gap-2">
-                    <Target className="w-4 h-4 text-amber-400" />
+                    <Target className="w-4 h-4 text-brand-hover" />
                     Active SLO Pressure
                   </h3>
                   <div className="flex items-end gap-2">
-                    <span className="text-4xl font-bold tracking-tight text-white">{overview.active_slo_pressure}</span>
+                    <span className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">{overview.active_slo_pressure}</span>
                   </div>
                 </div>
               </div>
@@ -145,8 +145,8 @@ export const EngineeringIntelligencePage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Trends Chart */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-brand-hover" />
                     Reliability Trends ({trends?.direction || 'N/A'})
                   </h2>
                   <div className="h-64">
@@ -179,8 +179,8 @@ export const EngineeringIntelligencePage: React.FC = () => {
 
                 {/* Hotspots */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-brand-hover" />
                     Engineering Hotspots
                   </h2>
                   <div className="space-y-4">
@@ -188,11 +188,11 @@ export const EngineeringIntelligencePage: React.FC = () => {
                       hotspots.map((h, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-900/50 border border-neutral-800">
                           <div>
-                            <div className="font-medium text-white">{h.component}</div>
+                            <div className="font-medium text-text-primary">{h.component}</div>
                             <div className="text-xs text-neutral-400 mt-1">{h.category}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-amber-400">{h.hotspot_score.toFixed(1)}</div>
+                            <div className="font-bold text-brand-hover">{h.hotspot_score.toFixed(1)}</div>
                             <div className="text-xs text-neutral-500">Score</div>
                           </div>
                         </div>
@@ -207,8 +207,8 @@ export const EngineeringIntelligencePage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Engineering Effectiveness */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <GitCommit className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <GitCommit className="w-5 h-5 text-brand-hover" />
                     Fix Effectiveness
                   </h2>
                   {effectiveness ? (
@@ -216,7 +216,7 @@ export const EngineeringIntelligencePage: React.FC = () => {
                       <div>
                         <div className="flex justify-between text-sm mb-2">
                           <span className="text-neutral-300">Validation Success Rate</span>
-                          <span className="font-bold text-white">{effectiveness.patch_validation_success_rate.toFixed(1)}%</span>
+                          <span className="font-bold text-text-primary">{effectiveness.patch_validation_success_rate.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-neutral-900 rounded-full h-2">
                           <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${effectiveness.patch_validation_success_rate}%` }}></div>
@@ -225,7 +225,7 @@ export const EngineeringIntelligencePage: React.FC = () => {
                       <div>
                         <div className="flex justify-between text-sm mb-2">
                           <span className="text-neutral-300">Deployment Health Rate</span>
-                          <span className="font-bold text-white">{effectiveness.deployment_health_success_rate.toFixed(1)}%</span>
+                          <span className="font-bold text-text-primary">{effectiveness.deployment_health_success_rate.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-neutral-900 rounded-full h-2">
                           <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${effectiveness.deployment_health_success_rate}%` }}></div>
@@ -239,27 +239,27 @@ export const EngineeringIntelligencePage: React.FC = () => {
 
                 {/* SLO Intelligence */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <Target className="w-5 h-5 text-brand-hover" />
                     SLO Intelligence
                   </h2>
                   {slo ? (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800">
                         <div className="text-sm text-neutral-400 mb-1">Total Objectives</div>
-                        <div className="text-2xl font-bold text-white">{slo.total_objectives}</div>
+                        <div className="text-2xl font-semibold tracking-tight text-text-primary">{slo.total_objectives}</div>
                       </div>
                       <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800">
                         <div className="text-sm text-neutral-400 mb-1">Compliance Rate</div>
-                        <div className="text-2xl font-bold text-white">{slo.slo_compliance_rate.toFixed(1)}%</div>
+                        <div className="text-2xl font-semibold tracking-tight text-text-primary">{slo.slo_compliance_rate.toFixed(1)}%</div>
                       </div>
                       <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800">
                         <div className="text-sm text-neutral-400 mb-1">Avg Remaining Budget</div>
-                        <div className="text-2xl font-bold text-white">{slo.average_remaining_budget.toFixed(1)}%</div>
+                        <div className="text-2xl font-semibold tracking-tight text-text-primary">{slo.average_remaining_budget.toFixed(1)}%</div>
                       </div>
                       <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800">
                         <div className="text-sm text-neutral-400 mb-1">Active Alerts</div>
-                        <div className="text-2xl font-bold text-amber-400">{slo.active_alerts}</div>
+                        <div className="text-2xl font-semibold tracking-tight text-brand-hover">{slo.active_alerts}</div>
                       </div>
                     </div>
                   ) : (
@@ -270,7 +270,7 @@ export const EngineeringIntelligencePage: React.FC = () => {
 
             {/* Model Comparison Table */}
             <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl overflow-hidden">
-              <h2 className="text-lg font-medium text-white mb-6">Cross-Model Reliability Comparison</h2>
+              <h2 className="text-lg font-medium text-text-primary mb-6">Cross-Model Reliability Comparison</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-neutral-300">
                   <thead className="text-xs text-neutral-400 uppercase bg-neutral-900/50 border-b border-neutral-700/50">
@@ -285,9 +285,9 @@ export const EngineeringIntelligencePage: React.FC = () => {
                   <tbody className="divide-y divide-neutral-800">
                     {models.map((m) => (
                       <tr key={m.model_id} className="hover:bg-neutral-800/50 transition-colors">
-                        <td className="px-4 py-4 font-medium text-white">{m.model_name}</td>
+                        <td className="px-4 py-4 font-medium text-text-primary">{m.model_name}</td>
                         <td className="px-4 py-4">
-                            <span className={`font-bold ${m.reliability_score >= 80 ? 'text-emerald-400' : m.reliability_score >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                            <span className={`font-bold ${m.reliability_score >= 80 ? 'text-emerald-400' : m.reliability_score >= 50 ? 'text-brand-hover' : 'text-red-400'}`}>
                                 {m.reliability_score}
                             </span>
                         </td>
@@ -295,7 +295,7 @@ export const EngineeringIntelligencePage: React.FC = () => {
                             <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
                                 m.status === 'HEALTHY' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                 m.status === 'STABLE' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                                m.status === 'AT_RISK' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                m.status === 'AT_RISK' ? 'bg-brand/10 text-brand-hover border-brand/20' :
                                 'bg-red-500/10 text-red-400 border-red-500/20'
                             }`}>
                                 {m.status}
@@ -320,8 +320,8 @@ export const EngineeringIntelligencePage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Root Causes */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-brand-hover" />
                     Root Cause Intelligence
                   </h2>
                   <div className="space-y-4">
@@ -329,11 +329,11 @@ export const EngineeringIntelligencePage: React.FC = () => {
                       rootCauses.map((rc, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-900/50 border border-neutral-800">
                           <div>
-                            <div className="font-medium text-white">{rc.root_cause}</div>
+                            <div className="font-medium text-text-primary">{rc.root_cause}</div>
                             <div className="text-xs text-neutral-400 mt-1">Severity: {rc.severity}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-amber-400">{rc.frequency}</div>
+                            <div className="font-bold text-brand-hover">{rc.frequency}</div>
                             <div className="text-xs text-neutral-500">Frequency</div>
                           </div>
                         </div>
@@ -346,8 +346,8 @@ export const EngineeringIntelligencePage: React.FC = () => {
 
                 {/* Reliability Drivers */}
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-amber-400" />
+                  <h2 className="text-lg font-medium text-text-primary mb-6 flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-brand-hover" />
                     Reliability Drivers
                   </h2>
                   <div className="space-y-4">
@@ -355,11 +355,11 @@ export const EngineeringIntelligencePage: React.FC = () => {
                       drivers.map((d, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-900/50 border border-neutral-800">
                           <div>
-                            <div className="font-medium text-white">{d.driver}</div>
+                            <div className="font-medium text-text-primary">{d.driver}</div>
                             <div className="text-xs text-neutral-400 mt-1">Confidence: {d.confidence}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-amber-400">{d.evidence_count}</div>
+                            <div className="font-bold text-brand-hover">{d.evidence_count}</div>
                             <div className="text-xs text-neutral-500">Evidence</div>
                           </div>
                         </div>

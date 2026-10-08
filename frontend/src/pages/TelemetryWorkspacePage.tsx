@@ -59,7 +59,7 @@ export function TelemetryWorkspacePage() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-text-primary">Production Telemetry</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Production Telemetry</h1>
           <p className="text-text-secondary mt-1">Monitor incoming model behavior and detect reliability degradation.</p>
         </div>
         <div className="flex items-center gap-4">
@@ -80,21 +80,21 @@ export function TelemetryWorkspacePage() {
             <h3 className="font-medium">Total Windows</h3>
             <Activity className="h-5 w-5 text-brand" />
           </div>
-          <div className="text-3xl font-bold text-text-primary">{total}</div>
+          <div className="text-2xl font-semibold tracking-tight text-text-primary">{total}</div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-6 flex flex-col gap-2">
           <div className="flex items-center justify-between text-text-secondary">
             <h3 className="font-medium">Successfully Processed</h3>
             <CheckCircle className="h-5 w-5 text-status-success" />
           </div>
-          <div className="text-3xl font-bold text-text-primary">{processed}</div>
+          <div className="text-2xl font-semibold tracking-tight text-text-primary">{processed}</div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-6 flex flex-col gap-2">
           <div className="flex items-center justify-between text-text-secondary">
             <h3 className="font-medium">Validation / Processing Failed</h3>
             <XCircle className="h-5 w-5 text-status-danger" />
           </div>
-          <div className="text-3xl font-bold text-text-primary">{failed}</div>
+          <div className="text-2xl font-semibold tracking-tight text-text-primary">{failed}</div>
         </div>
       </div>
 

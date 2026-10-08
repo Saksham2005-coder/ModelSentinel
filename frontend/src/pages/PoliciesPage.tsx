@@ -52,12 +52,12 @@ export function PoliciesPage() {
     <div className="p-8 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Reliability Policies</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight">Reliability Policies</h1>
           <p className="text-muted-foreground mt-2">
             Manage engineering guardrails and deterministic enforcement rules.
           </p>
         </div>
-        <Button>
+        <Button disabled title="Policy creation is configured via the CLI">
           <Plus className="mr-2 h-4 w-4" />
           Create Policy
         </Button>
@@ -70,7 +70,7 @@ export function PoliciesPage() {
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{policies.filter(p => p.enabled).length}</div>
+            <div className="text-2xl font-semibold tracking-tight">{policies.filter(p => p.enabled).length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -79,16 +79,16 @@ export function PoliciesPage() {
             <ShieldAlert className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">--</div>
+            <div className="text-2xl font-semibold tracking-tight">--</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Review Required</CardTitle>
-            <Activity className="h-4 w-4 text-amber-500" />
+            <Activity className="h-4 w-4 text-brand" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">--</div>
+            <div className="text-2xl font-semibold tracking-tight">--</div>
           </CardContent>
         </Card>
       </div>

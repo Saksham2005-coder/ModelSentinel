@@ -2,29 +2,35 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Loader2, ShieldCheck, PlayCircle, Clock } from 'lucide-react';
+import { Loader2, ShieldCheck, PlayCircle, Clock, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { fetchApi } from '@/services/api/client';
 import { Button } from '@/components/ui/Button';
 
 export function RegressionSuitePage() {
   const [cases, setCases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/regression-tests')
-      .then(res => res.json())
+    setLoading(true);
+    fetchApi<any[]>('/regression-tests')
       .then(data => {
         setCases(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setError(err.message || 'Failed to fetch regression tests');
+        setLoading(false);
+      });
   }, []);
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2 flex items-center">
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight mb-2 flex items-center">
             <ShieldCheck className="w-8 h-8 mr-3 text-emerald-500" />
             Regression Tests
           </h1>
@@ -32,13 +38,18 @@ export function RegressionSuitePage() {
             Automated test suite generated from learned incident memories.
           </p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-text-primary">
           <PlayCircle className="w-4 h-4 mr-2" />
           Run Suite
         </Button>
       </div>
 
-      {loading ? (
+      {error ? (
+        <div className="text-status-danger p-4 bg-status-danger/10 rounded-lg border border-status-danger/20 flex items-center">
+          <AlertCircle className="w-5 h-5 mr-2" />
+          {error}
+        </div>
+      ) : loading ? (
         <div className="flex justify-center p-12">
           <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
         </div>
@@ -86,7 +97,7 @@ export function RegressionSuitePage() {
                       } className={
                         c.last_run === 'PASS' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/10' :
                         c.last_run === 'FAIL' ? 'border-red-500/50 text-red-500 bg-red-500/10' :
-                        'border-amber-500/50 text-amber-500 bg-amber-500/10'
+                        'border-brand/50 text-brand bg-brand/10'
                       }>
                         {c.last_run}
                       </Badge>

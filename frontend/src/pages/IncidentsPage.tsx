@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { PageHeader, EmptyState } from '@/components/ui/Layout';
 import { Loader2, Search, Filter, AlertTriangle } from 'lucide-react';
 
 export function IncidentsPage() {
@@ -66,10 +67,10 @@ export function IncidentsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-text-primary">Incidents</h1>
-        <p className="text-text-secondary mt-1">View, investigate, and resolve issues across your ML systems.</p>
-      </div>
+      <PageHeader 
+        title="Incidents" 
+        description="View, investigate, and resolve issues across your ML systems."
+      />
 
       <div className="flex flex-col md:flex-row items-center gap-4 justify-between border-b border-border pb-4">
         <div className="flex gap-4">
@@ -106,11 +107,11 @@ export function IncidentsPage() {
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : incidents.length === 0 ? (
-          <div className="p-12 text-center text-text-secondary">
-            <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-text-muted" />
-            <h3 className="text-lg font-medium text-text-primary">No incidents found</h3>
-            <p>No incidents match the current criteria.</p>
-          </div>
+          <EmptyState
+            title="No incidents found"
+            description="No incidents match the current criteria."
+            icon={<AlertTriangle className="h-8 w-8" />}
+          />
         ) : (
           <Table>
             <TableHeader>

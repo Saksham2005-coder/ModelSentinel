@@ -68,7 +68,7 @@ export function PullRequestsPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-text-primary">Pull Requests</h1>
+        <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Pull Requests</h1>
         <p className="text-text-secondary mt-1">Manage validated patches through the delivery workflow.</p>
       </div>
 
@@ -76,7 +76,7 @@ export function PullRequestsPage() {
         {Object.entries(metrics).map(([key, value]) => (
           <div key={key} className="bg-surface border border-border rounded-lg p-4 flex flex-col">
             <span className="text-sm text-text-secondary capitalize">{key}</span>
-            <span className="text-2xl font-bold text-text-primary mt-1">{value}</span>
+            <span className="text-2xl font-semibold tracking-tight text-text-primary mt-1">{value}</span>
           </div>
         ))}
       </div>

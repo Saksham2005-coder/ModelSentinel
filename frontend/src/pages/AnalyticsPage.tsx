@@ -55,7 +55,7 @@ export const AnalyticsPage: React.FC = () => {
         {/* Header & Filters */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary flex items-center gap-3">
               <BarChart2 className="w-8 h-8 text-indigo-400" />
               ML Reliability Analytics
             </h1>
@@ -66,7 +66,7 @@ export const AnalyticsPage: React.FC = () => {
               <button
                 key={d || 'all'}
                 onClick={() => setDays(d)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${days === d ? 'bg-indigo-500/20 text-indigo-300' : 'text-neutral-400 hover:text-white hover:bg-neutral-700/50'}`}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${days === d ? 'bg-indigo-500/20 text-indigo-300' : 'text-neutral-400 hover:text-text-primary hover:bg-neutral-700/50'}`}
               >
                 {d ? `${d} Days` : 'All Time'}
               </button>
@@ -98,7 +98,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2">Regression Coverage</h3>
-                  <div className="text-4xl font-bold tracking-tight text-white">
+                  <div className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">
                     {overview.regression_coverage.toFixed(1)}%
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2">Mean Time to Resolve (MTTR)</h3>
-                  <div className="text-4xl font-bold tracking-tight text-white">
+                  <div className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">
                     {overview.mttr_minutes !== null ? `${overview.mttr_minutes.toFixed(1)}m` : 'Insufficient Data'}
                   </div>
                 </div>
@@ -114,7 +114,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <h3 className="text-sm font-medium text-neutral-400 mb-2">Post-Deploy Degradation</h3>
-                  <div className="text-4xl font-bold tracking-tight text-white">
+                  <div className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">
                     {overview.deployment_degradation_rate.toFixed(1)}%
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export const AnalyticsPage: React.FC = () => {
             {/* Models Table */}
             <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl shadow-xl overflow-hidden">
               <div className="p-6 border-b border-neutral-700/50">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
                   <Activity className="w-5 h-5 text-emerald-400" />
                   Model Reliability
                 </h2>
@@ -145,7 +145,7 @@ export const AnalyticsPage: React.FC = () => {
                   <tbody className="divide-y divide-neutral-800">
                     {models.map((model) => (
                       <tr key={model.model_id} className="hover:bg-neutral-800/30 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white">
+                        <td className="px-6 py-4 font-medium text-text-primary">
                           <Link to={`/analytics/models/${model.model_id}`} className="text-indigo-400 hover:text-indigo-300">
                             {model.model_name}
                           </Link>
@@ -188,7 +188,7 @@ export const AnalyticsPage: React.FC = () => {
             {policyMetrics && (
               <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl shadow-xl overflow-hidden">
                 <div className="p-6 border-b border-neutral-700/50">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-emerald-400" />
                     Policy Enforcement
                   </h2>
@@ -196,19 +196,19 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
                   <div>
                     <h3 className="text-sm text-neutral-400 mb-1">Total Evaluations</h3>
-                    <div className="text-3xl font-bold text-white">{policyMetrics.total_evaluations}</div>
+                    <div className="text-2xl font-semibold tracking-tight text-text-primary">{policyMetrics.total_evaluations}</div>
                   </div>
                   <div>
                     <h3 className="text-sm text-neutral-400 mb-1">Allowed</h3>
-                    <div className="text-3xl font-bold text-emerald-400">{policyMetrics.allowed}</div>
+                    <div className="text-2xl font-semibold tracking-tight text-emerald-400">{policyMetrics.allowed}</div>
                   </div>
                   <div>
                     <h3 className="text-sm text-neutral-400 mb-1">Blocked</h3>
-                    <div className="text-3xl font-bold text-rose-400">{policyMetrics.blocked}</div>
+                    <div className="text-2xl font-semibold tracking-tight text-rose-400">{policyMetrics.blocked}</div>
                   </div>
                   <div>
                     <h3 className="text-sm text-neutral-400 mb-1">Review Required</h3>
-                    <div className="text-3xl font-bold text-yellow-400">{policyMetrics.review_required}</div>
+                    <div className="text-2xl font-semibold tracking-tight text-yellow-400">{policyMetrics.review_required}</div>
                   </div>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export const AnalyticsPage: React.FC = () => {
               {/* Root Causes */}
               <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl shadow-xl overflow-hidden">
                 <div className="p-6 border-b border-neutral-700/50">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <Shield className="w-5 h-5 text-rose-400" />
                     Recurring Root Causes
                   </h2>
@@ -251,7 +251,7 @@ export const AnalyticsPage: React.FC = () => {
               {/* Fix Effectiveness */}
               <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl shadow-xl overflow-hidden">
                 <div className="p-6 border-b border-neutral-700/50">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
                     <GitMerge className="w-5 h-5 text-indigo-400" />
                     Closed-Loop Effectiveness
                   </h2>
@@ -262,7 +262,7 @@ export const AnalyticsPage: React.FC = () => {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-neutral-400">Patch Validation Success</span>
-                          <span className="font-medium text-white">{fixEffectiveness.patch_validation_success_rate.toFixed(1)}%</span>
+                          <span className="font-medium text-text-primary">{fixEffectiveness.patch_validation_success_rate.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-neutral-900 rounded-full h-2">
                           <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${fixEffectiveness.patch_validation_success_rate}%` }}></div>
@@ -272,7 +272,7 @@ export const AnalyticsPage: React.FC = () => {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-neutral-400">Deployment Health Success</span>
-                          <span className="font-medium text-white">{fixEffectiveness.deployment_health_success_rate.toFixed(1)}%</span>
+                          <span className="font-medium text-text-primary">{fixEffectiveness.deployment_health_success_rate.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-neutral-900 rounded-full h-2">
                           <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${fixEffectiveness.deployment_health_success_rate}%` }}></div>
@@ -282,7 +282,7 @@ export const AnalyticsPage: React.FC = () => {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-neutral-400">Full-Loop Completion (Detected → Verified)</span>
-                          <span className="font-medium text-white">{fixEffectiveness.full_loop_completion_rate.toFixed(1)}%</span>
+                          <span className="font-medium text-text-primary">{fixEffectiveness.full_loop_completion_rate.toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-neutral-900 rounded-full h-2">
                           <div className="bg-purple-500 h-2 rounded-full" style={{ width: `${fixEffectiveness.full_loop_completion_rate}%` }}></div>

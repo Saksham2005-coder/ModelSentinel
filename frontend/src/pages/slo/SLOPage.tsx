@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { PageHeader, EmptyState } from '@/components/ui/Layout';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { fetchApi } from '@/services/api/client';
 import { ShieldAlert, Activity, Plus } from 'lucide-react';
 
@@ -46,78 +47,79 @@ export function SLOPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Service Level Objectives</h1>
-          <p className="text-zinc-400">Manage and monitor your reliability objectives and error budgets.</p>
-        </div>
-        <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+      <PageHeader
+        title="Service Level Objectives"
+        description="Manage and monitor your reliability objectives and error budgets."
+      >
+        <Button variant="primary" disabled title="SLO creation is configured via the CLI">
           <Plus className="mr-2 h-4 w-4" />
           Create SLO
         </Button>
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-[#111111] border-zinc-800">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-zinc-400">Total SLOs</p>
-                <p className="text-3xl font-bold text-white">{objectives.length}</p>
+                <p className="text-sm font-medium text-text-muted">Total SLOs</p>
+                <p className="text-2xl font-semibold tracking-tight text-text-primary">{objectives.length}</p>
               </div>
-              <div className="p-3 bg-zinc-800/50 rounded-lg">
-                <ShieldAlert className="h-6 w-6 text-amber-500" />
+              <div className="p-3 bg-surface-hover rounded-lg">
+                <ShieldAlert className="h-6 w-6 text-brand" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-[#111111] border-zinc-800">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-medium text-white flex items-center">
-            <Activity className="mr-2 h-5 w-5 text-amber-500" />
+          <CardTitle className="text-lg font-medium text-text-primary flex items-center">
+            <Activity className="mr-2 h-5 w-5 text-brand" />
             Reliability Objectives
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-800">
-                <TableHead className="text-zinc-400">Name</TableHead>
-                <TableHead className="text-zinc-400">Type</TableHead>
-                <TableHead className="text-zinc-400">Target</TableHead>
-                <TableHead className="text-zinc-400">Window</TableHead>
-                <TableHead className="text-zinc-400">Status</TableHead>
-                <TableHead className="text-zinc-400 text-right">Actions</TableHead>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Target</TableHead>
+                <TableHead>Window</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
+                  <TableCell colSpan={6} className="text-center text-text-secondary py-8">
                     Loading objectives...
                   </TableCell>
                 </TableRow>
               ) : objectives.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
-                    No SLOs defined. Create one to get started.
+                  <TableCell colSpan={6}>
+                    <EmptyState
+                      title="No SLOs defined"
+                      description="Create an SLO to start monitoring."
+                      icon={<ShieldAlert className="h-8 w-8" />}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
                 objectives.map((obj) => (
-                  <TableRow key={obj.id} className="border-zinc-800">
-                    <TableCell className="font-medium text-zinc-200">{obj.name}</TableCell>
-                    <TableCell className="text-zinc-400">{obj.objective_type}</TableCell>
-                    <TableCell className="text-zinc-300">
+                  <TableRow key={obj.id}>
+                    <TableCell className="font-medium text-text-primary">{obj.name}</TableCell>
+                    <TableCell className="text-text-secondary">{obj.objective_type}</TableCell>
+                    <TableCell className="text-text-primary">
                       {obj.comparison_operator} {obj.target_value}
                     </TableCell>
-                    <TableCell className="text-zinc-400">{obj.evaluation_window}</TableCell>
+                    <TableCell className="text-text-secondary">{obj.evaluation_window}</TableCell>
                     <TableCell>
-                      <Badge variant={obj.enabled ? "success" : "default"}>
-                        {obj.enabled ? "Active" : "Inactive"}
-                      </Badge>
+                      <StatusBadge status={obj.enabled ? "ACTIVE" : "DISABLED"} />
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => handleEvaluate(obj.id)}>

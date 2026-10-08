@@ -5,6 +5,7 @@ import { IncidentApi, IncidentDetail } from '@/services/api/incidents';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, Play, AlertCircle, CheckCircle, ShieldAlert, FileText, Activity, Clock, BrainCircuit, Link as LinkIcon } from 'lucide-react';
+import { fetchApi } from '@/services/api/client';
 
 interface RelevantFile {
   file_path: string;
@@ -55,21 +56,15 @@ export function InvestigationPage() {
       }
       
       try {
-        const repoRes = await fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/repository-context`);
-        if (repoRes.ok) {
-          const repoData = await repoRes.json();
-          setRepoContext(repoData);
-        }
+        const repoData = await fetchApi<RepoContext>(`/incidents/${incidentId}/repository-context`);
+        setRepoContext(repoData);
       } catch (e) {
         console.error("Failed to fetch repository context", e);
       }
       
       try {
-        const simRes = await fetch(`http://localhost:8000/api/v1/incidents/${incidentId}/similar`);
-        if (simRes.ok) {
-          const simData = await simRes.json();
-          setSimilar(simData || []);
-        }
+        const simData = await fetchApi<SimilarIncident[]>(`/incidents/${incidentId}/similar`);
+        setSimilar(simData || []);
       } catch (e) {
         console.error("Failed to fetch similar incidents", e);
       }
@@ -121,7 +116,7 @@ export function InvestigationPage() {
         </Link>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold">AI Investigation</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">AI Investigation</h1>
             <Badge variant={investigation?.status === 'completed' ? 'success' : investigation?.status === 'running' ? 'warning' : 'default'}>
               {investigation?.status.toUpperCase() || 'NOT STARTED'}
             </Badge>
@@ -171,8 +166,8 @@ export function InvestigationPage() {
               {(repoContext.relevant_files?.length ?? 0) > 0 ? (
                 <div className="space-y-3">
                   {repoContext.relevant_files!.map((file: RelevantFile, i: number) => (
-                    <div key={i} className="p-2 border border-slate-700 rounded bg-slate-800/50 text-xs">
-                      <div className="font-mono font-medium text-slate-200 mb-1 truncate" title={file.file_path}>
+                    <div key={i} className="p-2 border border-border-strong rounded bg-background-secondary/50 text-xs">
+                      <div className="font-mono font-medium text-text-primary mb-1 truncate" title={file.file_path}>
                         {file.file_path.split('/').pop()}
                       </div>
                       <div className="flex gap-1 mb-1">
@@ -180,7 +175,7 @@ export function InvestigationPage() {
                           {file.relevance} Relevancy
                         </Badge>
                       </div>
-                      <div className="text-slate-400 mt-2 space-y-1">
+                      <div className="text-text-secondary mt-2 space-y-1">
                         {file.reasons.map((r: string, j: number) => (
                           <div key={j} className="flex gap-1 items-start">
                             <span className="text-indigo-400 mt-0.5">•</span>
@@ -192,14 +187,14 @@ export function InvestigationPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-sm text-slate-500 italic">No direct code relevance found.</div>
+                <div className="text-sm text-text-muted italic">No direct code relevance found.</div>
               )}
             </div>
           )}
           
           {similar.length > 0 && (
             <div className="mt-4 pt-4 border-t border-border">
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-amber-500">
+              <h3 className="font-medium mb-3 flex items-center gap-2 text-brand">
                 <BrainCircuit className="w-4 h-4" /> Historical Context
               </h3>
               <div className="space-y-3">
@@ -209,7 +204,7 @@ export function InvestigationPage() {
                       <Link to={`/incidents/${s.incident_id}`} className="font-medium text-text-primary hover:underline" title={s.title}>
                         {s.title.substring(0, 40)}{s.title.length > 40 ? '...' : ''}
                       </Link>
-                      <Badge variant="warning" className="text-[10px] px-1 py-0 h-4 border-amber-500/50 text-amber-500 bg-amber-500/10">
+                      <Badge variant="warning" className="text-[10px] px-1 py-0 h-4 border-brand/50 text-brand bg-brand/10">
                         {s.similarity_score}%
                       </Badge>
                     </div>

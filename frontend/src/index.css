@@ -5,43 +5,37 @@
 @layer base {
   :root {
     /* Backgrounds */
-    --color-bg-base: #060608;
+    --color-bg-base: #020202;
     --color-bg-primary: #0a0a0c;
     --color-bg-secondary: #121214;
     --color-bg-elevated: #1a1a1d;
     
     /* Surfaces */
-    --color-surface: #242428;
-    --color-surface-hover: #2d2d32;
+    --color-surface: rgba(36, 36, 40, 0.4);
+    --color-surface-hover: rgba(45, 45, 50, 0.6);
     
     /* Borders */
-    --color-border: #27272a;
-    --color-border-strong: #3f3f46;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-strong: rgba(255, 255, 255, 0.15);
     
     /* Text */
-    --color-text-primary: #f8f8f8;
+    --color-text-primary: #ffffff;
     --color-text-secondary: #a1a1aa;
     --color-text-muted: #71717a;
     --color-text-disabled: #52525b;
     
     /* Brand (Amber/Orange accent) */
     --color-brand: #f59e0b;
-    --color-brand-hover: #d97706;
+    --color-brand-hover: #fbbf24;
     --color-brand-soft: rgba(245, 158, 11, 0.15);
     
-    /* Status: Success (Green) */
+    /* Status */
     --color-success: #10b981;
     --color-success-soft: rgba(16, 185, 129, 0.15);
-    
-    /* Status: Warning (Amber) */
     --color-warning: #f59e0b;
     --color-warning-soft: rgba(245, 158, 11, 0.15);
-    
-    /* Status: Danger (Red) */
     --color-danger: #ef4444;
     --color-danger-soft: rgba(239, 68, 68, 0.15);
-    
-    /* Status: Info (Blue) */
     --color-info: #3b82f6;
     --color-info-soft: rgba(59, 130, 246, 0.15);
     
@@ -52,23 +46,117 @@
     --color-chart-incident: #ef4444;
   }
 
+  :root.light {
+    /* Backgrounds */
+    --color-bg-base: #f8fafc;
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f1f5f9;
+    --color-bg-elevated: #ffffff;
+    
+    /* Surfaces */
+    --color-surface: rgba(255, 255, 255, 0.7);
+    --color-surface-hover: rgba(241, 245, 249, 0.9);
+    
+    /* Borders */
+    --color-border: rgba(0, 0, 0, 0.1);
+    --color-border-strong: rgba(0, 0, 0, 0.2);
+    
+    /* Text */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #64748b;
+    --color-text-disabled: #94a3b8;
+    
+    /* Brand & Status (Keep generally same, maybe slight tweaks for contrast) */
+    --color-brand-soft: rgba(245, 158, 11, 0.1);
+    --color-success-soft: rgba(16, 185, 129, 0.1);
+    --color-warning-soft: rgba(245, 158, 11, 0.1);
+    --color-danger-soft: rgba(239, 68, 68, 0.1);
+    --color-info-soft: rgba(59, 130, 246, 0.1);
+  }
+
   body {
-    @apply bg-background-base text-text-primary font-sans antialiased;
+    @apply bg-background-base text-text-primary font-sans antialiased transition-colors duration-200;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(245, 158, 11, 0.04), transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.04), transparent 50%);
+    background-attachment: fixed;
   }
 }
 
 /* Custom Scrollbar for better UI feel */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-primary); 
+  background: transparent; 
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border); 
+  background: rgba(255, 255, 255, 0.1); 
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-strong); 
+  background: rgba(255, 255, 255, 0.2); 
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-surface backdrop-blur-md border border-border shadow-soft;
+  }
+  .glass-panel-hover {
+    @apply hover:bg-surface-hover hover:border-border-strong hover:shadow-glow transition-all duration-300;
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand to-brand-hover;
+  }
+}
+
+/* Recharts Custom Tooltip Glassmorphism */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: rgba(36, 36, 40, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+}
+
+@media print {
+  /* Hide UI Chrome */
+  header, nav, aside, button, .print-hidden, [role="dialog"], [role="navigation"] {
+    display: none !important;
+  }
+  
+  /* Reset Backgrounds and Colors for Print */
+  body {
+    background-color: white !important;
+    background-image: none !important;
+    color: black !important;
+  }
+
+  .glass-panel, .bg-surface, .bg-background-elevated, .bg-background-primary {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6, p, span, td, th {
+    color: black !important;
+  }
+
+  /* Reset layout constraints to use full page width */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Charts */
+  .recharts-wrapper {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
 }

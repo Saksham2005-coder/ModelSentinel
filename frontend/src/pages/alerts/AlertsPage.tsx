@@ -48,7 +48,7 @@ export function AlertsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Active Alerts</h1>
+          <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary mb-2">Active Alerts</h1>
           <p className="text-zinc-400">Monitor and respond to reliability alerts and SLO breaches.</p>
         </div>
       </div>
@@ -59,10 +59,10 @@ export function AlertsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-zinc-400">Total Alerts</p>
-                <p className="text-3xl font-bold text-white">{alerts.length}</p>
+                <p className="text-2xl font-semibold tracking-tight text-text-primary">{alerts.length}</p>
               </div>
               <div className="p-3 bg-amber-900/20 rounded-lg">
-                <Bell className="h-6 w-6 text-amber-500" />
+                <Bell className="h-6 w-6 text-brand" />
               </div>
             </div>
           </CardContent>
@@ -71,8 +71,8 @@ export function AlertsPage() {
 
       <Card className="bg-[#111111] border-zinc-800">
         <CardHeader>
-          <CardTitle className="text-lg font-medium text-white flex items-center">
-            <AlertTriangle className="mr-2 h-5 w-5 text-amber-500" />
+          <CardTitle className="text-lg font-medium text-text-primary flex items-center">
+            <AlertTriangle className="mr-2 h-5 w-5 text-brand" />
             Alert History
           </CardTitle>
         </CardHeader>

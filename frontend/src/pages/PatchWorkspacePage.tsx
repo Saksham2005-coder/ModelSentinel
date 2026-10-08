@@ -120,8 +120,8 @@ export const PatchWorkspacePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-950">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      <div className="flex items-center justify-center h-screen bg-background-base">
+        <Loader2 className="w-8 h-8 animate-spin text-text-secondary" />
       </div>
     );
   }
@@ -130,8 +130,8 @@ export const PatchWorkspacePage: React.FC = () => {
     return (
       <div className="p-8 max-w-4xl mx-auto text-center">
         <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-slate-100">No Investigation Found</h2>
-        <p className="text-slate-400 mt-2">A completed investigation is required before proposing a fix.</p>
+        <h2 className="text-xl font-bold text-text-primary">No Investigation Found</h2>
+        <p className="text-text-secondary mt-2">A completed investigation is required before proposing a fix.</p>
         <Button className="mt-4" onClick={() => navigate(`/incidents/${incidentId}/investigation`)}>
           Go to Investigation
         </Button>
@@ -143,8 +143,8 @@ export const PatchWorkspacePage: React.FC = () => {
     <div className="p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100">Fix Workspace</h1>
-          <p className="text-slate-400">Review and orchestrate automated repository patches.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-text-primary">Fix Workspace</h1>
+          <p className="text-text-secondary">Review and orchestrate automated repository patches.</p>
         </div>
         <Button onClick={handleProposeFix} disabled={generating} className="bg-emerald-600 hover:bg-emerald-700">
           {generating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Code2 className="w-4 h-4 mr-2" />}
@@ -159,8 +159,8 @@ export const PatchWorkspacePage: React.FC = () => {
       )}
 
       {!activePatch ? (
-        <Card className="bg-slate-900 border-slate-800">
-          <CardContent className="py-12 text-center text-slate-400">
+        <Card className="bg-background-primary border-border">
+          <CardContent className="py-12 text-center text-text-secondary">
             <Code2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>No patches proposed yet. Click "Propose Fix" to let the AI agent analyze the investigation and generate a code patch.</p>
           </CardContent>
@@ -168,16 +168,16 @@ export const PatchWorkspacePage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-3 gap-6">
           <div className="col-span-2 space-y-6">
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-background-primary border-border">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-slate-100">Patch Proposal</CardTitle>
+                  <CardTitle className="text-text-primary">Patch Proposal</CardTitle>
                   <div className="flex items-center gap-4">
                     {activePatch.status === 'approved' && (
                       <Button
                         size="sm"
                         onClick={() => navigate(`/incidents/${incidentId}/validation`)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-text-primary"
                       >
                         <CheckCircle2 className="w-4 h-4 mr-2" />
                         Validate Patch
@@ -195,38 +195,38 @@ export const PatchWorkspacePage: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-slate-300">Summary</h3>
-                  <p className="text-sm text-slate-400">{activePatch.summary}</p>
+                  <h3 className="font-semibold text-text-primary">Summary</h3>
+                  <p className="text-sm text-text-secondary">{activePatch.summary}</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-300">Rationale</h3>
-                  <p className="text-sm text-slate-400">{activePatch.rationale}</p>
+                  <h3 className="font-semibold text-text-primary">Rationale</h3>
+                  <p className="text-sm text-text-secondary">{activePatch.rationale}</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-300">Risk Assessment</h3>
+                  <h3 className="font-semibold text-text-primary">Risk Assessment</h3>
                   <div className="mt-2 flex items-center gap-2">
                     <Badge variant={activePatch.risk_summary?.level === 'Low' ? 'default' : 'danger'}>
                       {activePatch.risk_summary?.level} Risk
                     </Badge>
-                    <span className="text-sm text-slate-400">
+                    <span className="text-sm text-text-secondary">
                       {activePatch.risk_summary?.stats?.files_changed || 0} files changed
                     </span>
                   </div>
                   {activePatch.risk_summary?.reasons && activePatch.risk_summary.reasons.length > 0 && (
-                    <ul className="list-disc list-inside mt-2 text-sm text-slate-400">
+                    <ul className="list-disc list-inside mt-2 text-sm text-text-secondary">
                       {activePatch.risk_summary.reasons.map((r, i) => <li key={i}>{r}</li>)}
                     </ul>
                   )}
                 </div>
 
                 {policyResult && (
-                  <div className="pt-4 border-t border-slate-800">
-                    <h3 className="font-semibold text-slate-300 mb-2">Policy Check</h3>
-                    <div className="flex items-center justify-between bg-slate-950 p-4 rounded-md border border-slate-800">
+                  <div className="pt-4 border-t border-border">
+                    <h3 className="font-semibold text-text-primary mb-2">Policy Check</h3>
+                    <div className="flex items-center justify-between bg-background-base p-4 rounded-md border border-border">
                       <div>
-                        <span className="text-slate-400 text-sm block">Evaluated by: {policyResult.matched_policy || 'Default'}</span>
+                        <span className="text-text-secondary text-sm block">Evaluated by: {policyResult.matched_policy || 'Default'}</span>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="font-semibold text-slate-200">Result:</span>
+                          <span className="font-semibold text-text-primary">Result:</span>
                           <Badge variant={
                             policyResult.result === 'ALLOW' ? 'success' :
                             policyResult.result === 'BLOCK' ? 'danger' : 'warning'
@@ -239,7 +239,7 @@ export const PatchWorkspacePage: React.FC = () => {
                       {policyResult.blocking_rules?.length > 0 && (
                         <div className="text-sm">
                           <span className="text-rose-400 block mb-1">Failed Rules:</span>
-                          <ul className="list-disc pl-4 text-slate-400">
+                          <ul className="list-disc pl-4 text-text-secondary">
                             {policyResult.blocking_rules.map((r: PolicyRule, i: number) => (
                               <li key={i}>{r.type}: expected {r.operator} {r.required}, got {r.actual}</li>
                             ))}
@@ -251,10 +251,10 @@ export const PatchWorkspacePage: React.FC = () => {
                 )}
 
                 {riskAssessment && (
-                  <div className="pt-4 border-t border-slate-800">
-                    <h3 className="font-semibold text-slate-300 mb-4">CHANGE RISK</h3>
+                  <div className="pt-4 border-t border-border">
+                    <h3 className="font-semibold text-text-primary mb-4">CHANGE RISK</h3>
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="text-2xl font-bold text-slate-100">{riskAssessment.risk_score}</div>
+                      <div className="text-2xl font-semibold tracking-tight text-text-primary">{riskAssessment.risk_score}</div>
                       <Badge variant={
                         riskAssessment.risk_level === 'CRITICAL' ? 'danger' :
                         riskAssessment.risk_level === 'HIGH' ? 'danger' :
@@ -266,8 +266,8 @@ export const PatchWorkspacePage: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-slate-400 block mb-1">Blast Radius</span>
-                        <ul className="text-slate-300 space-y-1">
+                        <span className="text-text-secondary block mb-1">Blast Radius</span>
+                        <ul className="text-text-primary space-y-1">
                           <li>{riskAssessment.blast_radius.files.length} files</li>
                           <li>{riskAssessment.blast_radius.models.length} models</li>
                           <li>{riskAssessment.blast_radius.regression_tests.length} regression tests</li>
@@ -275,8 +275,8 @@ export const PatchWorkspacePage: React.FC = () => {
                         </ul>
                       </div>
                       <div>
-                        <span className="text-slate-400 block mb-1">Primary Risk Factors</span>
-                        <ul className="text-slate-300 space-y-1">
+                        <span className="text-text-secondary block mb-1">Primary Risk Factors</span>
+                        <ul className="text-text-primary space-y-1">
                           {riskAssessment.factors.map((f, i) => (
                             <li key={i} className="truncate" title={f.factor}>• {f.factor} (+{f.contribution})</li>
                           ))}
@@ -289,10 +289,10 @@ export const PatchWorkspacePage: React.FC = () => {
             </Card>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-100">File Changes</h3>
+              <h3 className="text-lg font-semibold text-text-primary">File Changes</h3>
               {activePatch.file_changes.map((change) => (
-                <Card key={change.id} className="bg-slate-900 border-slate-800 overflow-hidden">
-                  <CardHeader className="bg-slate-950 py-3 border-b border-slate-800">
+                <Card key={change.id} className="bg-background-primary border-border overflow-hidden">
+                  <CardHeader className="bg-background-base py-3 border-b border-border">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-sm text-emerald-400">{change.file_path}</span>
                       <div className="text-xs space-x-2">
@@ -302,7 +302,7 @@ export const PatchWorkspacePage: React.FC = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <pre className="p-4 text-sm font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap">
+                    <pre className="p-4 text-sm font-mono text-text-primary overflow-x-auto whitespace-pre-wrap">
                       {change.diff_text}
                     </pre>
                   </CardContent>
@@ -312,14 +312,14 @@ export const PatchWorkspacePage: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-background-primary border-border">
               <CardHeader>
-                <CardTitle className="text-slate-100">Review</CardTitle>
+                <CardTitle className="text-text-primary">Review</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <textarea
                   placeholder="Leave feedback or request changes..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-background-base border border-border rounded-md p-3 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   rows={4}
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
@@ -357,22 +357,22 @@ export const PatchWorkspacePage: React.FC = () => {
             </Card>
             
             {activePatch.reviews.length > 0 && (
-              <Card className="bg-slate-900 border-slate-800">
+              <Card className="bg-background-primary border-border">
                 <CardHeader>
-                  <CardTitle className="text-slate-100">Review History</CardTitle>
+                  <CardTitle className="text-text-primary">Review History</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {activePatch.reviews.map(rev => (
-                      <div key={rev.id} className="border-l-2 border-slate-700 pl-4 py-1">
+                      <div key={rev.id} className="border-l-2 border-border-strong pl-4 py-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-sm text-slate-300 capitalize">{rev.reviewer_type}</span>
+                          <span className="font-semibold text-sm text-text-primary capitalize">{rev.reviewer_type}</span>
                           <Badge variant="info" className="text-[10px] uppercase">
                             {rev.decision}
                           </Badge>
                         </div>
                         {rev.comment && (
-                          <p className="text-sm text-slate-400">{rev.comment}</p>
+                          <p className="text-sm text-text-secondary">{rev.comment}</p>
                         )}
                       </div>
                     ))}

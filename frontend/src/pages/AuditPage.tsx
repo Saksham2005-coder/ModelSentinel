@@ -25,47 +25,47 @@ export function AuditPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Audit Log</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Review system-wide actions and approvals.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary text-text-primary">Audit Log</h1>
+        <p className="mt-1 text-sm text-text-muted dark:text-text-secondary">Review system-wide actions and approvals.</p>
       </div>
       
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-background-secondary rounded-lg border border-slate-200 dark:border-border-strong overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-700/50">
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Time</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Action</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">User</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Role</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Resource</th>
+              <tr className="bg-slate-50 dark:bg-background-elevated/50">
+                <th className="px-6 py-4 text-xs font-semibold text-text-muted dark:text-text-secondary uppercase">Time</th>
+                <th className="px-6 py-4 text-xs font-semibold text-text-muted dark:text-text-secondary uppercase">Action</th>
+                <th className="px-6 py-4 text-xs font-semibold text-text-muted dark:text-text-secondary uppercase">User</th>
+                <th className="px-6 py-4 text-xs font-semibold text-text-muted dark:text-text-secondary uppercase">Role</th>
+                <th className="px-6 py-4 text-xs font-semibold text-text-muted dark:text-text-secondary uppercase">Resource</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-slate-200 dark:divide-border-strong">
               {events.map((event) => (
-                <tr key={event.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                <tr key={event.id} className="hover:bg-slate-50 dark:hover:bg-background-elevated/50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-disabled dark:text-text-primary">
                     {new Date(event.timestamp).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary text-text-primary">
                     {event.action}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-disabled dark:text-text-primary">
                     {event.user_id}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-disabled dark:text-text-primary">
                     {event.user_role}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-disabled dark:text-text-primary">
                     {event.resource_type}: {event.resource_id}
                   </td>
                 </tr>
               ))}
               {events.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-text-muted dark:text-text-secondary">
                     No audit events found.
                   </td>
                 </tr>
