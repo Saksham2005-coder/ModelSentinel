@@ -42,3 +42,9 @@ def create_pull_request(incident_id: str, patch_id: str, validation_run_id: str,
         return pr
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/{pr_id}/checks")
+def get_pull_request_checks(pr_id: str, db: Session = Depends(get_db)) -> Any:
+    from app.models.integration import ExternalCheck
+    checks = db.query(ExternalCheck).filter(ExternalCheck.pull_request_id == pr_id).order_by(ExternalCheck.started_at.desc()).all()
+    return checks

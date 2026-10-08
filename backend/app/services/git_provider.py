@@ -21,8 +21,8 @@ class GitProvider:
 
 class GitHubProvider(GitProvider):
     def __init__(self):
-        self.token = settings.GITHUB_TOKEN
-        self.api_url = settings.GITHUB_API_URL or "https://api.github.com"
+        self.token = settings.MODELSENTINEL_GITHUB_TOKEN
+        self.api_url = settings.MODELSENTINEL_GITHUB_API_URL or "https://api.github.com"
         self.headers = {
             "Accept": "application/vnd.github.v3+json",
         }
