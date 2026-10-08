@@ -20,6 +20,7 @@ import { PullRequestDetailPage } from '@/pages/PullRequestDetailPage';
 import { DeploymentGatesPage } from '@/pages/DeploymentGatesPage';
 import { DeploymentGateDetailPage } from '@/pages/DeploymentGateDetailPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
+import { EngineeringIntelligencePage } from '@/pages/EngineeringIntelligencePage';
 import { ModelAnalyticsDetailPage } from '@/pages/ModelAnalyticsDetailPage';
 import { ChangeRiskPage } from '@/pages/ChangeRiskPage';
 import { PoliciesPage } from '@/pages/PoliciesPage';
@@ -84,6 +85,7 @@ function App() {
               <Route path="/alerts" element={<AlertsPage />} />
               
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/engineering-intelligence" element={<EngineeringIntelligencePage />} />
               <Route path="/analytics/models/:modelId" element={<ModelAnalyticsDetailPage />} />
               <Route path="/change-risk" element={<ChangeRiskPage />} />
               <Route path="/change-intelligence" element={<ChangeIntelligencePage />} />

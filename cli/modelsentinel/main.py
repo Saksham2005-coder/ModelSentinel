@@ -13,7 +13,7 @@ app = typer.Typer(
 )
 
 # Import and register subcommands
-from .commands import models, incidents, telemetry, repository, change_intelligence, patches, validation, deployments, reliability, workflows, integrations, prs, ci, webhooks, auth, slo, alerts
+from .commands import models, incidents, telemetry, repository, change_intelligence, patches, validation, deployments, reliability, workflows, integrations, prs, ci, webhooks, auth, slo, alerts, intelligence
 
 app.add_typer(models.app, name="models", help="Model inspection and health commands")
 app.add_typer(incidents.app, name="incidents", help="Incident investigation commands")
@@ -32,6 +32,7 @@ app.add_typer(webhooks.app, name="webhooks", help="Webhook commands")
 app.add_typer(auth.app, name="auth", help="Authentication commands")
 app.add_typer(slo.app, name="slo", help="SLO objective and evaluation commands")
 app.add_typer(alerts.app, name="alerts", help="SLO Alert commands")
+app.add_typer(intelligence.app, name="intelligence", help="Engineering intelligence and advanced analytics commands")
 
 __version__ = "0.1.0"
 

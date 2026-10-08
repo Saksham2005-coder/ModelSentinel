@@ -40,7 +40,7 @@ app.include_router(memory.router, prefix="/api/v1", tags=["memory"], dependencie
 app.include_router(regression.router, prefix="/api/v1", tags=["regression"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(pull_requests.router, prefix="/api/v1/pull-requests", tags=["pull_requests"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(deployments.router, prefix="/api/v1/deployments", tags=["deployments"], dependencies=[Depends(deps.get_current_active_user)])
-app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"], dependencies=[Depends(deps.get_current_active_user), Depends(deps.RequirePermissions(["analytics.read"]))])
 app.include_router(change_risk.router, prefix="/api/v1/change-risk", tags=["change_risk"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(policies.router, prefix="/api/v1/policies", tags=["policies"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(telemetry.router, prefix="/api/v1/telemetry", tags=["telemetry"], dependencies=[Depends(deps.get_current_active_user)])
