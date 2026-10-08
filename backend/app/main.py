@@ -26,6 +26,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import time
+from starlette.middleware.base import BaseHTTPMiddleware
+import uuid
+
+class RequestIDMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+        if len(request_id) > 64:
+            request_id = str(uuid.uuid4())
+        
+        request.state.request_id = request_id
+        start_time = time.time()
+        
+        try:
+            response = await call_next(request)
+        except Exception as exc:
+            raise exc
+        finally:
+            process_time = (time.time() - start_time) * 1000.0
+            # Could log here: logger.info(f"[{request_id}] {request.method} {request.url.path} - {process_time:.2f}ms")
+            
+        response.headers["X-Request-ID"] = request_id
+        return response
+
+app.add_middleware(RequestIDMiddleware)
+
 from fastapi import Depends
 from app.api import deps
 
@@ -58,11 +84,42 @@ app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["alerts"], depe
 from sqlalchemy import text
 from app.db.session import SessionLocal
 from app.ai.service import get_llm_provider
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import logging
+import traceback
+import uuid
+
+# Configure basic logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_id = str(uuid.uuid4())
+    logger.error(f"Unhandled exception (Error ID: {error_id}): {exc}")
+    logger.error(traceback.format_exc())
+    # Return a safe error message without exposing stack traces or database details
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected internal server error occurred.", "error_id": error_id},
+    )
 
 @app.get("/health")
 def health_check():
+    # Liveness check - very lightweight, just confirms the API is running
+    return {
+        "status": "ok",
+        "service": "modelsentinel-api",
+        "version": "0.1.0"
+    }
+
+@app.get("/ready")
+def readiness_check():
+    # Readiness check - ensures dependencies (DB, LLM) are up
     db_status = "unknown"
     db_engine = "unknown"
+    is_ready = True
     try:
         db = SessionLocal()
         # Test connection
@@ -71,6 +128,7 @@ def health_check():
         db_status = "connected"
     except Exception as e:
         db_status = f"error: {str(e)}"
+        is_ready = False
     finally:
         try:
             db.close()
@@ -84,18 +142,24 @@ def health_check():
             provider_status = "configured"
         else:
             provider_status = "misconfigured"
+            # Optional: Decide if misconfigured LLM means NOT READY. 
+            # We'll allow it to be ready since LLM isn't strictly required for core telemetry.
     except Exception:
         provider_status = "unavailable"
 
-    return {
-        "status": "ok",
-        "service": "modelsentinel-api",
-        "version": "0.1.0",
-        "database": {
-            "status": db_status,
-            "engine": db_engine
-        },
-        "ai_provider": {
-            "status": provider_status
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=200 if is_ready else 503,
+        content={
+            "status": "ok" if is_ready else "error",
+            "service": "modelsentinel-api",
+            "version": "0.1.0",
+            "database": {
+                "status": db_status,
+                "engine": db_engine
+            },
+            "ai_provider": {
+                "status": provider_status
+            }
         }
-    }
+    )
