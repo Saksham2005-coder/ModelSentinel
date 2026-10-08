@@ -34,7 +34,7 @@ class GitHubProvider(GitProvider):
         if not self.token:
             # We are in testing or mocked mode
             pass
-        response = requests.request(method, url, headers=self.headers, **kwargs)
+        response = requests.request(method, url, headers=self.headers, timeout=10, **kwargs)
         response.raise_for_status()
         return response.json()
 
