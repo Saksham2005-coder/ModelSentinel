@@ -63,16 +63,30 @@ class TelemetryService:
             telemetry.validation_errors = ["Only CSV files are supported"]
             db.commit()
             raise HTTPException(status_code=400, detail="Only CSV files are supported")
+            
+        MAX_FILE_SIZE = 50 * 1024 * 1024 # 50 MB
+        if getattr(file, 'size', 0) and file.size > MAX_FILE_SIZE:
+            telemetry.status = "INVALID"
+            telemetry.validation_errors = ["File exceeds 50MB limit"]
+            db.commit()
+            raise HTTPException(status_code=413, detail="File too large")
 
         file_path = os.path.join(self.data_dir, f"{telemetry.id}.csv")
         try:
+            bytes_written = 0
             with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
+                while chunk := file.file.read(8192):
+                    bytes_written += len(chunk)
+                    if bytes_written > MAX_FILE_SIZE:
+                        raise ValueError("File exceeds maximum allowed size.")
+                    buffer.write(chunk)
         except Exception as e:
             telemetry.status = "FAILED"
             telemetry.validation_errors = [f"File save failed: {str(e)}"]
             db.commit()
-            raise HTTPException(status_code=500, detail="Could not save file")
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            raise HTTPException(status_code=413 if "maximum allowed size" in str(e) else 500, detail=str(e) if "maximum allowed size" in str(e) else "Could not save file")
 
         telemetry.file_path = file_path
 

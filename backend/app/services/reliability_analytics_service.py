@@ -162,19 +162,38 @@ class ReliabilityAnalyticsService:
         q_mem = q_mem.filter(IncidentMemory.root_cause_category.isnot(None))
         q_mem = q_mem.group_by(IncidentMemory.root_cause_category)
         
+        # Pre-fetch all memories and deployments to avoid N+1 query
+        base_mem_q = db.query(IncidentMemory.root_cause_category, IncidentMemory.incident_id)
+        base_mem_q = cls._apply_time_filter(base_mem_q, IncidentMemory.created_at, time_range_days)
+        base_mem_q = cls._apply_model_filter(base_mem_q, IncidentMemory.model_id, model_id)
+        memories = base_mem_q.all()
+        
+        inc_ids = [m.incident_id for m in memories if m.incident_id]
+        deps = []
+        if inc_ids:
+            deps = db.query(Deployment.incident_id, Deployment.status).filter(Deployment.incident_id.in_(inc_ids)).all()
+            
+        deps_by_incident = {}
+        for d in deps:
+            deps_by_incident.setdefault(d.incident_id, []).append(d.status)
+            
+        mem_by_cat = {}
+        for m in memories:
+            mem_by_cat.setdefault(m.root_cause_category, []).append(m.incident_id)
+        
         results = []
         for row in q_mem.all():
             cat = row[0]
             freq = row[1]
             models_affected = row[2]
             
-            # Find related deployments for this category
-            mems = db.query(IncidentMemory).filter(IncidentMemory.root_cause_category == cat).all()
-            inc_ids = [m.incident_id for m in mems]
-            deps = db.query(Deployment).filter(Deployment.incident_id.in_(inc_ids)).all()
+            cat_inc_ids = mem_by_cat.get(cat, [])
+            cat_deps_statuses = []
+            for i_id in cat_inc_ids:
+                cat_deps_statuses.extend(deps_by_incident.get(i_id, []))
             
-            total_deps = len(deps)
-            healthy_deps = len([d for d in deps if d.status == "HEALTHY"])
+            total_deps = len(cat_deps_statuses)
+            healthy_deps = len([s for s in cat_deps_statuses if s == "HEALTHY"])
             success_rate = (healthy_deps / total_deps * 100) if total_deps > 0 else 100
             
             results.append({
