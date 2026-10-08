@@ -8,6 +8,24 @@ class ModelSentinelClient:
         self.base_url = base_url or config.API_URL
         self.timeout = config.TIMEOUT
         self.session = requests.Session()
+        self._load_auth()
+
+    def _load_auth(self):
+        import os
+        import json
+        from pathlib import Path
+        token = os.environ.get("MODELSENTINEL_TOKEN")
+        if not token:
+            config_path = Path.home() / ".modelsentinel" / "auth.json"
+            if config_path.exists():
+                try:
+                    with open(config_path, "r") as f:
+                        data = json.load(f)
+                        token = data.get("access_token")
+                except Exception:
+                    pass
+        if token:
+            self.session.headers.update({"Authorization": f"Bearer {token}"})
 
     def _handle_response(self, response: requests.Response):
         try:
@@ -18,6 +36,14 @@ class ModelSentinelClient:
         if response.status_code == 404:
             detail = data.get("detail", "Resource not found") if isinstance(data, dict) else data
             raise NotFoundError(f"{detail}")
+            
+        if response.status_code == 401:
+            detail = data.get("detail", "Unauthenticated") if isinstance(data, dict) else data
+            raise APIError(f"Authentication failed (401): {detail}")
+            
+        if response.status_code == 403:
+            detail = data.get("detail", "Forbidden") if isinstance(data, dict) else data
+            raise APIError(f"Authorization denied (403): {detail}")
         
         # Determine if it's a specific gate failure or generic bad request
         if response.status_code in (400, 422):

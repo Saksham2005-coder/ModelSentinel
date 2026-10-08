@@ -13,6 +13,7 @@ class Integration(Base):
     name = Column(String, nullable=False)
     status = Column(String, nullable=False, default="CONNECTED")
     config = Column(JSON, nullable=True) # For non-secret configuration
+    created_by = Column(String, nullable=True)
     
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

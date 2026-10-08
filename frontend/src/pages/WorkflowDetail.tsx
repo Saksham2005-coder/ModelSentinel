@@ -152,6 +152,19 @@ const WorkflowDetail: React.FC = () => {
                     </div>
                   </div>
                 )}
+                
+                {step.approval && step.approval.status === 'APPROVED' && (
+                  <div className="mt-2 text-sm text-emerald-400">
+                    Approved by: {step.approval.approved_by || 'Unknown'} 
+                    {step.approval.approval_role ? ` (${step.approval.approval_role})` : ''}
+                  </div>
+                )}
+                
+                {step.approval && step.approval.status === 'REJECTED' && (
+                  <div className="mt-2 text-sm text-red-400">
+                    Rejected by: {step.approval.rejected_by || 'Unknown'}
+                  </div>
+                )}
               </div>
             </div>
           ))}

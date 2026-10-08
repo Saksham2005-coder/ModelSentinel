@@ -12,6 +12,7 @@ def get_db():
     finally:
         db.close()
 from app.core.config import settings
+from app.api import deps
 from app.models.integration import WebhookEvent
 import uuid
 import datetime
@@ -85,11 +86,12 @@ async def github_webhook(
     
     return {"status": "ok", "delivery_id": delivery_id, "processing_status": webhook_event.processing_status}
 
-@router.get("")
+@router.get("", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def list_integrations(
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    current_user: Any = Depends(deps.get_current_active_user)
 ) -> Any:
     from app.models.integration import Integration
     # Sync github status first
@@ -98,9 +100,10 @@ def list_integrations(
     integrations = db.query(Integration).offset(skip).limit(limit).all()
     return integrations
 
-@router.get("/github/status")
+@router.get("/github/status", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def get_github_status(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Any = Depends(deps.get_current_active_user)
 ) -> Any:
     from app.models.integration import Integration
     ensure_github_integration(db)
@@ -119,7 +122,8 @@ def ensure_github_integration(db: Session):
             type="repository",
             name="GitHub",
             status=status,
-            config={"api_url": settings.MODELSENTINEL_GITHUB_API_URL}
+            config={"api_url": settings.MODELSENTINEL_GITHUB_API_URL},
+            created_by="system"
         )
         db.add(integration)
         db.commit()
@@ -128,11 +132,12 @@ def ensure_github_integration(db: Session):
             integration.status = status
             db.commit()
 
-@router.get("/webhooks")
+@router.get("/webhooks", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def list_webhooks(
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    current_user: Any = Depends(deps.get_current_active_user)
 ) -> Any:
     events = db.query(WebhookEvent).order_by(WebhookEvent.received_at.desc()).offset(skip).limit(limit).all()
     # Strip payload from list to save bandwidth and avoid leaking sensitive data

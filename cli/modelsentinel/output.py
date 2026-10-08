@@ -41,6 +41,6 @@ def print_error(message: str, debug_info: str = None):
 
 def print_success(message: str):
     if not is_json:
-        console.print(f"[green]✓[/green] {message}")
+        console.print(f"[green]*[/green] {message}")
 
 from .config import config

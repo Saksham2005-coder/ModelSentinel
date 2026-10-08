@@ -41,12 +41,6 @@ class WorkflowStepRunBase(BaseModel):
     output_reference_type: Optional[str] = None
     output_reference_id: Optional[str] = None
 
-class WorkflowStepRunSchema(WorkflowStepRunBase):
-    id: str
-    workflow_run_id: str
-
-    model_config = {"from_attributes": True}
-
 class WorkflowRunBase(BaseModel):
     name: str
     workflow_type: str
@@ -58,20 +52,32 @@ class WorkflowRunBase(BaseModel):
     completed_at: Optional[datetime] = None
     created_at: datetime
 
-class WorkflowRunSchema(WorkflowRunBase):
-    id: str
-    steps: List[WorkflowStepRunSchema] = []
-
-    model_config = {"from_attributes": True}
 
 class WorkflowApprovalSchema(BaseModel):
     id: str
     workflow_step_run_id: str
     status: WorkflowApprovalStatus
     requested_at: datetime
-    responded_at: Optional[datetime] = None
-    comments: Optional[str] = None
-    reviewer: Optional[str] = None
+    approved_by: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    approval_role: Optional[str] = None
+    approval_comment: Optional[str] = None
+    rejected_by: Optional[str] = None
+    rejected_at: Optional[datetime] = None
+    rejection_comment: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+class WorkflowStepRunSchema(WorkflowStepRunBase):
+    id: str
+    workflow_run_id: str
+    approval: Optional[WorkflowApprovalSchema] = None
+
+    model_config = {"from_attributes": True}
+
+class WorkflowRunSchema(WorkflowRunBase):
+    id: str
+    steps: List[WorkflowStepRunSchema] = []
 
     model_config = {"from_attributes": True}
 

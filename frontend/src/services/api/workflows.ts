@@ -1,5 +1,18 @@
 import { fetchApi } from './client';
 
+export interface WorkflowApproval {
+  id: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  requested_at: string;
+  approved_by?: string;
+  approved_at?: string;
+  approval_role?: string;
+  approval_comment?: string;
+  rejected_by?: string;
+  rejected_at?: string;
+  rejection_comment?: string;
+}
+
 export interface WorkflowStepRun {
   id: string;
   workflow_run_id: string;
@@ -14,6 +27,7 @@ export interface WorkflowStepRun {
   started_at: string | null;
   completed_at: string | null;
   error_message: string | null;
+  approval?: WorkflowApproval | null;
 }
 
 export interface WorkflowRun {

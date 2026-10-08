@@ -44,7 +44,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('investigations', schema=None) as batch_op:
-        batch_op.create_foreign_key(None, 'investigation_hypotheses', ['primary_hypothesis_id'], ['id'], ondelete='SET NULL', use_alter=True)
+        batch_op.create_foreign_key('fk_investigations_hypotheses', 'investigation_hypotheses', ['primary_hypothesis_id'], ['id'], ondelete='SET NULL', use_alter=True)
 
     # ### end Alembic commands ###
 

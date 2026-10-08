@@ -49,6 +49,7 @@ class WorkflowStepRun(Base):
     output_reference_id = Column(String, nullable=True)
     
     workflow_run = relationship("WorkflowRun", back_populates="steps")
+    approval = relationship("WorkflowApproval", back_populates="step_run", uselist=False)
 
 class WorkflowApproval(Base):
     __tablename__ = "workflow_approvals"
@@ -58,9 +59,14 @@ class WorkflowApproval(Base):
     
     status = Column(String, nullable=False, default="PENDING") # PENDING, APPROVED, REJECTED
     requested_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.UTC))
-    responded_at = Column(DateTime, nullable=True)
     
-    comments = Column(String, nullable=True)
-    reviewer = Column(String, nullable=True)
+    approved_by = Column(String, nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    approval_role = Column(String, nullable=True)
+    approval_comment = Column(String, nullable=True)
     
-    step_run = relationship("WorkflowStepRun")
+    rejected_by = Column(String, nullable=True)
+    rejected_at = Column(DateTime, nullable=True)
+    rejection_comment = Column(String, nullable=True)
+    
+    step_run = relationship("WorkflowStepRun", back_populates="approval")

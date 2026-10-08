@@ -24,3 +24,21 @@ def db():
         yield db_session
     finally:
         db_session.close()
+
+from fastapi.testclient import TestClient
+from app.main import app
+from app.api.deps import get_current_active_user
+from app.models.user import User, Role
+
+def override_get_current_active_user():
+    return User(
+        id="test-user-id",
+        email="test@modelsentinel.com",
+        full_name="Test User",
+        role=Role.ADMIN,
+        is_active=True
+    )
+
+app.dependency_overrides[get_current_active_user] = override_get_current_active_user
+
+# If there are tests that instantiate their own TestClient, they will automatically use the overridden dependency.

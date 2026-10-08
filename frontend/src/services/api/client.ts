@@ -19,6 +19,11 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
+  
+  const token = localStorage.getItem('modelsentinel_token');
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
   const response = await fetch(url, {
     ...options,

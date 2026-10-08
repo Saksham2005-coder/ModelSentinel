@@ -26,27 +26,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(models.router, prefix="/api/v1/models", tags=["models"])
-app.include_router(monitoring.router, prefix="/api/v1/models/{model_id}/monitoring", tags=["monitoring"])
-app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["incidents"])
-app.include_router(investigations.router, prefix="/api/v1", tags=["investigations"])
-app.include_router(repositories.router, prefix="/api/v1/repositories", tags=["repositories"])
-app.include_router(patches.router, prefix="/api/v1", tags=["patches"])
-app.include_router(validation.router, prefix="/api/v1", tags=["validation"])
-app.include_router(memory.router, prefix="/api/v1", tags=["memory"])
-app.include_router(regression.router, prefix="/api/v1", tags=["regression"])
-app.include_router(pull_requests.router, prefix="/api/v1/pull-requests", tags=["pull_requests"])
-app.include_router(deployments.router, prefix="/api/v1/deployments", tags=["deployments"])
-app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
-app.include_router(change_risk.router, prefix="/api/v1/change-risk", tags=["change_risk"])
-app.include_router(policies.router, prefix="/api/v1/policies", tags=["policies"])
-app.include_router(telemetry.router, prefix="/api/v1/telemetry", tags=["telemetry"])
-app.include_router(reliability.router, prefix="/api/v1/models/{model_id}/reliability", tags=["reliability"])
-app.include_router(model_intelligence.router, prefix="/api/v1/models", tags=["intelligence"])
-app.include_router(workflows.router, prefix="/api/v1/workflows", tags=["workflows"])
+from fastapi import Depends
+from app.api import deps
+
+app.include_router(models.router, prefix="/api/v1/models", tags=["models"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(monitoring.router, prefix="/api/v1/models/{model_id}/monitoring", tags=["monitoring"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["incidents"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(investigations.router, prefix="/api/v1", tags=["investigations"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(repositories.router, prefix="/api/v1/repositories", tags=["repositories"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(patches.router, prefix="/api/v1", tags=["patches"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(validation.router, prefix="/api/v1", tags=["validation"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(memory.router, prefix="/api/v1", tags=["memory"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(regression.router, prefix="/api/v1", tags=["regression"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(pull_requests.router, prefix="/api/v1/pull-requests", tags=["pull_requests"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(deployments.router, prefix="/api/v1/deployments", tags=["deployments"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(change_risk.router, prefix="/api/v1/change-risk", tags=["change_risk"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(policies.router, prefix="/api/v1/policies", tags=["policies"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(telemetry.router, prefix="/api/v1/telemetry", tags=["telemetry"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(reliability.router, prefix="/api/v1/models/{model_id}/reliability", tags=["reliability"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(model_intelligence.router, prefix="/api/v1/models", tags=["intelligence"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(workflows.router, prefix="/api/v1/workflows", tags=["workflows"], dependencies=[Depends(deps.get_current_active_user)])
 app.include_router(integrations.router, prefix="/api/v1/integrations", tags=["integrations"])
-from app.api.v1.endpoints import ci
-app.include_router(ci.router, prefix="/api/v1/ci", tags=["ci"])
+from app.api.v1.endpoints import ci, auth, audit
+app.include_router(ci.router, prefix="/api/v1/ci", tags=["ci"], dependencies=[Depends(deps.get_current_active_user)])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(audit.router, prefix="/api/v1/audit", tags=["audit"], dependencies=[Depends(deps.get_current_active_user)])
 from sqlalchemy import text
 from app.db.session import SessionLocal
 from app.ai.service import get_llm_provider
