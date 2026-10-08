@@ -26,25 +26,20 @@ The architecture emphasizes maintainability, strong typing, and standard industr
 - **Backend:** Python, FastAPI, Pydantic, SQLAlchemy, Alembic.
 - **Infrastructure:** Docker, Docker Compose, PostgreSQL.
 
-## Local Setup
+## Setup and Demo
 
-You can run the entire environment locally using Docker Compose.
+The infrastructure has been finalized for easy demonstration.
+For a complete guide to running the presentation demo, please refer to:
+[DEMO.md](DEMO.md)
 
-1. **Environment Variables:**
-   Copy `.env.example` to `.env` and fill in the values if necessary.
-   ```bash
-   cp .env.example .env
-   ```
+For detailed deployment instructions (Demo vs Production modes, PostgreSQL vs SQLite):
+[DEPLOYMENT.md](DEPLOYMENT.md)
 
-2. **Start Services:**
-   ```bash
-   docker-compose up --build
-   ```
-
-This will start:
-- Frontend on `http://localhost:5173`
-- Backend API on `http://localhost:8000` (Health endpoint: `http://localhost:8000/health`)
-- PostgreSQL database
+**Quick Start (Demo Mode):**
+```bash
+./demo start
+./demo seed
+```
 
 ## Repository Structure
 

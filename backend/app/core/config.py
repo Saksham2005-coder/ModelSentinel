@@ -32,8 +32,15 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.TESTING:
-            return "sqlite:///./test.db"
+            # Deterministic relative path for testing
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+            return f"sqlite:///{os.path.join(project_root, 'test.db')}"
         if self.DATABASE_URL:
+            # If DATABASE_URL is a relative sqlite URL like sqlite:///./file.db, make it deterministic
+            if self.DATABASE_URL.startswith("sqlite:///./"):
+                project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+                db_name = self.DATABASE_URL.replace("sqlite:///./", "")
+                return f"sqlite:///{os.path.join(project_root, db_name)}"
             return self.DATABASE_URL
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 

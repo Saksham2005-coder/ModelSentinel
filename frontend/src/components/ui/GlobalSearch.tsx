@@ -118,7 +118,7 @@ export function GlobalSearch() {
             id: i.id as string, type: 'incident' as const, title: i.title as string, subtitle: i.severity as string, url: `/incidents/${i.id}`
           }));
 
-        const extractId = (obj: Record<string, unknown>) => obj.id || obj.name || 'unknown';
+        const extractId = (obj: Record<string, unknown>): string => String(obj.id || obj.name || 'unknown');
 
         const mapRemote = (res: { data?: Record<string, unknown>[] }, type: SearchResult['type'], urlPrefix: string, titleField: string, subtitleField?: string) => {
           return (res.data || [])

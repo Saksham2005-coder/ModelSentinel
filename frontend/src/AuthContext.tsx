@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   const login = (newToken: string, newUser: User) => {
+    localStorage.setItem('modelsentinel_token', newToken);
     setToken(newToken);
     setUser(newUser);
   };

@@ -103,28 +103,21 @@ def reset_demo(db):
     repo_names = ["ml-serving-platform", "fraud-prediction-service"]
     db.query(Repository).filter(Repository.name.in_(repo_names)).delete(synchronize_session=False)
     
-    # Remove demo user
-    db.query(User).filter(User.email == "demo-admin@modelsentinel.com").delete(synchronize_session=False)
-    
+
     db.commit()
     print("Demo environment reset complete.")
 
 def seed_demo(db):
     print("Seeding demo environment...")
     
-    # 0. Create Demo User
-    user_id = generate_uuid()
-    user = User(
-        id=user_id,
-        email="demo-admin@modelsentinel.com",
-        hashed_password=get_password_hash("password123"),
-        full_name="Demo Admin",
-        role="ADMIN",
-        is_active=True,
-        email_verified=True,
-        email_verified_at=dt(-30)
-    )
-    db.add(user)
+    # 0. Get Admin User
+    user = db.query(User).filter(User.role == "ADMIN").first()
+    if not user:
+        print("ERROR: No admin user found. Please run the bootstrap process to create an admin user first.")
+        print("Example: python scripts/create_admin.py")
+        sys.exit(1)
+        
+    user_id = user.id
     
     # 1. Integrations
     github_int = Integration(provider="github", type="repository", name="Demo GitHub", status="CONNECTED", config={}, created_by=user_id, created_at=dt(-25))
