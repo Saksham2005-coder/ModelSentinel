@@ -57,12 +57,26 @@ def test_registration_role_escalation_prevented():
     # Should force to VIEWER despite requesting ADMIN
     assert data["role"] == "VIEWER"
 
-def test_login_success():
+def test_login_success(clean_db: Session):
     client.post("/api/v1/auth/register", json={
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
         "full_name": "Test User"
     })
+    
+    # Get token from db
+    from app.models.user import VerificationToken
+    user = clean_db.query(User).filter(User.email == "newuser@example.com").first()
+    token_record = clean_db.query(VerificationToken).filter(VerificationToken.user_id == user.id).first()
+    
+    # Needs to match raw token, but we only have hash in DB. 
+    # Actually, we can just manually set it in DB and commit, why didn't it work?
+    # Because SQLite caches it? Let's just do `db.refresh(user)` in the endpoint? No, the login endpoint creates a new session.
+    # Ah, SQLAlchemy caches objects. Maybe `clean_db.commit()` didn't work because `user` was modified but `clean_db` didn't track it properly?
+    user.email_verified = True
+    clean_db.add(user)
+    clean_db.commit()
+    
     response = client.post("/api/v1/auth/login", data={
         "username": "newuser@example.com",
         "password": "SecurePassword123!"
@@ -72,12 +86,18 @@ def test_login_success():
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
-def test_login_invalid_credentials():
+def test_login_invalid_credentials(clean_db: Session):
     client.post("/api/v1/auth/register", json={
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
         "full_name": "Test User"
     })
+    
+    user = clean_db.query(User).filter(User.email == "newuser@example.com").first()
+    user.email_verified = True
+    clean_db.add(user)
+    clean_db.commit()
+    
     response = client.post("/api/v1/auth/login", data={
         "username": "newuser@example.com",
         "password": "WrongPassword!"
@@ -100,12 +120,18 @@ def test_login_empty_credentials():
     })
     assert response.status_code == 422  # FastAPI validation error
 
-def test_plaintext_password_not_returned():
+def test_plaintext_password_not_returned(clean_db: Session):
     client.post("/api/v1/auth/register", json={
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
         "full_name": "Test User"
     })
+    
+    user = clean_db.query(User).filter(User.email == "newuser@example.com").first()
+    user.email_verified = True
+    clean_db.add(user)
+    clean_db.commit()
+    
     response = client.post("/api/v1/auth/login", data={
         "username": "newuser@example.com",
         "password": "SecurePassword123!"
@@ -123,12 +149,18 @@ def test_unauthorized_access():
     response = client.get("/api/v1/auth/me")
     assert response.status_code == 401
 
-def test_session_logout():
+def test_session_logout(clean_db: Session):
     client.post("/api/v1/auth/register", json={
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
         "full_name": "Test User"
     })
+    
+    user = clean_db.query(User).filter(User.email == "newuser@example.com").first()
+    user.email_verified = True
+    clean_db.add(user)
+    clean_db.commit()
+    
     response = client.post("/api/v1/auth/login", data={
         "username": "newuser@example.com",
         "password": "SecurePassword123!"
@@ -137,3 +169,17 @@ def test_session_logout():
     
     logout_response = client.post("/api/v1/auth/logout", headers={"Authorization": f"Bearer {token}"})
     assert logout_response.status_code == 200
+    
+def test_unverified_user_cannot_login():
+    client.post("/api/v1/auth/register", json={
+        "email": "unverified@example.com",
+        "password": "SecurePassword123!",
+        "full_name": "Unverified User"
+    })
+    
+    response = client.post("/api/v1/auth/login", data={
+        "username": "unverified@example.com",
+        "password": "SecurePassword123!"
+    })
+    assert response.status_code == 401
+    assert "verify your email" in response.json()["detail"]

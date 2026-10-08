@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
 from app.db.session import SessionLocal
-from app.models.user import User
+from app.models.user import User, BlacklistedToken
 from app.core import security
 from app.core.rbac import has_permission
 
@@ -25,6 +25,14 @@ def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> User:
     try:
+        # Check blacklist
+        is_blacklisted = db.query(BlacklistedToken).filter(BlacklistedToken.token == token).first()
+        if is_blacklisted:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been invalidated",
+            )
+            
         payload = jwt.decode(
             token, security.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
@@ -51,6 +59,8 @@ def get_current_active_user(
 ) -> User:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    if not current_user.email_verified:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Please verify your email address")
     return current_user
 
 class RequirePermissions:

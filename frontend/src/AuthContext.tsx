@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const login = (newToken: string, newUser: User) => {
@@ -50,7 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(newUser);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (token) {
+      try {
+        await fetchApi('/auth/logout', { method: 'POST' });
+      } catch (err) {
+        // Ignore errors during logout
+      }
+    }
     setToken(null);
     setUser(null);
     localStorage.removeItem('modelsentinel_token');

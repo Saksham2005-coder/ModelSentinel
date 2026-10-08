@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { fetchApi } from '@/services/api/client';
 import { Eye, EyeOff, Activity, ShieldCheck, Zap, Search } from 'lucide-react';
 
@@ -14,8 +14,6 @@ export function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +46,6 @@ export function RegisterPage() {
       });
 
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 3000);
     } catch (err: unknown) {
       if (err instanceof Error) {
         // Backend returns "The user with this email already exists in the system." for duplicate
@@ -140,13 +135,17 @@ export function RegisterPage() {
 
           <div className="mt-8">
             {success ? (
-              <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-center space-y-4">
-                <div className="w-12 h-12 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="p-6 bg-slate-900 border border-slate-700 rounded-lg text-center space-y-4">
+                <div className="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-medium text-emerald-400">Account Created</h3>
-                <p className="text-sm text-slate-300">Your ModelSentinel account has been created.</p>
-                <p className="text-xs text-slate-500">Redirecting you to sign in...</p>
+                <h3 className="text-lg font-medium text-white">Check your email</h3>
+                <p className="text-sm text-slate-300">We've sent a verification link to your email address.</p>
+                <div className="pt-4">
+                  <Link to="/login" className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-black bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:ring-offset-slate-900 transition-colors">
+                    Back to Sign In
+                  </Link>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">

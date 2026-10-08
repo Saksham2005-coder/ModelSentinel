@@ -36,7 +36,10 @@ def main():
                 print(f"Administrator with email {email} already exists.")
                 reset = input("Reset password? (y/N): ").strip().lower()
                 if reset == 'y':
+                    import datetime
                     user.hashed_password = get_password_hash(password)
+                    user.email_verified = True
+                    user.email_verified_at = datetime.datetime.utcnow()
                     db.commit()
                     print("Administrator password reset successfully.")
                 else:
@@ -46,21 +49,27 @@ def main():
                 print(f"User with email {email} already exists but is not an ADMIN.")
                 promote = input("Promote to ADMIN and reset password? (y/N): ").strip().lower()
                 if promote == 'y':
+                    import datetime
                     user.role = Role.ADMIN
                     user.hashed_password = get_password_hash(password)
+                    user.email_verified = True
+                    user.email_verified_at = datetime.datetime.utcnow()
                     db.commit()
                     print("User promoted to Administrator successfully.")
                 else:
                     print("Aborted.")
                 sys.exit(0)
                 
+        import datetime
         # Create new admin user
         new_admin = User(
             email=email,
             full_name="Administrator",
             hashed_password=get_password_hash(password),
             role=Role.ADMIN,
-            is_active=True
+            is_active=True,
+            email_verified=True,
+            email_verified_at=datetime.datetime.utcnow()
         )
         db.add(new_admin)
         db.commit()
