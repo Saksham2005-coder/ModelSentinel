@@ -25,6 +25,7 @@ class UserResponse(BaseModel):
     role: Role
     is_active: bool
     email_verified: bool
+    dev_verification_token: str = None
 
     class Config:
         orm_mode = True
@@ -61,9 +62,13 @@ def register(
     db.commit()
     db.refresh(user)
     
-    # Generate and send verification email
     token = email_service.create_verification_token(db, user)
     email_service.send_verification_email(user.email, token)
+    
+    # If in development, return the token so the UI can show the link
+    import os
+    if os.getenv("EMAIL_PROVIDER", "console") == "console":
+        user.dev_verification_token = token
     
     audit_service.record_event(
         db=db,
@@ -121,9 +126,14 @@ def resend_verification(
     if user.email_verified:
         return {"status": "If an account exists, a verification email has been sent."}
         
-    # Generate and send new token
     token = email_service.create_verification_token(db, user)
     email_service.send_verification_email(user.email, token)
+    
+    import os
+    if os.getenv("EMAIL_PROVIDER", "console") == "console":
+        # In dev mode, we could return it, but resend endpoint response is fixed.
+        # Let's change the response for dev mode.
+        return {"status": "If an account exists, a verification email has been sent.", "dev_verification_token": token}
     
     audit_service.record_event(
         db=db,

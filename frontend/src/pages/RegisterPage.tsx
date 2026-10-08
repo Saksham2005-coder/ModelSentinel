@@ -13,6 +13,7 @@ export function RegisterPage() {
   
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [devToken, setDevToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +34,7 @@ export function RegisterPage() {
     }
 
     try {
-      await fetchApi('/auth/register', {
+      const response = await fetchApi<{dev_verification_token?: string}>('/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +46,9 @@ export function RegisterPage() {
         })
       });
 
+      if (response.dev_verification_token) {
+        setDevToken(response.dev_verification_token);
+      }
       setSuccess(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -141,6 +145,20 @@ export function RegisterPage() {
                 </div>
                 <h3 className="text-lg font-medium text-white">Check your email</h3>
                 <p className="text-sm text-slate-300">We've sent a verification link to your email address.</p>
+                
+                {devToken && (
+                  <div className="mt-4 p-4 bg-slate-800 rounded-lg text-left">
+                    <p className="text-xs text-amber-500 font-semibold mb-2">DEVELOPMENT MODE:</p>
+                    <p className="text-sm text-slate-300 mb-2">Verification link generated successfully.</p>
+                    <a 
+                      href={`/verify-email?token=${devToken}`}
+                      className="text-xs text-blue-400 hover:text-blue-300 break-all"
+                    >
+                      {window.location.origin}/verify-email?token={devToken}
+                    </a>
+                  </div>
+                )}
+
                 <div className="pt-4">
                   <Link to="/login" className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-black bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:ring-offset-slate-900 transition-colors">
                     Back to Sign In

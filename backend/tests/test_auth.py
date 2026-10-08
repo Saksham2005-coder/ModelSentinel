@@ -183,3 +183,71 @@ def test_unverified_user_cannot_login():
     })
     assert response.status_code == 401
     assert "verify your email" in response.json()["detail"]
+
+def test_development_verification_link():
+    import os
+    os.environ["EMAIL_PROVIDER"] = "console"
+    response = client.post("/api/v1/auth/register", json={
+        "email": "devuser@example.com",
+        "password": "SecurePassword123!",
+        "full_name": "Dev User"
+    })
+    assert response.status_code == 200
+    assert "dev_verification_token" in response.json()
+    token = response.json()["dev_verification_token"]
+    
+    # Verify token
+    verify_response = client.post("/api/v1/auth/verify-email", json={"token": token})
+    assert verify_response.status_code == 200
+    assert "successfully" in verify_response.json()["status"]
+
+def test_invalid_verification_token():
+    verify_response = client.post("/api/v1/auth/verify-email", json={"token": "invalid_token"})
+    assert verify_response.status_code == 400
+
+def test_reused_verification_token():
+    import os
+    os.environ["EMAIL_PROVIDER"] = "console"
+    response = client.post("/api/v1/auth/register", json={
+        "email": "reuseuser@example.com",
+        "password": "SecurePassword123!",
+        "full_name": "Reuse User"
+    })
+    token = response.json()["dev_verification_token"]
+    
+    # First verify
+    verify_response = client.post("/api/v1/auth/verify-email", json={"token": token})
+    assert verify_response.status_code == 200
+    
+    # Second verify should fail
+    verify_response2 = client.post("/api/v1/auth/verify-email", json={"token": token})
+    assert verify_response2.status_code == 400
+
+def test_protected_api_fails_after_logout(clean_db: Session):
+    client.post("/api/v1/auth/register", json={
+        "email": "logoutuser@example.com",
+        "password": "SecurePassword123!",
+        "full_name": "Test User"
+    })
+    
+    user = clean_db.query(User).filter(User.email == "logoutuser@example.com").first()
+    user.email_verified = True
+    clean_db.add(user)
+    clean_db.commit()
+    
+    response = client.post("/api/v1/auth/login", data={
+        "username": "logoutuser@example.com",
+        "password": "SecurePassword123!"
+    })
+    token = response.json()["access_token"]
+    
+    # Call protected API
+    me_response = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_response.status_code == 200
+    
+    # Logout
+    client.post("/api/v1/auth/logout", headers={"Authorization": f"Bearer {token}"})
+    
+    # Call protected API again
+    me_response2 = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_response2.status_code == 401
