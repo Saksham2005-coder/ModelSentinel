@@ -32,6 +32,7 @@ import { VersionComparisonPage } from '@/pages/model/VersionComparisonPage';
 import { ChangeIntelligencePage } from '@/pages/ChangeIntelligencePage';
 import Workflows from '@/pages/Workflows';
 import WorkflowDetail from '@/pages/WorkflowDetail';
+import { IntegrationsPage } from '@/pages/IntegrationsPage';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
           <Route path="/incident-memory" element={<IncidentMemoryPage />} />
           <Route path="/workflows" element={<Workflows />} />
           <Route path="/workflows/:id" element={<WorkflowDetail />} />
+          <Route path="/integrations" element={<IntegrationsPage />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
           
           <Route path="/analytics" element={<AnalyticsPage />} />

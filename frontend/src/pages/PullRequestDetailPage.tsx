@@ -4,9 +4,18 @@ import { PullRequestApi, PullRequest } from '@/services/api/pull_requests';
 import { IncidentApi, Incident } from '@/services/api/incidents';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import { changeRiskService, ChangeRiskAssessment } from '@/services/api/changeRisk';
+import { fetchApi } from '@/services/api/client';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Loader2, ArrowLeft, GitPullRequest, GitBranch, ShieldAlert, CheckCircle, XCircle, Rocket } from 'lucide-react';
+
+interface ExternalCheck {
+  id: string;
+  name: string;
+  provider: string;
+  conclusion: string;
+  status: string;
+}
 
 export function PullRequestDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +26,7 @@ export function PullRequestDetailPage() {
   const [riskAssessment, setRiskAssessment] = useState<ChangeRiskAssessment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [checks, setChecks] = useState<ExternalCheck[]>([]);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -33,6 +43,13 @@ export function PullRequestDetailPage() {
         setRiskAssessment(risk);
       } catch (e) {
         console.warn("Could not load risk assessment");
+      }
+
+      try {
+        const res = await fetchApi<ExternalCheck[]>(`/pull-requests/${id}/checks`);
+        setChecks(res);
+      } catch (e) {
+        console.warn("Could not load CI checks");
       }
 
       const deps = await DeploymentApi.getDeployments();
@@ -139,10 +156,32 @@ export function PullRequestDetailPage() {
                 {g?.regression_passed === true ? <Badge variant="success">PASS</Badge> : <Badge variant="danger">FAIL</Badge>}
               </div>
               <div className="flex items-center justify-between p-3 border border-border rounded bg-background-base">
-                <span className="font-medium text-text-primary">CI Pipeline</span>
+                <span className="font-medium text-text-primary">Internal CI Pipeline</span>
                 {g?.ci_passed === true ? <Badge variant="success">PASS</Badge> : <Badge variant="danger">FAIL</Badge>}
               </div>
             </div>
+            
+            {checks.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold text-text-secondary mb-3">External Provider Checks</h4>
+                <div className="flex flex-col gap-2">
+                  {checks.map(c => (
+                    <div key={c.id} className="flex items-center justify-between p-3 border border-border rounded bg-background-base text-sm">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{c.name}</span>
+                        <span className="text-xs text-text-muted">{c.provider}</span>
+                      </div>
+                      <Badge variant={
+                        c.conclusion === 'SUCCESS' ? 'success' :
+                        (c.conclusion === 'FAILURE' || c.conclusion === 'CANCELLED') ? 'danger' : 'info'
+                      }>
+                        {c.conclusion || c.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         </div>
 

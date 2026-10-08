@@ -36,6 +36,7 @@ const navigation = [
   { name: 'Pull Requests', href: '/pull-requests', icon: GitPullRequest },
   { name: 'Repository', href: '/repository', icon: GitBranch },
   { name: 'Incident Memory', href: '/incident-memory', icon: BrainCircuit },
+  { name: 'Integrations', href: '/integrations', icon: Search },
 ];
 
 export function Sidebar() {
