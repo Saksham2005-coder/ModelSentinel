@@ -27,12 +27,19 @@ export function AddModelModal({ open, onOpenChange, onSuccess }: AddModelModalPr
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-      // Auto-generate slug from name if user types in name
-      ...(name === 'name' && !prev.slug.trim() ? { slug: value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') } : {})
-    }));
+    setFormData(prev => {
+      const updates: Partial<ModelCreate> = { [name]: value };
+      
+      // Auto-generate slug from name if the current slug was auto-generated from the previous name, or if it's empty
+      if (name === 'name') {
+        const expectedOldSlug = prev.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        if (!prev.slug || prev.slug === expectedOldSlug) {
+          updates.slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        }
+      }
+      
+      return { ...prev, ...updates };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

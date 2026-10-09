@@ -282,7 +282,7 @@ export function DashboardPage() {
               <div 
                 key={model.id} 
                 className="p-4 rounded-xl border border-border bg-surface hover:border-brand/50 transition-colors cursor-pointer group"
-                onClick={() => navigate(`/models/${model.id}`)}
+                onClick={() => navigate(`/models/${model.id}/intelligence`)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-medium text-sm text-text-primary group-hover:text-brand transition-colors line-clamp-1">{model.name}</h3>
@@ -305,8 +305,8 @@ export function DashboardPage() {
         {/* Recent Incidents */}
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold tracking-tight text-text-primary">Recent Incidents</h2>
-          <div className="rounded-xl border border-border bg-surface overflow-hidden">
-            <Table>
+          <div className="rounded-xl border border-border bg-surface overflow-x-auto">
+            <Table className="min-w-[600px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Incident</TableHead>
@@ -361,8 +361,8 @@ export function DashboardPage() {
         {/* Recent Deployments */}
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold tracking-tight text-text-primary">Engineering Activity</h2>
-          <div className="rounded-xl border border-border bg-surface overflow-hidden">
-            <Table>
+          <div className="rounded-xl border border-border bg-surface overflow-x-auto">
+            <Table className="min-w-[500px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Event</TableHead>

@@ -57,7 +57,11 @@ def get_timeline(
     )
     return events
 
-@router.get("/incidents/{incident_id}/graph")
+class CausalGraphResponse(BaseModel):
+    nodes: List[ReliabilityEventResponse]
+    edges: List[Dict[str, Any]]
+
+@router.get("/incidents/{incident_id}/graph", response_model=CausalGraphResponse)
 def get_incident_graph_by_incident_id(
     model_id: str,
     incident_id: str,
@@ -75,7 +79,7 @@ def get_incident_graph_by_incident_id(
         
     return reliability_service.get_incident_graph(db, event.id)
 
-@router.get("/graph/{incident_event_id}")
+@router.get("/graph/{incident_event_id}", response_model=CausalGraphResponse)
 def get_incident_graph(
     model_id: str,
     incident_event_id: str,

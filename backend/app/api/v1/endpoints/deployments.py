@@ -129,8 +129,8 @@ def get_deployment(id: str, db: Session = Depends(get_db)):
                 "failure_reason": v.failure_reason,
                 "started_at": v.started_at,
                 "completed_at": v.completed_at,
-                "observations": v.post_deployment_observation,
-                "baseline": v.baseline_reference
+                "observations": json.loads(v.post_deployment_observation) if isinstance(v.post_deployment_observation, str) else v.post_deployment_observation,
+                "baseline": json.loads(v.baseline_reference) if isinstance(v.baseline_reference, str) else v.baseline_reference
             } for v in verifs
         ]
     }

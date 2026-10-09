@@ -46,7 +46,7 @@ export function InvestigationPage() {
   const fetchData = useCallback(async () => {
     if (!incidentId) return;
     try {
-      setLoading(true);
+      if (!incident) setLoading(true);
       const inc = await IncidentApi.getIncident(incidentId);
       setIncident(inc);
       const invs = await InvestigationsApi.getInvestigations(incidentId);
@@ -73,6 +73,7 @@ export function InvestigationPage() {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incidentId]);
 
   useEffect(() => {

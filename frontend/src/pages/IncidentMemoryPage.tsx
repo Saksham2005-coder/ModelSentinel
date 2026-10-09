@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -27,10 +28,13 @@ export function IncidentMemoryPage() {
       });
   }, []);
 
-  const filtered = memories.filter(m => 
-    m.title?.toLowerCase().includes(search.toLowerCase()) ||
-    m.root_cause?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = memories.filter(m => {
+    if (!search) return true;
+    const t = (m.title || '').toLowerCase();
+    const r = (m.root_cause || '').toLowerCase();
+    const s = search.toLowerCase();
+    return t.includes(s) || r.includes(s);
+  });
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
@@ -104,7 +108,7 @@ export function IncidentMemoryPage() {
                 </div>
                 <div className="flex space-x-2 pt-2 border-t border-border/50">
                   <Button variant="default" size="sm" className="h-8 text-xs text-muted-foreground" asChild>
-                    <a href={`/incidents/${memory.incident_id}`}>View Source Incident</a>
+                    <Link to={`/incidents/${memory.incident_id}`}>View Source Incident</Link>
                   </Button>
                 </div>
               </CardContent>

@@ -99,9 +99,6 @@ def list_patches(
     investigation_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
-    service = PatchService(db)
-    proposals = service.db.query(service.db.class_mapper(service.get_patch_proposal("").__class__)).filter_by(investigation_id=investigation_id).all()
-    # Wait, getting proposals:
     from app.models.patch import PatchProposal
     proposals = db.query(PatchProposal).filter(PatchProposal.investigation_id == investigation_id).order_by(PatchProposal.created_at.desc()).all()
     return proposals
