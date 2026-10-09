@@ -20,3 +20,6 @@ venv/
 Thumbs.db
 *.db
 test.db
+*.db-journal
+*.db-shm
+*.db-wal

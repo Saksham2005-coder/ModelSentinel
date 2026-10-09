@@ -1,94 +1,141 @@
 # ModelSentinel
 
-**ModelSentinel** is an AI-powered ML reliability engineering platform. It is designed to take an ML incident through its complete lifecycle: from model failure to validated, human-approved code change. 
+**ModelSentinel** is an AI-powered ML reliability engineering platform. It is designed to take an ML incident through its complete lifecycle: from model failure detection to a validated, human-approved code change.
 
-## Core Product Workflow
+## Problem Statement
 
-1. **Monitor & Detect:** Watch for ML anomalies or drift.
-2. **Investigate & Find Root Cause:** Deep dive into failures.
-3. **Identify Affected Code:** Trace issues back to the specific ML code or data pipelines.
-4. **Propose Multi-File Fix:** AI-assisted suggestion of necessary code modifications.
-5. **Human Review & Validation:** Engineers review the fix within a sandbox environment.
-6. **Regression Test Generation:** Automatically create tests to prevent recurrence.
-7. **Pull Request:** Ship the fix securely.
+When a machine learning model degrades in production, engineering teams face a fragmented workflow: detecting the anomaly, investigating the root cause across data/code, reproducing the issue, developing a patch, and securely deploying it. ModelSentinel unifies this process.
 
-## Current Architecture
+## Key Capabilities
 
-The architecture emphasizes maintainability, strong typing, and standard industry practices without unnecessary microservices.
-
-- **Frontend:** A single-page application communicating with the REST API.
-- **Backend:** A monolithic REST API providing the core services.
-- **Database:** Relational storage for all entities, designed for future vector capabilities (pgvector).
+- **Real-time Monitoring & Alerts**: Detects data drift (PSI, KS Statistic) and performance degradation.
+- **Incident Management**: Automatically escalates alerts into actionable incidents.
+- **AI Investigations**: Deep-dives into failures by analyzing telemetry, data quality, and causal graphs.
+- **Automated Patch Proposals**: Generates multi-file code fixes based on investigation findings.
+- **Validation & Regression Analysis**: Safely tests patches against historical regression suites.
+- **Deployment Gates**: Controls deployment promotion based on ML health checks and CI/CD policies.
+- **Reliability Analytics**: Tracks organizational SLOs, MTTR, and engineering intelligence.
+- **Python CLI**: Interact with models, incidents, and deployments directly from the terminal.
 
 ## Technology Stack
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query.
-- **Backend:** Python, FastAPI, Pydantic, SQLAlchemy, Alembic.
-- **Infrastructure:** Docker, Docker Compose, PostgreSQL.
-
-## Setup and Demo
-
-The infrastructure has been finalized for easy demonstration.
-For a complete guide to running the presentation demo, please refer to:
-[DEMO.md](DEMO.md)
-
-For detailed deployment instructions (Demo vs Production modes, PostgreSQL vs SQLite):
-[DEPLOYMENT.md](DEPLOYMENT.md)
-
-**Quick Start (Demo Mode):**
-```bash
-./demo start
-./demo seed
-```
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, React Router
+- **Backend**: Python, FastAPI, Pydantic, SQLAlchemy, Alembic
+- **Database**: PostgreSQL (Production) / SQLite (Local Demo)
+- **Infrastructure**: Docker, Docker Compose
 
 ## Repository Structure
 
 ```
 ModelSentinel/
-├── frontend/           # React frontend application
-├── backend/            # FastAPI backend application
-│   ├── app/            # Application code
-│   └── tests/          # Backend test suite
-├── docs/               # Project documentation
-├── scripts/            # Helper and deployment scripts
-├── docker-compose.yml  # Local development environment
-└── README.md           # This file
+├── backend/            # FastAPI REST API, database models, and ML intelligence services
+├── cli/                # Python CLI tool for developers
+├── docs/               # Architecture, Deployment, and Configuration documentation
+├── frontend/           # React SPA frontend application
+├── scripts/            # Helper scripts (admin creation, demo seeding)
+├── demo.cmd / demo     # Entry points for running the local demo
+├── docker-compose.yml  # Base Docker configuration
+└── docker-compose.demo.yml # Local SQLite-based demo overrides
 ```
 
-## Development Commands
+## System Requirements
 
-**Frontend (Local):**
+- **Docker** and **Docker Compose**
+- **Node.js** (v18+) and npm (for frontend development)
+- **Python 3.10+** (for backend/CLI development)
+
+## Quick Start (Local Demo)
+
+The repository includes a self-contained SQLite demo environment with pre-seeded data showcasing the complete hero workflow (Spam Classifier failure).
+
+1. **Start the environment:**
+   ```bash
+   ./demo start
+   ```
+2. **Seed the database:**
+   ```bash
+   ./demo seed
+   ```
+3. **Access the application:**
+   - Frontend: [http://localhost:5173](http://localhost:5173)
+   - Backend API: [http://localhost:8000/api/v1](http://localhost:8000/api/v1)
+   - Login with: `admin@modelsentinel.local` / `StrongDemoPassword123!`
+
+For more details, see [docs/DEMO.md](docs/DEMO.md).
+
+## Development Setup
+
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
-npm run lint
 ```
 
-**Backend (Local):**
+### Backend
+
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## Current Project Status
+## CLI Usage
 
-**Phase 0 / Foundation:** Complete. Basic project structure and Docker infrastructure established.
+The Python CLI (`modelsentinel`) interacts with the backend.
 
-**Phase 1 / Premium Product UI Foundation:** Complete. Established central design-token support, Tailwind CSS integrations, and highly modular React components mimicking the amber/orange dark theme of the design reference.
+```bash
+cd cli
+pip install -e .
 
-**Phase 2 / Real ML Model Management Foundation:** Complete. Implemented model registry full-stack (SQLAlchemy models for Model, ModelVersion, ModelMetric, FastAPI endpoints, and React frontend API integrations with modals).
+# Authenticate
+modelsentinel --api-url http://localhost:8000 auth login
 
-**Phase 3 / ML Monitoring & Deterministic Evaluation:** Complete.
-- **Monitoring Architecture**: A synchronous, deterministic monitoring runner in the FastAPI backend that compares current window data to baseline data (CSV).
-- **Supported Metrics**: Classification metrics (Accuracy, Precision, Recall, F1, ROC-AUC).
-- **Drift Methods**: KS Statistic (Numerical features), PSI (Population Stability Index for Numerical, Categorical features, and Prediction drift).
-- **Baseline/Current Concept**: Compares a reference `baseline` dataframe against a recent `current` dataframe to extract drift and performance degradation.
-- **Data Quality**: Evaluates Missing Values, Duplicate Rows, and Invalid Data.
-- **Segment Analysis**: Evaluates standard ML metrics over dynamically filtered segments (e.g. `url_count > 2`).
-- **Monitoring Endpoints**: RESTful `POST /api/v1/models/{id}/monitoring/runs` orchestrates the run and GET variants retrieve the persisted metric, drift, quality, and segment tables.
-- **Demo Dataset**: Seed script generates dummy CSVs `email-spam-classifier_baseline.csv` and `email-spam-classifier_current.csv` with synthetic performance degradation and feature drift for demonstration.
-- **Thresholds**: Defined in `thresholds.py`. Signals are mapped to `healthy`, `warning`, or `critical`. (e.g., PSI > 0.25 is critical).
+# List active models
+modelsentinel --api-url http://localhost:8000 models list
+
+# View incident details
+modelsentinel --api-url http://localhost:8000 incidents view <INCIDENT_ID>
+```
+For more commands, see [docs/CLI.md](docs/CLI.md).
+
+## Testing
+
+Run the test suites to verify functionality:
+
+**Backend:**
+```bash
+cd backend
+pytest tests/
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm run lint
+npm run build
+```
+
+**CLI:**
+```bash
+cd cli
+pytest tests/
+```
+
+## Security Considerations
+
+- **Secrets**: Never commit `.env` files or API keys. Use `.env.example` as a template.
+- **Admin Accounts**: The bootstrap script uses a temporary hardcoded password for the demo environment. Rotate this immediately in production.
+- **Environment**: The local demo uses SQLite without strict transport security. Production deployments MUST use PostgreSQL and HTTPS.
+
+## Limitations and Work-in-Progress
+
+- AI Investigation functionality simulates AI outputs in the demo environment; production requires a configured LLM provider.
+- Full Git provider integrations (e.g., GitHub Webhooks for PR merging) are partially mocked in the current release candidate.
+
+## License
+
+*(A license decision is currently pending. Please do not use in production without explicit authorization.)*

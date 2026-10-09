@@ -47,6 +47,11 @@ def seed_demo(reset=False):
     
     # We execute seed script inside the backend container
     # so we don't have to worry about python environment / dependencies locally.
+    # Ensure admin user exists before seeding
+    admin_cmd = "docker compose -f docker-compose.demo.yml exec backend python scripts/create_admin.py --demo"
+    print("Bootstrapping demo admin account...")
+    subprocess.Popen(admin_cmd, shell=True).wait()
+
     cmd = "docker compose -f docker-compose.demo.yml exec backend python scripts/seed_demo_environment.py"
     if reset:
         cmd += " --reset"
