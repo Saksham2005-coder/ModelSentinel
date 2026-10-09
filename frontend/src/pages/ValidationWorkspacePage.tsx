@@ -60,7 +60,7 @@ export const ValidationWorkspacePage: React.FC = () => {
         throw new Error('No active investigation found.');
       }
       const patchResponse = await fetchApi(`/investigations/${activeInv.id}/patches`) as Array<{id: string, status: string}>;
-      const approvedPatch = patchResponse.find(p => p.status === 'approved');
+      const approvedPatch = patchResponse.find(p => p.status === 'approved' || p.status === 'merged');
       if (!approvedPatch) {
         throw new Error('No approved patch found for validation.');
       }
@@ -97,7 +97,7 @@ export const ValidationWorkspacePage: React.FC = () => {
       const invResponse = await fetchApi(`/incidents/${incidentId}/investigations`) as Array<{id: string, status: string}>;
       const activeInv = invResponse.find(i => i.status === 'completed' || i.status === 'in_progress');
       const patchResponse = await fetchApi(`/investigations/${activeInv?.id}/patches`) as Array<{id: string, status: string}>;
-      const approvedPatch = patchResponse.find(p => p.status === 'approved');
+      const approvedPatch = patchResponse.find(p => p.status === 'approved' || p.status === 'merged');
       
       if (approvedPatch) {
         await fetchApi(`/patches/${approvedPatch.id}/validation`, {

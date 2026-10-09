@@ -206,7 +206,7 @@ def seed_demo(db):
     db.flush()
     db.add(InvestigationHypothesis(investigation_id=inv2.id, title="Shopping behavior drift", description="Holiday shopping caused drift", status="confirmed", rank=1, evidence_strength=0.9))
     
-    patch2 = PatchProposal(investigation_id=inv2.id, incident_id=inc2.id, repository_id=repo_fraud.id, repository_snapshot_id=snap_fraud.id, version="v1", status="merged", summary="Retrain with recent data", rationale="Data drift requires new data.", expected_behavior="Model recovers performance.", created_at=dt(-24))
+    patch2 = PatchProposal(investigation_id=inv2.id, incident_id=inc2.id, repository_id=repo_fraud.id, repository_snapshot_id=snap_fraud.id, version=1, status="merged", summary="Retrain with recent data", rationale="Data drift requires new data.", expected_behavior="Model recovers performance.", created_at=dt(-24))
     db.add(patch2)
     db.flush()
     db.add(ChangeRiskAssessment(patch_proposal_id=patch2.id, risk_score=20, risk_level="LOW"))
@@ -254,7 +254,7 @@ def seed_demo(db):
     db.flush()
     inv4.primary_hypothesis_id = hyp4.id
     
-    patch4 = PatchProposal(investigation_id=inv4.id, incident_id=inc4.id, repository_id=repo_ml.id, repository_snapshot_id=snap_ml.id, version="v1", status="merged", summary="Fix emoji parsing logic in text_features.py", rationale="The new emoji set causes parsing exceptions.", expected_behavior="Emojis are correctly ignored or parsed.", created_at=dt(-1, -8))
+    patch4 = PatchProposal(investigation_id=inv4.id, incident_id=inc4.id, repository_id=repo_ml.id, repository_snapshot_id=snap_ml.id, version=1, status="merged", summary="Fix emoji parsing logic in text_features.py", rationale="The new emoji set causes parsing exceptions.", expected_behavior="Emojis are correctly ignored or parsed.", created_at=dt(-1, -8))
     db.add(patch4)
     db.flush()
     db.add(PatchFileChange(patch_proposal_id=patch4.id, file_path="src/features/text_features.py", change_type="MODIFY", additions=15, deletions=2, diff_text="@@ -10,3 +10,18 @@\n-def parse(text):\n+def parse(text):\n+    import emoji", rationale="Use python emoji package instead of custom regex"))
