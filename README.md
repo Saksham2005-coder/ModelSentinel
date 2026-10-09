@@ -133,8 +133,9 @@ pytest tests/
 
 ## Limitations and Work-in-Progress
 
-- AI Investigation functionality simulates AI outputs in the demo environment; production requires a configured LLM provider.
-- Full Git provider integrations (e.g., GitHub Webhooks for PR merging) are partially mocked in the current release candidate.
+- **AI Investigation**: Fully implemented with the Groq provider via structured output generation and tool-calling. It is not simulated at runtime. A valid LLM API key must be configured, otherwise active investigations will gracefully fail with an error. (Note: The demo environment is pre-seeded with historical completed investigations for visualization).
+- **GitHub Integrations**: Fully implemented. Webhook listeners (with HMAC signature verification and idempotency logic) and REST API PR interactions are strictly live and credential-dependent. They are not mocked. Active Git interactions require a valid GitHub Token and configured Webhook Secret.
+
 
 ## License
 
