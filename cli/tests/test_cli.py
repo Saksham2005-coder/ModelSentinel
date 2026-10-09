@@ -14,7 +14,7 @@ def test_help():
 
 @patch("modelsentinel.client.ModelSentinelClient._request")
 def test_models_list_json(mock_request):
-    mock_request.return_value = [{"id": "m1", "name": "Test Model", "status": "active"}]
+    mock_request.return_value = {"items": [{"id": "m1", "name": "Test Model", "status": "active"}]}
     from modelsentinel.output import set_json_output
     set_json_output(True)
     try:
@@ -26,11 +26,41 @@ def test_models_list_json(mock_request):
 
 @patch("modelsentinel.client.ModelSentinelClient._request")
 def test_models_list_human(mock_request):
-    mock_request.return_value = [{"id": "m1", "name": "Test Model", "task_type": "cls", "status": "active"}]
+    mock_request.return_value = {"items": [{"id": "m1", "name": "Test Model", "task_type": "cls", "status": "active"}]}
     result = runner.invoke(app, ["models", "list"])
     assert result.exit_code == 0
     assert "m1" in result.stdout
     assert "Test Model" in result.stdout
+
+@patch("modelsentinel.client.ModelSentinelClient._request")
+def test_models_list_empty(mock_request):
+    mock_request.return_value = {"items": []}
+    result = runner.invoke(app, ["models", "list"])
+    assert result.exit_code == 0
+
+@patch("modelsentinel.client.ModelSentinelClient._request")
+@patch("modelsentinel.output.print_error")
+def test_models_list_malformed(mock_print_error, mock_request):
+    mock_request.return_value = {"not_items": []}
+    result = runner.invoke(app, ["models", "list"])
+    assert result.exit_code == 1
+    mock_print_error.assert_called_with("Unexpected response format from API: missing 'items' key")
+
+@patch("modelsentinel.client.ModelSentinelClient._request")
+@patch("modelsentinel.output.print_error")
+def test_models_list_malformed_type(mock_print_error, mock_request):
+    mock_request.return_value = "string response"
+    result = runner.invoke(app, ["models", "list"])
+    assert result.exit_code == 1
+    mock_print_error.assert_called_with("Unexpected response format from API: expected a list of models")
+
+@patch("modelsentinel.client.ModelSentinelClient._request")
+def test_models_list_auth_failure(mock_request):
+    from modelsentinel.errors import APIError
+    mock_request.side_effect = APIError("Not authenticated")
+    result = runner.invoke(app, ["models", "list"])
+    assert isinstance(result.exception, APIError)
+    assert result.exception.exit_code == 3
 
 @patch("modelsentinel.client.ModelSentinelClient._request")
 def test_not_found(mock_request):

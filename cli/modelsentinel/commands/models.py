@@ -13,9 +13,21 @@ def list():
         print_json(data)
         return
 
+    items = data
+    if isinstance(data, dict):
+        if "items" in data:
+            items = data["items"]
+        else:
+            output.print_error("Unexpected response format from API: missing 'items' key")
+            raise typer.Exit(1)
+            
+    if type(items) is not type([]):
+        output.print_error("Unexpected response format from API: expected a list of models")
+        raise typer.Exit(1)
+
     print_table(
         "Models",
-        data,
+        items,
         ["ID", "Name", "Task Type", "Status"],
         [lambda m: m.get("id"), lambda m: m.get("name"), lambda m: m.get("task_type"), lambda m: m.get("status")]
     )
