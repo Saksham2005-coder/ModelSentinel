@@ -12,7 +12,9 @@ MAX_EXTRACT_SIZE_BYTES = 100 * 1024 * 1024 # 100MB
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 # 5MB
 
 class RepositoryStorage:
-    def __init__(self, base_dir: str = "./data/repositories"):
+    def __init__(self, base_dir: Optional[str] = None):
+        if base_dir is None:
+            base_dir = os.getenv("STORAGE_DIR", "./data/repositories")
         self.base_dir = os.path.abspath(base_dir)
         os.makedirs(self.base_dir, exist_ok=True)
 

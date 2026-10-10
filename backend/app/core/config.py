@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     MODELSENTINEL_GITHUB_API_URL: str = os.getenv("MODELSENTINEL_GITHUB_API_URL", os.getenv("GITHUB_API_URL", "https://api.github.com"))
     MODELSENTINEL_GITHUB_WEBHOOK_SECRET: str = os.getenv("MODELSENTINEL_GITHUB_WEBHOOK_SECRET", "")
 
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "fallback-secret-key-do-not-use-in-prod")
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.TESTING:
@@ -45,3 +48,9 @@ class Settings(BaseSettings):
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()
+
+if settings.ENVIRONMENT == "production":
+    if settings.SECRET_KEY == "fallback-secret-key-do-not-use-in-prod":
+        raise ValueError("Unsafe production default: SECRET_KEY must be set in production")
+    if settings.POSTGRES_PASSWORD == "modelsentinel_password":
+        raise ValueError("Unsafe production default: POSTGRES_PASSWORD must be changed in production")

@@ -25,7 +25,7 @@ def check_backend_ready():
                 return True
         except:
             pass
-        time.sleep(2)
+        time.sleep(0.5)
     return False
 
 def check_frontend_ready():
@@ -39,7 +39,7 @@ def check_frontend_ready():
                 return True
         except:
             pass
-        time.sleep(2)
+        time.sleep(0.5)
     return False
 
 def seed_demo(reset=False):
@@ -68,7 +68,7 @@ def seed_demo(reset=False):
 
 def start_demo():
     print("Starting ModelSentinel Demo Environment...")
-    run_command("docker compose -f docker-compose.demo.yml up -d --build")
+    run_command("docker compose -f docker-compose.demo.yml up -d")
     
     if check_backend_ready() and check_frontend_ready():
         print("\n========================================================")

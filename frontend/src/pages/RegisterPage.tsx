@@ -66,13 +66,12 @@ export function RegisterPage() {
     <div className="min-h-screen flex bg-background-base text-text-primary">
       {/* Left side: Branding & Visuals (Hidden on Mobile) */}
       <div className="hidden lg:flex lg:flex-1 relative bg-background-primary border-r border-border overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
-          style={{ backgroundImage: 'url(/assets/auth-bg.jpg)' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background-base via-background-base/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background-base/90 to-transparent" />
+        {/* Modern Ambient Gradient Background */}
+        <div className="absolute inset-0 bg-[#0a0a0a]">
+          <div className="absolute top-0 right-0 w-[80%] h-[80%] rounded-full bg-brand/10 blur-[120px] mix-blend-screen pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-[60%] h-[60%] rounded-full bg-blue-500/10 blur-[120px] mix-blend-screen pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20" />
+        </div>
         
         {/* Atmospheric Accent */}
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand/10 rounded-full blur-3xl pointer-events-none" />
@@ -116,12 +115,8 @@ export function RegisterPage() {
       {/* Right side: Auth Card */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 relative overflow-hidden">
         {/* Mobile background */}
-        <div className="lg:hidden absolute inset-0 z-0">
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity"
-            style={{ backgroundImage: 'url(/assets/auth-bg.jpg)' }}
-          />
-          <div className="absolute inset-0 bg-background-base/90" />
+        <div className="lg:hidden absolute inset-0 z-0 bg-[#0a0a0a]">
+          <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] rounded-full bg-brand/10 blur-[100px] pointer-events-none" />
         </div>
 
         <div className="mx-auto w-full max-w-sm relative z-10">

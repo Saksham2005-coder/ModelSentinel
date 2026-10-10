@@ -8,7 +8,8 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:////app_data/modelsentinel.db
-      - LLM_PROVIDER=${LLM_PROVIDER:-}
+      - STORAGE_DIR=/app_data/repositories
+      - LLM_PROVIDER=${LLM_PROVIDER:-groq}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       - GROQ_MODEL=${GROQ_MODEL:-}
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS:-["http://localhost:5173", "http://localhost", "http://127.0.0.1"]}

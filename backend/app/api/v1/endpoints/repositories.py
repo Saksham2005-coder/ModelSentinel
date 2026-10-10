@@ -43,7 +43,8 @@ def create_repository(
         
         # We would run this in background
         def bg_task(repo_id: str):
-            with get_db() as db_session:
+            db_session = SessionLocal()
+            try:
                 svc = RepositoryService(db_session)
                 try:
                     repo_obj = db_session.query(Repository).filter(Repository.id == repo_id).first()
@@ -60,6 +61,8 @@ def create_repository(
                     if repo_obj:
                         repo_obj.status = "failed"
                         db_session.commit()
+            finally:
+                db_session.close()
 
         background_tasks.add_task(bg_task, repo.id)
         return {"id": repo.id, "status": repo.status}
@@ -85,7 +88,8 @@ def create_repository(
             shutil.copyfileobj(file.file, buffer)
             
         def bg_task_zip(repo_id: str, zip_path: str):
-            with get_db() as db_session:
+            db_session = SessionLocal()
+            try:
                 svc = RepositoryService(db_session)
                 try:
                     svc.storage.extract_zip(repo_id, zip_path)
@@ -102,6 +106,8 @@ def create_repository(
                         os.rmdir(os.path.dirname(zip_path))
                     except:
                         pass
+            finally:
+                db_session.close()
                         
         background_tasks.add_task(bg_task_zip, repo.id, temp_path)
         return {"id": repo.id, "status": repo.status}

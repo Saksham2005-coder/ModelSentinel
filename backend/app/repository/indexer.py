@@ -59,7 +59,8 @@ class RepositoryIndexer:
         pending_dependencies = []
 
         for root, _, files in os.walk(repo_dir):
-            if ".git" in root.split(os.sep):
+            path_parts = root.split(os.sep)
+            if ".git" in path_parts or "node_modules" in path_parts or "venv" in path_parts or ".venv" in path_parts or "__pycache__" in path_parts:
                 continue
 
             for file in files:
@@ -104,7 +105,7 @@ class RepositoryIndexer:
                     is_binary=is_binary
                 )
                 self.db.add(repo_file)
-                self.db.commit() # commit early to get ID
+                self.db.flush() # flush early to get ID instead of commit to save disk I/O latency
                 
                 path_to_file_id[rel_path] = repo_file.id
                 
@@ -135,6 +136,22 @@ class RepositoryIndexer:
                             "source_symbol": getattr(dep, 'source_symbol', None)
                         })
 
+        # Cache symbols in memory to avoid N+1 queries during resolution
+        # file_id -> {symbol_name -> symbol_id}
+        local_symbols_cache = {}
+        source_ids = list(set(d["source_id"] for d in pending_dependencies))
+        
+        batch_size = 500
+        for i in range(0, len(source_ids), batch_size):
+            batch = source_ids[i:i+batch_size]
+            for sym in self.db.query(RepositorySymbol.repository_file_id, RepositorySymbol.name, RepositorySymbol.id).filter(
+                RepositorySymbol.repository_file_id.in_(batch)
+            ).all():
+                file_id, name, sym_id = sym
+                if file_id not in local_symbols_cache:
+                    local_symbols_cache[file_id] = {}
+                local_symbols_cache[file_id][name] = sym_id
+
         # Resolve dependencies loosely
         for dep in pending_dependencies:
             target = dep["target"]
@@ -147,13 +164,10 @@ class RepositoryIndexer:
             if dep["type"] in ("call", "method_call"):
                 # For calls, the target is usually a function/method in the same file or imported.
                 # Try to resolve to a symbol in the same file first.
-                local_sym = self.db.query(RepositorySymbol).filter(
-                    RepositorySymbol.repository_file_id == dep["source_id"],
-                    RepositorySymbol.name == target
-                ).first()
-                if local_sym:
-                    resolved_file_id = dep["source_id"]
-                    resolved_symbol_id = local_sym.id
+                source_id = dep["source_id"]
+                if source_id in local_symbols_cache and target in local_symbols_cache[source_id]:
+                    resolved_file_id = source_id
+                    resolved_symbol_id = local_symbols_cache[source_id][target]
             else:
                 # Import
                 if target_path in path_to_file_id:
