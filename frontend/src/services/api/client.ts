@@ -20,6 +20,8 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     headers.set('Content-Type', 'application/json');
   }
   
+  headers.set('Bypass-Tunnel-Reminder', 'true');
+  
   const token = localStorage.getItem('modelsentinel_token');
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
