@@ -2,15 +2,14 @@ services:
   - type: web
     name: modelsentinel-backend
     env: python
+    plan: free
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: modelsentinel-db
-          property: connectionString
+        sync: false   # You will paste Neon connection string here manually in Render dashboard
       - key: SECRET_KEY
         generateValue: true
       - key: LLM_PROVIDER
@@ -23,13 +22,9 @@ services:
   - type: web
     name: modelsentinel-frontend
     env: static
+    plan: free
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: "./frontend/dist"
     envVars:
       - key: VITE_API_BASE_URL
         value: "https://modelsentinel-backend.onrender.com/api/v1"
-    
-databases:
-  - name: modelsentinel-db
-    databaseName: modelsentinel
-    user: modelsentinel
