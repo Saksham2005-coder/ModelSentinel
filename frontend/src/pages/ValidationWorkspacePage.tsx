@@ -119,11 +119,11 @@ export const ValidationWorkspacePage: React.FC = () => {
       case 'passed':
       case 'recovered':
       case 'PASS':
-        return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+        return <CheckCircle className="w-5 h-5 text-status-success" />;
       case 'failed':
       case 'regressed':
       case 'FAIL':
-        return <XCircle className="w-5 h-5 text-rose-500" />;
+        return <XCircle className="w-5 h-5 text-status-danger" />;
       case 'warning':
       case 'PARTIAL':
         return <AlertCircle className="w-5 h-5 text-brand" />;
@@ -131,7 +131,7 @@ export const ValidationWorkspacePage: React.FC = () => {
       case 'INCONCLUSIVE':
         return <Info className="w-5 h-5 text-text-secondary" />;
       default:
-        return <Clock className="w-5 h-5 text-indigo-400" />;
+        return <Clock className="w-5 h-5 text-brand" />;
     }
   };
 
@@ -152,14 +152,14 @@ export const ValidationWorkspacePage: React.FC = () => {
           <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary text-text-primary">Validation Workspace</h1>
           <p className="text-text-muted mt-2">Isolated patch validation and ML recovery verification</p>
         </div>
-        <Button onClick={startValidation} disabled={triggering} className="bg-indigo-600 hover:bg-indigo-700 text-text-primary">
+        <Button onClick={startValidation} disabled={triggering} className="bg-brand hover:bg-brand-hover text-background-base">
           {triggering ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <PlayCircle className="w-4 h-4 mr-2" />}
           Start Validation
         </Button>
       </div>
 
       {error && (
-        <div className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 p-4 rounded-lg flex items-center border border-rose-200 dark:border-rose-800">
+        <div className="bg-rose-50 dark:bg-status-danger-soft text-status-danger p-4 rounded-lg flex items-center border border-status-danger dark:border-status-danger">
           <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
           <p>{error}</p>
         </div>
@@ -192,7 +192,7 @@ export const ValidationWorkspacePage: React.FC = () => {
               <CardContent className="pt-6">
                 <p className="text-text-disabled dark:text-text-primary">{activeRun.summary || 'Validation is in progress...'}</p>
                 {activeRun.verdict === 'FAIL' && (
-                  <Button variant="outline" className="mt-4 text-rose-600 border-rose-200 hover:bg-rose-50">
+                  <Button variant="outline" className="mt-4 text-status-danger border-status-danger hover:bg-rose-50" onClick={() => alert('Changes have been requested. The developer will be notified.')}>
                     Request Changes
                   </Button>
                 )}
@@ -245,8 +245,8 @@ export const ValidationWorkspacePage: React.FC = () => {
                         <tr key={m.id} className="border-b border-slate-100 dark:border-border last:border-0">
                           <td className="px-4 py-3 font-medium text-text-primary text-text-primary">{m.metric_name}</td>
                           <td className="px-4 py-3 text-text-muted">{m.baseline_value.toFixed(3) || '-'}</td>
-                          <td className="px-4 py-3 text-rose-500">{m.current_value.toFixed(3) || '-'}</td>
-                          <td className="px-4 py-3 font-medium text-emerald-600">{m.patched_value.toFixed(3)}</td>
+                          <td className="px-4 py-3 text-status-danger">{m.current_value.toFixed(3) || '-'}</td>
+                          <td className="px-4 py-3 font-medium text-status-success">{m.patched_value.toFixed(3)}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1.5">
                               {getStatusIcon(m.status)}
@@ -280,7 +280,7 @@ export const ValidationWorkspacePage: React.FC = () => {
                       onClick={() => { setActiveRunId(run.id); fetchRunDetails(run.id); }}
                       className={`w-full text-left p-3 rounded-lg border transition-colors ${
                         activeRunId === run.id 
-                          ? 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800' 
+                          ? 'bg-indigo-50 border-brand dark:bg-brand-soft dark:border-brand' 
                           : 'bg-white border-slate-200 hover:bg-slate-50 dark:bg-background-base dark:border-border'
                       }`}
                     >

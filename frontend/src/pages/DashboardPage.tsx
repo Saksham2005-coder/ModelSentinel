@@ -96,20 +96,20 @@ export function DashboardPage() {
         title="ModelSentinel" 
         description="Monitor model health, production incidents, engineering changes, and recovery activity across your ML systems."
       >
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={() => alert('Time range selection coming soon!')}>
           Last 7 days
           <ChevronDown className="h-4 w-4" />
         </Button>
       </PageHeader>
 
       {/* Hero Insight Panel */}
-      <div className="rounded-xl border border-border bg-surface-hover/30 p-4 flex items-center gap-4">
-        <div className="p-3 bg-brand/10 rounded-lg">
-          <Zap className="h-5 w-5 text-brand" />
+      <div className="rounded-2xl border border-border bg-surface-hover p-5 flex items-center gap-5 shadow-soft">
+        <div className="p-3 bg-brand-soft rounded-xl">
+          <Zap className="h-6 w-6 text-brand" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-text-primary">Reliability Signal</h3>
-          <p className="text-sm text-text-secondary mt-0.5">
+          <h3 className="text-base font-semibold text-text-primary">Reliability Signal</h3>
+          <p className="text-sm text-text-secondary mt-1 leading-relaxed">
             {modelsWithIssues.length > 0 
               ? `${modelsWithIssues.length} model${modelsWithIssues.length > 1 ? 's' : ''} currently requires attention.` 
               : 'All tracked models and deployments currently healthy.'}
@@ -304,7 +304,7 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
         {/* Recent Incidents */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold tracking-tight text-text-primary">Recent Incidents</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-text-primary">Recent Incidents</h2>
           <div className="rounded-xl border border-border bg-surface overflow-x-auto">
             <Table className="min-w-[600px]">
               <TableHeader>
@@ -360,7 +360,7 @@ export function DashboardPage() {
 
         {/* Recent Deployments */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold tracking-tight text-text-primary">Engineering Activity</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-text-primary">Engineering Activity</h2>
           <div className="rounded-xl border border-border bg-surface overflow-x-auto">
             <Table className="min-w-[500px]">
               <TableHeader>
@@ -380,7 +380,7 @@ export function DashboardPage() {
                   <TableRow 
                     key={deployment.id}
                     className="cursor-pointer hover:bg-surface-hover"
-                    onClick={() => navigate(`/deployments/${deployment.id}`)}
+                    onClick={() => navigate(`/deployment-gates/${deployment.id}`)}
                   >
                     <TableCell>
                       <div className="flex flex-col">

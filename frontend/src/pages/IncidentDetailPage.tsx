@@ -216,7 +216,7 @@ export function IncidentDetailPage() {
               </>
             )}
             {incident.status === 'resolved' && eligibility?.eligible && (
-               <Button onClick={() => handleAction('learn')} disabled={actionLoading} className="bg-amber-600 hover:bg-amber-700 text-text-primary">
+               <Button onClick={() => handleAction('learn')} disabled={actionLoading} className="bg-status-warning hover:bg-status-warning/90 text-background-base text-text-primary">
                  <BrainCircuit className="w-4 h-4 mr-2" />
                  Learn From This Incident
                </Button>
@@ -257,7 +257,7 @@ export function IncidentDetailPage() {
 
       {activeTab === 'Overview' && (
         <div className="space-y-8 animate-in fade-in duration-500">
-          <div className="p-6 border border-border rounded-xl bg-surface-50">
+          <div className="p-6 border border-border rounded-xl bg-surface">
             <h2 className="text-lg font-semibold mb-2">Summary</h2>
             <p className="text-text-secondary">{incident.summary || incident.title}</p>
           </div>
@@ -296,7 +296,7 @@ export function IncidentDetailPage() {
                       <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Why it matched</p>
                       <div className="text-xs text-text-secondary flex flex-wrap gap-2">
                         {s.similarity_reasons && s.similarity_reasons.map((r: string, i: number) => (
-                          <span key={i} className="bg-surface-50 border border-border px-2 py-1 rounded-md">{r}</span>
+                          <span key={i} className="bg-surface border border-border px-2 py-1 rounded-md">{r}</span>
                         ))}
                       </div>
                     </div>
@@ -347,7 +347,7 @@ export function IncidentDetailPage() {
           {incident.evidence && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Evidence Snapshot</h2>
-              <div className="p-4 border border-border rounded-xl bg-surface-50 overflow-auto max-h-96">
+              <div className="p-4 border border-border rounded-xl bg-surface overflow-auto max-h-96">
                 <pre className="text-xs text-text-secondary">
                   {JSON.stringify(incident.evidence.snapshot, null, 2)}
                 </pre>

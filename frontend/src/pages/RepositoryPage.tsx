@@ -152,7 +152,7 @@ export const RepositoryPage: React.FC = () => {
                   repositories.map(repo => (
                     <div 
                       key={repo.id} 
-                      className={`p-3 rounded border cursor-pointer transition-colors ${activeRepo?.id === repo.id ? 'bg-indigo-900/50 border-indigo-500' : 'bg-background-secondary border-border-strong hover:border-slate-600'}`}
+                      className={`p-3 rounded border cursor-pointer transition-colors ${activeRepo?.id === repo.id ? 'bg-brand-soft border-brand' : 'bg-background-secondary border-border-strong hover:border-slate-600'}`}
                       onClick={() => setActiveRepo(repo)}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -206,7 +206,7 @@ export const RepositoryPage: React.FC = () => {
                     className="bg-background-secondary border-border-strong text-text-primary"
                   />
                 </div>
-                <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-text-primary" disabled={!gitUrl || !repoName}>
+                <Button type="submit" className="w-full bg-brand hover:bg-brand-hover text-background-base" disabled={!gitUrl || !repoName}>
                   <Github className="mr-2 h-4 w-4" /> Connect via Git
                 </Button>
               </form>
@@ -270,7 +270,7 @@ export const RepositoryPage: React.FC = () => {
                           onClick={() => handleOpenFile(res.file_path)}
                         >
                           <div className="flex items-center gap-2">
-                            <Code className="h-4 w-4 text-indigo-400" />
+                            <Code className="h-4 w-4 text-brand" />
                             <span className="text-text-primary font-mono">{res.symbol_name}</span>
                             <span className="text-text-muted text-xs">({res.symbol_type})</span>
                           </div>
@@ -289,7 +289,7 @@ export const RepositoryPage: React.FC = () => {
                     <div className="w-1/3 border-r border-border bg-background-primary/50 p-4">
                        <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-4">Workspace</h3>
                        <div className="text-sm text-text-secondary flex items-center gap-2 p-1">
-                          <Folder className="h-4 w-4 text-indigo-400" />
+                          <Folder className="h-4 w-4 text-brand" />
                           {activeRepo.name}
                        </div>
                        {selectedFile && (

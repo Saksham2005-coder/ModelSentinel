@@ -23,7 +23,7 @@ const Workflows: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'COMPLETED': return <CheckCircle className="w-5 h-5 text-emerald-400" />;
+      case 'COMPLETED': return <CheckCircle className="w-5 h-5 text-status-success" />;
       case 'FAILED': return <XCircle className="w-5 h-5 text-red-400" />;
       case 'RUNNING': return <Activity className="w-5 h-5 text-blue-400" />;
       case 'WAITING_APPROVAL': return <AlertCircle className="w-5 h-5 text-brand-hover" />;

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader, EmptyState } from '@/components/ui/Layout';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { fetchApi } from '@/services/api/client';
-import { ShieldAlert, Activity, Plus } from 'lucide-react';
+import { useToast } from '@/contexts/ToastContext';
+import { ShieldAlert, Activity, Plus, Loader2 } from 'lucide-react';
 
 interface Objective {
   id: string;
@@ -20,6 +21,8 @@ interface Objective {
 export function SLOPage() {
   const [objectives, setObjectives] = useState<Objective[]>([]);
   const [loading, setLoading] = useState(true);
+  const [evaluatingId, setEvaluatingId] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     const fetchSLOs = async () => {
@@ -37,11 +40,18 @@ export function SLOPage() {
 
   const handleEvaluate = async (id: string) => {
     try {
+      setEvaluatingId(id);
       await fetchApi(`/slo/objectives/${id}/evaluate`, { method: 'POST' });
-      alert("Evaluation triggered successfully!");
+      addToast('success', 'The SLO has been evaluated successfully.');
+      
+      // Reload the data silently
+      const response = await fetchApi<Objective[]>('/slo/objectives');
+      setObjectives(response || []);
     } catch (err) {
       console.error(err);
-      alert("Failed to evaluate SLO.");
+      addToast('error', 'Failed to evaluate SLO.');
+    } finally {
+      setEvaluatingId(null);
     }
   }
 
@@ -51,7 +61,7 @@ export function SLOPage() {
         title="Service Level Objectives"
         description="Manage and monitor your reliability objectives and error budgets."
       >
-        <Button variant="primary" disabled title="SLO creation is configured via the CLI">
+        <Button variant="primary" onClick={() => addToast('info', "SLO creation is configured via the CLI. Run 'modelsentinel slo create' to add new SLOs.")} title="SLO creation is configured via the CLI">
           <Plus className="mr-2 h-4 w-4" />
           Create SLO
         </Button>
@@ -122,8 +132,8 @@ export function SLOPage() {
                       <StatusBadge status={obj.enabled ? "ACTIVE" : "DISABLED"} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleEvaluate(obj.id)}>
-                        Evaluate
+                      <Button variant="outline" size="sm" onClick={() => handleEvaluate(obj.id)} disabled={evaluatingId === obj.id}>
+                        {evaluatingId === obj.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Evaluate'}
                       </Button>
                     </TableCell>
                   </TableRow>

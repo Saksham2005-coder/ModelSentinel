@@ -73,6 +73,7 @@ function App() {
               <Route path="/regression-tests" element={<RegressionSuitePage />} />
               <Route path="/regression-tests/:id" element={<RegressionTestPage />} />
               <Route path="/deployments" element={<DeploymentGatesPage />} />
+              <Route path="/deployments/:id" element={<DeploymentGateDetailPage />} />
               <Route path="/deployment-gates/:id" element={<DeploymentGateDetailPage />} />
               <Route path="/pull-requests" element={<PullRequestsPage />} />
               <Route path="/pull-requests/:id" element={<PullRequestDetailPage />} />

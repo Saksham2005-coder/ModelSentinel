@@ -63,7 +63,7 @@ const ReliabilityTimelinePage: React.FC = () => {
     if (['DEGRADATION_DETECTED', 'INCIDENT_CREATED'].includes(type)) return 'bg-red-500/10 border-red-500/20 text-red-400';
     if (['ROOT_CAUSE_IDENTIFIED', 'PATCH_PROPOSED', 'VALIDATION_COMPLETED', 'DEPLOYMENT_COMPLETED', 'VERIFICATION_COMPLETED'].includes(type)) return 'bg-green-500/10 border-green-500/20 text-green-400';
     if (['INVESTIGATION_STARTED', 'REGRESSION_LEARNED'].includes(type)) return 'bg-blue-500/10 border-blue-500/20 text-blue-400';
-    return 'bg-background-secondary border-border-strong text-gray-300';
+    return 'bg-background-secondary border-border-strong text-text-primary';
   };
 
   return (
@@ -74,7 +74,7 @@ const ReliabilityTimelinePage: React.FC = () => {
         </h1>
         <button
           onClick={loadTimeline}
-          className="px-4 py-2 bg-background-secondary text-text-primary rounded hover:bg-gray-700 transition"
+          className="px-4 py-2 bg-background-secondary text-text-primary rounded hover:bg-background-elevated transition"
         >
           Refresh
         </button>

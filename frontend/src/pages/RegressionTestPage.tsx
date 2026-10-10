@@ -62,12 +62,12 @@ export function RegressionTestPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight tracking-tight mb-2">{test.name}</h1>
             <div className="flex space-x-3 text-sm text-muted-foreground">
-              <span>Source Incident: <Link to={`/incidents/${test.source_incident_id}`} className="text-emerald-500 hover:underline">{test.source_incident_id.substring(0,8)}</Link></span>
+              <span>Source Incident: <Link to={`/incidents/${test.source_incident_id}`} className="text-status-success hover:underline">{test.source_incident_id.substring(0,8)}</Link></span>
               <span>•</span>
               <span>Segments: {test.affected_segments?.join(', ') || 'Global'}</span>
             </div>
           </div>
-          <Button onClick={runTest} disabled={running} className="bg-emerald-600 hover:bg-emerald-700 text-text-primary">
+          <Button onClick={runTest} disabled={running} className="bg-status-success hover:bg-status-success/90 text-background-base">
             {running ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <PlayCircle className="w-4 h-4 mr-2" />}
             {running ? 'Running...' : 'Run Regression Test'}
           </Button>
@@ -110,7 +110,7 @@ export function RegressionTestPage() {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                       {run.status === 'PASS' ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <CheckCircle2 className="w-5 h-5 text-status-success" />
                       ) : run.status === 'FAIL' ? (
                         <XCircle className="w-5 h-5 text-red-500" />
                       ) : (
@@ -122,7 +122,7 @@ export function RegressionTestPage() {
                       run.status === 'PASS' ? 'success' :
                       run.status === 'FAIL' ? 'danger' : 'warning'
                     } className={
-                      run.status === 'PASS' ? 'border-emerald-500/50 text-emerald-500' :
+                      run.status === 'PASS' ? 'border-status-success/50 text-status-success' :
                       run.status === 'FAIL' ? 'border-red-500/50 text-red-500' : 'border-brand/50 text-brand'
                     }>
                       {run.status}
@@ -134,7 +134,7 @@ export function RegressionTestPage() {
                       {run.results.map((res: any, idx: number) => (
                         <div key={idx} className="flex flex-col">
                           <span className="text-muted-foreground">{res.segment || 'Global'} - {res.metric}</span>
-                          <span className={res.status === 'PASS' ? 'text-emerald-500' : 'text-red-500'}>
+                          <span className={res.status === 'PASS' ? 'text-status-success' : 'text-red-500'}>
                             Actual: {res.actual?.toFixed(4)} (Expected {'>='} {res.expected?.toFixed(4)})
                           </span>
                         </div>

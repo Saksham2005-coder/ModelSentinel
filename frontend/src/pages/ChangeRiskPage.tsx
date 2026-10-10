@@ -74,11 +74,11 @@ export const ChangeRiskPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Risk Factors</h4>
+                <h4 className="text-sm font-semibold text-text-primary mb-2 uppercase tracking-wider">Risk Factors</h4>
                 <ul className="space-y-2">
                   {a.factors.map((f, i) => (
                     <li key={i} className="flex justify-between items-center text-sm bg-background-primary p-2 rounded">
-                      <span className="text-gray-300">{f.factor}</span>
+                      <span className="text-text-primary">{f.factor}</span>
                       <span className="text-brand font-mono">+{f.contribution}</span>
                     </li>
                   ))}
@@ -86,7 +86,7 @@ export const ChangeRiskPage: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Blast Radius</h4>
+                <h4 className="text-sm font-semibold text-text-primary mb-2 uppercase tracking-wider">Blast Radius</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="bg-background-primary p-3 rounded">
                     <div className="text-text-secondary">Files</div>
@@ -111,7 +111,7 @@ export const ChangeRiskPage: React.FC = () => {
                     <h5 className="text-xs font-semibold text-text-secondary mb-1">Recommended Regressions</h5>
                     <div className="flex flex-wrap gap-2">
                       {a.recommended_regressions.map(r => (
-                        <span key={r} className="text-xs bg-brand/20 text-amber-300 px-2 py-1 rounded">
+                        <span key={r} className="text-xs bg-brand/20 text-status-warning px-2 py-1 rounded">
                           {r.substring(0, 8)}
                         </span>
                       ))}

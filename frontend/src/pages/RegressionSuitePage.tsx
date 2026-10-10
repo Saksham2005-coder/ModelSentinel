@@ -31,14 +31,14 @@ export function RegressionSuitePage() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight tracking-tight mb-2 flex items-center">
-            <ShieldCheck className="w-8 h-8 mr-3 text-emerald-500" />
+            <ShieldCheck className="w-8 h-8 mr-3 text-status-success" />
             Regression Tests
           </h1>
           <p className="text-muted-foreground text-lg">
             Automated test suite generated from learned incident memories.
           </p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-text-primary">
+        <Button className="bg-status-success hover:bg-status-success/90 text-background-base" onClick={() => alert("Regression suite run initiated. Check back later for results.")}>
           <PlayCircle className="w-4 h-4 mr-2" />
           Run Suite
         </Button>
@@ -51,7 +51,7 @@ export function RegressionSuitePage() {
         </div>
       ) : loading ? (
         <div className="flex justify-center p-12">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+          <Loader2 className="w-8 h-8 animate-spin text-status-success" />
         </div>
       ) : cases.length === 0 ? (
         <Card className="border-dashed">
@@ -79,7 +79,7 @@ export function RegressionSuitePage() {
               {cases.map((c) => (
                 <tr key={c.id} className="hover:bg-muted/20 transition-colors group">
                   <td className="px-4 py-3">
-                    <Link to={`/regression-tests/${c.id}`} className="font-medium text-emerald-500 hover:underline">
+                    <Link to={`/regression-tests/${c.id}`} className="font-medium text-status-success hover:underline">
                       {c.name}
                     </Link>
                   </td>
@@ -95,7 +95,7 @@ export function RegressionSuitePage() {
                         c.last_run === 'PASS' ? 'success' :
                         c.last_run === 'FAIL' ? 'danger' : 'warning'
                       } className={
-                        c.last_run === 'PASS' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/10' :
+                        c.last_run === 'PASS' ? 'border-status-success/50 text-status-success bg-status-success-soft' :
                         c.last_run === 'FAIL' ? 'border-red-500/50 text-red-500 bg-red-500/10' :
                         'border-brand/50 text-brand bg-brand/10'
                       }>

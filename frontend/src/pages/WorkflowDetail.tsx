@@ -74,7 +74,7 @@ const WorkflowDetail: React.FC = () => {
           <div className="flex items-center space-x-3 bg-background-primary px-4 py-2 rounded-lg border border-border">
             <span className="text-text-secondary text-sm font-medium">Status</span>
             <span className={`px-2 py-1 rounded text-xs font-bold ${
-              workflow.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400' :
+              workflow.status === 'COMPLETED' ? 'bg-status-success-soft text-status-success' :
               workflow.status === 'FAILED' ? 'bg-red-500/10 text-red-400' :
               workflow.status === 'WAITING_APPROVAL' ? 'bg-brand/10 text-brand-hover' :
               'bg-blue-500/10 text-blue-400'
@@ -97,7 +97,7 @@ const WorkflowDetail: React.FC = () => {
               
               <div className="relative z-10 flex-shrink-0 w-6 h-6 flex items-center justify-center bg-background-primary rounded-full">
                 {step.status === 'SUCCESS' ? (
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                  <CheckCircle2 className="w-6 h-6 text-status-success" />
                 ) : step.status === 'FAILED' ? (
                   <XCircle className="w-6 h-6 text-red-500" />
                 ) : step.status === 'WAITING' ? (
@@ -136,7 +136,7 @@ const WorkflowDetail: React.FC = () => {
                       <button
                         onClick={handleApprove}
                         disabled={actionLoading}
-                        className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-text-primary rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
+                        className="flex items-center space-x-2 px-4 py-2 bg-status-success hover:bg-status-success/90 text-background-base rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
                       >
                         <Check className="w-4 h-4" />
                         <span>Approve & Continue</span>
@@ -154,7 +154,7 @@ const WorkflowDetail: React.FC = () => {
                 )}
                 
                 {step.approval && step.approval.status === 'APPROVED' && (
-                  <div className="mt-2 text-sm text-emerald-400">
+                  <div className="mt-2 text-sm text-status-success">
                     Approved by: {step.approval.approved_by || 'Unknown'} 
                     {step.approval.approval_role ? ` (${step.approval.approval_role})` : ''}
                   </div>

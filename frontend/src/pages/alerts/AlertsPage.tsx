@@ -61,7 +61,7 @@ export function AlertsPage() {
                 <p className="text-sm font-medium text-zinc-400">Total Alerts</p>
                 <p className="text-2xl font-semibold tracking-tight text-text-primary">{alerts.length}</p>
               </div>
-              <div className="p-3 bg-amber-900/20 rounded-lg">
+              <div className="p-3 bg-status-warning-soft rounded-lg">
                 <Bell className="h-6 w-6 text-brand" />
               </div>
             </div>

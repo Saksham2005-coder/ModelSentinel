@@ -92,7 +92,7 @@ export function IncidentsPage() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-text-muted" />
             <Input placeholder="Search incidents..." className="pl-9 w-full" />
           </div>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => alert('Filter options coming soon!')}>
             <Filter className="h-4 w-4" />
             Filters
           </Button>

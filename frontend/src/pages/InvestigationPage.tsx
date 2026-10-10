@@ -161,7 +161,7 @@ export function InvestigationPage() {
           
           {repoContext && !repoContext.error && (
             <div className="mt-4 pt-4 border-t border-border">
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-indigo-400">
+              <h3 className="font-medium mb-3 flex items-center gap-2 text-brand">
                 <FileText className="w-4 h-4" /> Code Relevance
               </h3>
               {(repoContext.relevant_files?.length ?? 0) > 0 ? (
@@ -179,7 +179,7 @@ export function InvestigationPage() {
                       <div className="text-text-secondary mt-2 space-y-1">
                         {file.reasons.map((r: string, j: number) => (
                           <div key={j} className="flex gap-1 items-start">
-                            <span className="text-indigo-400 mt-0.5">•</span>
+                            <span className="text-brand mt-0.5">•</span>
                             <span>{r}</span>
                           </div>
                         ))}

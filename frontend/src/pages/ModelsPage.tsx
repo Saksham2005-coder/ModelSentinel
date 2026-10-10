@@ -68,7 +68,7 @@ export function ModelsPage() {
             onChange={handleSearch}
           />
         </div>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={() => alert('Filter options coming soon!')}>
           <Filter className="h-4 w-4" />
           Filters
         </Button>
@@ -120,8 +120,8 @@ export function ModelsPage() {
                         <Box className="h-4 w-4 text-brand" />
                       </div>
                       <div>
-                        <div>{model.name}</div>
-                        <div className="text-xs text-text-muted font-normal">{model.slug}</div>
+                        <div className="text-base font-semibold text-text-primary">{model.name}</div>
+                        <div className="text-xs text-text-muted font-mono mt-0.5">{model.slug}</div>
                       </div>
                     </div>
                   </TableCell>

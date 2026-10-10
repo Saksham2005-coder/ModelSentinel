@@ -10,8 +10,8 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>
-        {description && <p className="mt-1 text-sm text-text-secondary max-w-2xl">{description}</p>}
+        <h1 className="text-3xl font-semibold text-text-primary tracking-tight">{title}</h1>
+        {description && <p className="mt-2 text-base text-text-secondary max-w-2xl leading-relaxed">{description}</p>}
       </div>
       {children && (
         <div className="flex items-center gap-3">
@@ -26,8 +26,8 @@ export function SectionHeader({ title, description, children }: PageHeaderProps)
   return (
     <div className="flex items-center justify-between gap-4 mb-4 pb-2 border-b border-border">
       <div>
-        <h2 className="text-lg font-medium text-text-primary tracking-tight">{title}</h2>
-        {description && <p className="text-sm text-text-secondary mt-0.5">{description}</p>}
+        <h2 className="text-xl font-semibold text-text-primary tracking-tight">{title}</h2>
+        {description && <p className="text-sm text-text-secondary mt-1">{description}</p>}
       </div>
       {children && (
         <div className="flex items-center gap-2">
@@ -49,8 +49,8 @@ export function EmptyState({ title, description, icon, action }: EmptyStateProps
   return (
     <div className="flex flex-col items-center justify-center p-12 text-center bg-background-primary border border-border rounded-lg border-dashed">
       {icon && <div className="mb-4 text-text-disabled">{icon}</div>}
-      <h3 className="text-sm font-medium text-text-primary">{title}</h3>
-      <p className="mt-1 text-sm text-text-secondary max-w-md">{description}</p>
+      <h3 className="text-base font-medium text-text-primary">{title}</h3>
+      <p className="mt-2 text-sm text-text-secondary max-w-md leading-relaxed">{description}</p>
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

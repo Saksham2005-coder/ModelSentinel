@@ -146,14 +146,14 @@ export const PatchWorkspacePage: React.FC = () => {
           <h1 className="text-2xl font-semibold tracking-tight text-text-primary">Fix Workspace</h1>
           <p className="text-text-secondary">Review and orchestrate automated repository patches.</p>
         </div>
-        <Button onClick={handleProposeFix} disabled={generating} className="bg-emerald-600 hover:bg-emerald-700">
+        <Button onClick={handleProposeFix} disabled={generating} className="bg-status-success hover:bg-status-success/90 text-background-base">
           {generating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Code2 className="w-4 h-4 mr-2" />}
           {patches.length > 0 ? 'Regenerate Patch' : 'Propose Fix'}
         </Button>
       </div>
 
       {error && (
-        <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded">
+        <div className="bg-status-danger-soft border border-status-danger/20 text-status-danger px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -177,7 +177,7 @@ export const PatchWorkspacePage: React.FC = () => {
                       <Button
                         size="sm"
                         onClick={() => navigate(`/incidents/${incidentId}/validation`)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-text-primary"
+                        className="bg-status-success hover:bg-status-success/90 text-background-base"
                       >
                         <CheckCircle2 className="w-4 h-4 mr-2" />
                         Validate Patch
@@ -238,7 +238,7 @@ export const PatchWorkspacePage: React.FC = () => {
                       
                       {policyResult.blocking_rules?.length > 0 && (
                         <div className="text-sm">
-                          <span className="text-rose-400 block mb-1">Failed Rules:</span>
+                          <span className="text-status-danger block mb-1">Failed Rules:</span>
                           <ul className="list-disc pl-4 text-text-secondary">
                             {policyResult.blocking_rules.map((r: PolicyRule, i: number) => (
                               <li key={i}>{r.type}: expected {r.operator} {r.required}, got {r.actual}</li>
@@ -294,10 +294,10 @@ export const PatchWorkspacePage: React.FC = () => {
                 <Card key={change.id} className="bg-background-primary border-border overflow-hidden">
                   <CardHeader className="bg-background-base py-3 border-b border-border">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-sm text-emerald-400">{change.file_path}</span>
+                      <span className="font-mono text-sm text-status-success">{change.file_path}</span>
                       <div className="text-xs space-x-2">
-                        <span className="text-emerald-500">+{change.additions}</span>
-                        <span className="text-rose-500">-{change.deletions}</span>
+                        <span className="text-status-success">+{change.additions}</span>
+                        <span className="text-status-danger">-{change.deletions}</span>
                       </div>
                     </div>
                   </CardHeader>
@@ -329,7 +329,7 @@ export const PatchWorkspacePage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <Button 
                       variant="outline" 
-                      className="border-emerald-500 text-emerald-500 hover:bg-emerald-950"
+                      className="border-status-success text-status-success hover:bg-emerald-950"
                       onClick={() => handleReview('approve')}
                     >
                       <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -337,7 +337,7 @@ export const PatchWorkspacePage: React.FC = () => {
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="border-rose-500 text-rose-500 hover:bg-rose-950"
+                      className="border-status-danger text-status-danger hover:bg-rose-950"
                       onClick={() => handleReview('reject')}
                     >
                       <XCircle className="w-4 h-4 mr-2" />

@@ -169,66 +169,66 @@ export function DeploymentGateDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-surface border border-border rounded-xl p-6">
           <p className="text-sm text-text-secondary">Pull Request</p>
-          <p className="font-mono text-lg text-brand mt-1">{deployment.pull_request_id.substring(0,8)}</p>
-          <Button variant="outline" size="sm" className="mt-4 w-full" onClick={() => navigate(`/pull-requests/${deployment.pull_request_id}`)}>
+          <p className="font-mono text-lg text-brand mt-1">{deployment.pull_request_id ? deployment.pull_request_id.substring(0,8) : 'N/A'}</p>
+          <Button variant="outline" size="sm" className="mt-4 w-full" onClick={() => navigate(`/pull-requests/${deployment.pull_request_id}`)} disabled={!deployment.pull_request_id}>
             View Pull Request
           </Button>
         </div>
         <div className="bg-surface border border-border rounded-xl p-6">
           <p className="text-sm text-text-secondary">Incident</p>
-          <p className="font-mono text-lg text-text-primary mt-1">{deployment.incident_id.substring(0,8)}</p>
-          <Button variant="outline" size="sm" className="mt-4 w-full" onClick={() => navigate(`/incidents/${deployment.incident_id}`)}>
+          <p className="font-mono text-lg text-text-primary mt-1">{deployment.incident_id ? deployment.incident_id.substring(0,8) : 'N/A'}</p>
+          <Button variant="outline" size="sm" className="mt-4 w-full" onClick={() => navigate(`/incidents/${deployment.incident_id}`)} disabled={!deployment.incident_id}>
             View Incident
           </Button>
         </div>
       </div>
 
-      {!isPostDeployment ? (
-        <div className="bg-surface border border-border rounded-xl p-6">
-          <h3 className="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
-            <Rocket className="h-5 w-5 text-brand" /> Deterministic Checklist
-          </h3>
+      <div className="bg-surface border border-border rounded-xl p-6">
+        <h3 className="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
+          <Rocket className="h-5 w-5 text-brand" /> Deterministic Checklist
+        </h3>
 
-          <RequirementRow label="Patch Approval" passed={g?.patch_approved} required={true} />
-          <RequirementRow label="Validation Checks" passed={g?.validation_passed} required={true} />
-          <RequirementRow label="Regression Suite" passed={g?.regression_passed} required={true} />
-          <RequirementRow label="Security Checks" passed={g?.security_passed} required={true} />
-          <RequirementRow label="Continuous Integration (CI)" passed={g?.ci_passed} required={true} />
-          <RequirementRow label="Human Approval" passed={g?.human_approved} required={true} />
+        <RequirementRow label="Patch Approval" passed={g?.patch_approved} required={true} />
+        <RequirementRow label="Validation Checks" passed={g?.validation_passed} required={true} />
+        <RequirementRow label="Regression Suite" passed={g?.regression_passed} required={true} />
+        <RequirementRow label="Security Checks" passed={g?.security_passed} required={true} />
+        <RequirementRow label="Continuous Integration (CI)" passed={g?.ci_passed} required={true} />
+        <RequirementRow label="Human Approval" passed={g?.human_approved} required={true} />
 
-          {deployment.policy_result && (
-            <div className="mt-6 p-4 border border-border bg-background-base rounded-lg text-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-text-primary">Policy Evaluation: {deployment.policy_result.matched_policy || 'Default'}</span>
-                <Badge variant={
-                  deployment.policy_result.result === 'ALLOW' ? 'success' :
-                  deployment.policy_result.result === 'BLOCK' ? 'danger' : 'warning'
-                }>
-                  {deployment.policy_result.result}
-                </Badge>
-              </div>
-              {deployment.policy_result.blocking_rules?.length > 0 && (
-                <ul className="list-disc pl-4 mt-2 text-status-danger text-xs">
-                  {deployment.policy_result.blocking_rules.map((r: Record<string, unknown>, i: number) => (
-                    <li key={i}>{String(r.type)}: expected {String(r.operator)} {String(r.required)}, got {String(r.actual)}</li>
-                  ))}
-                </ul>
-              )}
+        {deployment.policy_result && (
+          <div className="mt-6 p-4 border border-border bg-background-base rounded-lg text-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-text-primary">Policy Evaluation: {deployment.policy_result.matched_policy || 'Default'}</span>
+              <Badge variant={
+                deployment.policy_result.result === 'ALLOW' ? 'success' :
+                deployment.policy_result.result === 'BLOCK' ? 'danger' : 'warning'
+              }>
+                {deployment.policy_result.result}
+              </Badge>
             </div>
-          )}
-
-          <div className={`mt-8 p-6 rounded-lg border text-center ${deployment.status === 'ELIGIBLE' ? 'bg-status-success/10 border-status-success/30' : 'bg-status-danger/10 border-status-danger/30'}`}>
-            <h2 className={`text-2xl font-black tracking-widest ${getStatusColor(deployment.status)}`}>
-              {deployment.status === 'ELIGIBLE' ? 'DEPLOYMENT ELIGIBLE' : 'DEPLOYMENT BLOCKED'}
-            </h2>
-            {deployment.status === 'BLOCKED' && deployment.block_reason && (
-              <p className="text-status-danger font-medium mt-4 p-3 bg-background-base rounded border border-status-danger/20 inline-block">
-                {deployment.block_reason}
-              </p>
+            {deployment.policy_result.blocking_rules?.length > 0 && (
+              <ul className="list-disc pl-4 mt-2 text-status-danger text-xs">
+                {deployment.policy_result.blocking_rules.map((r: Record<string, unknown>, i: number) => (
+                  <li key={i}>{String(r.type)}: expected {String(r.operator)} {String(r.required)}, got {String(r.actual)}</li>
+                ))}
+              </ul>
             )}
           </div>
+        )}
+
+        <div className={`mt-8 p-6 rounded-lg border text-center ${deployment.status === 'ELIGIBLE' ? 'bg-status-success/10 border-status-success/30' : 'bg-status-danger/10 border-status-danger/30'}`}>
+          <h2 className={`text-2xl font-black tracking-widest ${getStatusColor(deployment.status)}`}>
+            {deployment.status === 'ELIGIBLE' ? 'DEPLOYMENT ELIGIBLE' : 'DEPLOYMENT BLOCKED'}
+          </h2>
+          {deployment.status === 'BLOCKED' && deployment.block_reason && (
+            <p className="text-status-danger font-medium mt-4 p-3 bg-background-base rounded border border-status-danger/20 inline-block">
+              {deployment.block_reason}
+            </p>
+          )}
         </div>
-      ) : (
+      </div>
+
+      {isPostDeployment && (
         <div className="bg-surface border border-border rounded-xl p-6">
           <h3 className="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
             <Activity className="h-5 w-5 text-brand" /> Post-Deployment Verification

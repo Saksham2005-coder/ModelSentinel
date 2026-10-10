@@ -77,7 +77,7 @@ export function ChangeIntelligencePage() {
           <button 
             type="submit"
             disabled={loading || !searchVal.trim()}
-            className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-text-primary px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            className="bg-status-warning hover:bg-status-warning/90 text-background-base disabled:opacity-50 text-text-primary px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Analyze
           </button>
@@ -126,7 +126,7 @@ export function ChangeIntelligencePage() {
                     <span className={cn(
                       "text-3xl font-bold",
                       data.risk_score >= 70 ? "text-red-400" :
-                      data.risk_score >= 40 ? "text-brand-hover" : "text-emerald-400"
+                      data.risk_score >= 40 ? "text-brand-hover" : "text-status-success"
                     )}>
                       {data.risk_score}
                     </span>
@@ -136,7 +136,7 @@ export function ChangeIntelligencePage() {
                 <ShieldAlert className={cn(
                   "w-10 h-10 opacity-20",
                   data.risk_score >= 70 ? "text-red-500" :
-                  data.risk_score >= 40 ? "text-brand" : "text-emerald-500"
+                  data.risk_score >= 40 ? "text-brand" : "text-status-success"
                 )} />
               </div>
               
@@ -147,7 +147,7 @@ export function ChangeIntelligencePage() {
                     <span className={cn(
                       "text-2xl font-bold tracking-wide",
                       data.blast_radius === 'HIGH' ? "text-red-400" :
-                      data.blast_radius === 'MEDIUM' ? "text-brand-hover" : "text-emerald-400"
+                      data.blast_radius === 'MEDIUM' ? "text-brand-hover" : "text-status-success"
                     )}>
                       {data.blast_radius}
                     </span>
@@ -161,7 +161,7 @@ export function ChangeIntelligencePage() {
             <div className="bg-background-primary border border-border rounded-lg overflow-hidden">
               <div className="px-5 py-4 border-b border-border bg-background-primary/50">
                 <h2 className="text-lg font-medium text-text-primary flex items-center gap-2">
-                  <FileCode className="w-5 h-5 text-indigo-400" />
+                  <FileCode className="w-5 h-5 text-brand" />
                   Changed Files
                 </h2>
               </div>
@@ -183,7 +183,7 @@ export function ChangeIntelligencePage() {
                             <span className="text-text-muted text-xs uppercase tracking-wider mb-1 block">Modified Symbols</span>
                             <div className="flex flex-wrap gap-2">
                               {cf.symbols_changed.map(sym => (
-                                <span key={sym} className="font-mono text-xs text-amber-200/80 bg-amber-900/20 px-2 py-1 rounded border border-amber-900/30">
+                                <span key={sym} className="font-mono text-xs text-status-warning/80 bg-status-warning-soft px-2 py-1 rounded border border-status-warning/30">
                                   {sym}
                                 </span>
                               ))}
@@ -204,7 +204,7 @@ export function ChangeIntelligencePage() {
               <div className="bg-background-primary border border-border rounded-lg flex flex-col">
                 <div className="px-5 py-4 border-b border-border bg-background-primary/50">
                   <h2 className="text-lg font-medium text-text-primary flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-emerald-400" />
+                    <Layers className="w-5 h-5 text-status-success" />
                     Dependency Impact
                   </h2>
                 </div>
@@ -329,7 +329,7 @@ export function ChangeIntelligencePage() {
                           <li key={i} className="text-sm flex items-start gap-2">
                             <span className={cn(
                               "font-mono font-medium",
-                              isPlus ? "text-brand-hover" : "text-emerald-400"
+                              isPlus ? "text-brand-hover" : "text-status-success"
                             )}>
                               {rf.split(' ')[0]}
                             </span>

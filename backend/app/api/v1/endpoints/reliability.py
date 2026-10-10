@@ -28,7 +28,7 @@ class ReliabilityEventResponse(BaseModel):
     severity: Optional[str]
     status: Optional[str]
     summary: Optional[str]
-    metadata_json: Dict[str, Any]
+    metadata_json: Optional[Dict[str, Any]]
     occurred_at: datetime
     created_at: datetime
     

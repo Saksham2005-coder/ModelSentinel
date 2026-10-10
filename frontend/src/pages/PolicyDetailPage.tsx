@@ -94,7 +94,7 @@ export function PolicyDetailPage() {
           <CardContent className="space-y-4">
             {policy.rules && policy.rules.map((rule: PolicyRule, i: number) => (
               <div key={i} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-status-success mt-0.5" />
                 <div>
                   <div className="font-medium">{rule.type}</div>
                   <div className="text-sm text-muted-foreground flex gap-2 mt-1">

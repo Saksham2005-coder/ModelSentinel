@@ -100,12 +100,12 @@ export function VersionComparisonPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to={`/models/${modelId}`}>
-            <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to={`/models/${modelId}`}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Model
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div>
             <h1 className="text-2xl font-semibold text-text-primary flex items-center gap-2">
               <GitCompare className="w-6 h-6 text-primary-500" />

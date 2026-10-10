@@ -21,8 +21,8 @@ export function MetricCard({ title, value, icon: Icon, trend, className }: Metri
           <span className="text-sm font-medium">{title}</span>
           {Icon && <Icon className="h-4 w-4" />}
         </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-semibold tracking-tight text-text-primary">{value}</span>
+        <div className="flex items-baseline gap-2 mt-1">
+          <span className="text-3xl font-semibold tracking-tight text-text-primary">{value}</span>
           {trend && (
             <span
               className={cn(

@@ -34,7 +34,7 @@ const CausalGraphModal: React.FC<Props> = ({ modelId, eventId, onClose }) => {
           </h2>
           <button 
             onClick={onClose}
-            className="text-text-secondary hover:text-text-primary transition bg-background-secondary hover:bg-gray-700 p-2 rounded-lg"
+            className="text-text-secondary hover:text-text-primary transition bg-background-secondary hover:bg-background-elevated p-2 rounded-lg"
           >
             ✕
           </button>
@@ -81,11 +81,11 @@ export const SimpleGraphRenderer: React.FC<{ graph: CausalGraph; focusId?: strin
             
             <div className={`
               w-96 p-4 rounded-xl border-2 shadow-lg transition-all
-              ${isFocused ? 'bg-indigo-900/40 border-indigo-500 shadow-indigo-500/20' : 'bg-background-secondary border-border-strong hover:border-gray-500'}
+              ${isFocused ? 'bg-indigo-900/40 border-brand shadow-indigo-500/20' : 'bg-background-secondary border-border-strong hover:border-gray-500'}
             `}>
               <div className="flex justify-between items-start mb-2">
                 <div className="font-semibold text-text-primary">{node.title}</div>
-                <div className="text-xs bg-black/40 px-2 py-1 rounded text-gray-300">{node.event_type}</div>
+                <div className="text-xs bg-black/40 px-2 py-1 rounded text-text-primary">{node.event_type}</div>
               </div>
               {node.summary && <div className="text-sm text-text-secondary mt-2">{node.summary}</div>}
               <div className="mt-3 text-xs text-text-muted font-mono flex justify-between">

@@ -47,9 +47,12 @@ def get_pull_request(pr_id: str, db: Session = Depends(get_db)) -> Any:
         raise HTTPException(status_code=404, detail="PR not found")
     
     # Sync status
-    provider = GitHubProvider()
-    svc = PullRequestService(db, provider)
-    svc.sync_pr_status(pr.id)
+    try:
+        provider = GitHubProvider()
+        svc = PullRequestService(db, provider)
+        svc.sync_pr_status(pr.id)
+    except Exception as e:
+        print(f"Warning: Failed to sync PR status from GitHub: {e}")
     
     return {
         "id": pr.id,

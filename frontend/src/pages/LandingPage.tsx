@@ -154,8 +154,8 @@ export function LandingPage() {
               {/* Top Stats */}
               <div className="flex gap-4">
                 <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full border-2 border-emerald-500 flex items-center justify-center">
-                    <span className="text-emerald-500 font-bold text-xs">18</span>
+                  <div className="w-10 h-10 rounded-full border-2 border-status-success flex items-center justify-center">
+                    <span className="text-status-success font-bold text-xs">18</span>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase">Healthy Models</div>
@@ -173,7 +173,7 @@ export function LandingPage() {
                 </div>
                 <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
                   <div className="text-[10px] text-slate-400 uppercase">Mean Time to Fix</div>
-                  <div className="text-white font-bold text-xl mt-1">21 <span className="text-xs text-emerald-500 font-normal">↓ 42%</span></div>
+                  <div className="text-white font-bold text-xl mt-1">21 <span className="text-xs text-status-success font-normal">↓ 42%</span></div>
                 </div>
               </div>
               
@@ -259,7 +259,7 @@ export function LandingPage() {
           {/* Fix Card */}
           <div className="absolute top-[60%] left-[5%] w-60 bg-white/95 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-[0_20px_40px_rgba(0,0,0,0.15)] flex items-center justify-between z-30 transform hover:scale-105 transition-all cursor-default">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 border border-emerald-100 shadow-sm">
+              <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-status-success border border-status-success shadow-sm">
                 <Zap size={20} strokeWidth={2.5} />
               </div>
               <div className="flex flex-col">
@@ -273,7 +273,7 @@ export function LandingPage() {
           {/* Validate Card */}
           <div className="absolute top-[75%] right-[2%] w-60 bg-slate-100/95 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-[0_20px_40px_rgba(0,0,0,0.2)] flex items-center justify-between z-30 transform hover:scale-105 transition-all cursor-default">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-emerald-500 border border-emerald-100 shadow-sm">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-status-success border border-status-success shadow-sm">
                 <CheckSquare size={20} strokeWidth={2.5} />
               </div>
               <div className="flex flex-col">

@@ -99,7 +99,7 @@ export function PullRequestDetailPage() {
         </Button>
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Pull Request: {pr.id.substring(0,8)}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight tracking-tight text-text-primary">Pull Request: {pr.id ? pr.id.substring(0,8) : 'N/A'}</h1>
             <Badge variant={pr.status === 'PASSED' ? 'success' : pr.status === 'FAILED' ? 'danger' : 'info'}>
               {pr.status}
             </Badge>
@@ -120,7 +120,7 @@ export function PullRequestDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-text-secondary">Incident ID</p>
-                <p className="font-medium">{pr.incident_id.substring(0,8)}</p>
+                <p className="font-medium">{pr.incident_id ? pr.incident_id.substring(0,8) : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-sm text-text-secondary">Branch</p>
