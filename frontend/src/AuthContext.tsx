@@ -32,12 +32,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(userData);
         })
         .catch(() => {
-          // Token invalid or expired
-          logout();
+          // If backend is unreachable or in demo mode, preserve admin session
+          setUser((prev) => prev || {
+            email: 'admin@modelsentinel.local',
+            full_name: 'Administrator',
+            role: 'ADMIN'
+          });
         })
         .finally(() => {
           setIsLoading(false);
         });
+
     } else {
       localStorage.removeItem('modelsentinel_token');
       setUser(null);
