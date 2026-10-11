@@ -23,12 +23,26 @@ export function ChangeIntelligencePage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PatchChangeIntelligence | null>(null);
   const [searchVal, setSearchVal] = useState(patchId);
+  const [recentPatches, setRecentPatches] = useState<string[]>([]);
 
   useEffect(() => {
     if (patchId) {
       loadData(patchId);
+    } else {
+      loadRecentPatches();
     }
   }, [patchId]);
+
+  const loadRecentPatches = async () => {
+    try {
+      const { changeRiskService } = await import('@/services/api/changeRisk');
+      const assessments = await changeRiskService.getRecentAssessments();
+      const patches = assessments.map(a => a.patch_proposal_id);
+      setRecentPatches([...new Set(patches)]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const loadData = async (id: string) => {
     setLoading(true);
@@ -48,6 +62,11 @@ export function ChangeIntelligencePage() {
     if (searchVal.trim()) {
       setSearchParams({ patchId: searchVal.trim() });
     }
+  };
+
+  const handleSelectPatch = (id: string) => {
+    setSearchVal(id);
+    setSearchParams({ patchId: id });
   };
 
   return (
@@ -108,9 +127,30 @@ export function ChangeIntelligencePage() {
         )}
 
         {!loading && !error && !data && !patchId && (
-          <div className="flex flex-col items-center justify-center py-20 text-text-muted space-y-4">
+          <div className="flex flex-col items-center justify-center py-20 text-text-muted space-y-6 max-w-2xl mx-auto">
             <Activity className="w-16 h-16 text-slate-700" />
-            <p>Enter a patch ID above to view ML-aware change intelligence.</p>
+            <p className="text-lg">Enter a patch ID above to view ML-aware change intelligence.</p>
+            
+            {recentPatches.length > 0 && (
+              <div className="w-full bg-background-primary border border-border rounded-lg p-6 mt-8">
+                <h3 className="text-text-primary font-medium mb-4 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-brand" />
+                  Recent Patches to Analyze
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {recentPatches.map(id => (
+                    <button 
+                      key={id}
+                      onClick={() => handleSelectPatch(id)}
+                      className="text-left px-4 py-3 bg-background-base border border-border-strong hover:border-brand/50 hover:bg-background-secondary rounded-md transition-colors text-sm font-mono text-text-secondary hover:text-text-primary flex justify-between items-center"
+                    >
+                      <span>{id}</span>
+                      <span className="text-brand text-xs font-sans font-medium opacity-0 group-hover:opacity-100 transition-opacity">Analyze &rarr;</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

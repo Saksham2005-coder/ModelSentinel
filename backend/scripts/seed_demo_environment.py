@@ -334,6 +334,7 @@ if __name__ == "__main__":
     try:
         if args.reset:
             reset_demo(db)
+            seed_demo(db)
         else:
             seed_demo(db)
     except Exception as e:

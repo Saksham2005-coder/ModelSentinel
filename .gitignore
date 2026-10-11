@@ -20,6 +20,9 @@ venv/
 Thumbs.db
 *.db
 test.db
-*.db-journal
-*.db-shm
 *.db-wal
+
+# Storage / Cloned Repositories
+repositories/
+data/
+

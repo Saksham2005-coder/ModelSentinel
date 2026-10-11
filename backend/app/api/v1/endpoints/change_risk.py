@@ -22,11 +22,11 @@ class FactorModel(BaseModel):
     contribution: int
 
 class BlastRadiusModel(BaseModel):
-    files: List[str]
-    models: List[str]
-    features: List[str]
-    regression_tests: List[str]
-    historical_incidents: List[str]
+    files: List[str] = []
+    models: List[str] = []
+    features: List[str] = []
+    regression_tests: List[str] = []
+    historical_incidents: List[str] = []
 
 class ChangeRiskResponse(BaseModel):
     id: str
