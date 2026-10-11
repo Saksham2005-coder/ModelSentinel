@@ -10,23 +10,15 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS setup - allow all origins for deployment/preview flexibility
-origins = os.getenv("BACKEND_CORS_ORIGINS", "*")
-if isinstance(origins, str) and origins != "*":
-    try:
-        origins = json.loads(origins)
-    except Exception:
-        origins = [origins]
-elif origins == "*":
-    origins = ["*"]
-
+# CORS setup - support all origins (including Vercel previews) with credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origin_regex="https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 import time
