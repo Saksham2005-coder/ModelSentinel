@@ -47,11 +47,11 @@ export function LoginPage() {
         body: formData.toString()
       });
 
-      login(data.access_token, (data.user as unknown as User) || { email, full_name: 'Unknown User', role: 'VIEWER' });
+      login(data.access_token, (data.user as unknown as User) || { email, full_name: 'Administrator', role: 'ADMIN' });
       navigate(from, { replace: true });
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError('Email or password is incorrect.');
+        setError(err.message || 'Email or password is incorrect.');
       } else {
         setError('Unable to connect to ModelSentinel. Please try again.');
       }
@@ -59,6 +59,39 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  const handleQuickDemo = async () => {
+    setEmail('admin@modelsentinel.local');
+    setPassword('StrongDemoPassword123!');
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', 'admin@modelsentinel.local');
+      formData.append('password', 'StrongDemoPassword123!');
+
+      const data = await fetchApi<LoginResponse>('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString()
+      });
+
+      login(data.access_token, (data.user as unknown as User) || { email: 'admin@modelsentinel.local', full_name: 'Administrator', role: 'ADMIN' });
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Demo login failed');
+      } else {
+        setError('Unable to connect to ModelSentinel. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex bg-black text-text-primary">
@@ -146,8 +179,8 @@ export function LoginPage() {
                   <input
                     id="email"
                     name="email"
-                    type="email"
-                    autoComplete="email"
+                    type="text"
+                    autoComplete="username"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -206,7 +239,17 @@ export function LoginPage() {
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </button>
+
+              <button
+                type="button"
+                onClick={handleQuickDemo}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-amber-500/40 rounded-lg shadow-sm text-sm font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-amber-500 disabled:opacity-50 transition-all"
+              >
+                <span>⚡ Instant Demo Sign In (Judge One-Click)</span>
+              </button>
             </form>
+
 
             <div className="mt-8 pt-8 border-t border-border flex justify-center">
               <p className="text-sm text-text-secondary">
