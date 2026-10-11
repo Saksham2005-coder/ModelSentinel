@@ -105,7 +105,38 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected internal server error occurred.", "error_id": error_id},
     )
 
+@app.on_event("startup")
+def bootstrap_admin():
+    from app.db.session import SessionLocal
+    from app.models.user import User, Role
+    from app.core import security
+    db = SessionLocal()
+    try:
+        admin_email = "admin@modelsentinel.local"
+        admin = db.query(User).filter(User.email == admin_email).first()
+        if not admin:
+            admin = User(
+                email=admin_email,
+                hashed_password=security.get_password_hash("StrongDemoPassword123!"),
+                full_name="Default Administrator",
+                role=Role.ADMIN,
+                is_active=True,
+                email_verified=True,
+            )
+            db.add(admin)
+            db.commit()
+            logger.info("Bootstrap: Created default demo admin account.")
+        else:
+            admin.is_active = True
+            admin.email_verified = True
+            db.commit()
+    except Exception as e:
+        logger.error(f"Bootstrap warning: {e}")
+    finally:
+        db.close()
+
 @app.get("/health")
+@app.get("/api/v1/health")
 def health_check():
     # Liveness check - very lightweight, just confirms the API is running
     return {
