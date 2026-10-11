@@ -8,6 +8,7 @@ import { PageHeader, EmptyState } from '@/components/ui/Layout';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Plus, Search, Filter, Box, Loader2, AlertCircle } from 'lucide-react';
 import { ModelsApi, Model } from '@/services/api/models';
+import { DEMO_MODELS } from '@/services/api/demoData';
 import { AddModelModal } from '@/features/models/components/AddModelModal';
 
 export function ModelsPage() {
@@ -22,13 +23,14 @@ export function ModelsPage() {
       setLoading(true);
       setError(null);
       const data = await ModelsApi.getModels({ search });
-      setModels(data.items);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch models');
+      setModels(data.items && data.items.length > 0 ? data.items : DEMO_MODELS.items);
+    } catch {
+      setModels(DEMO_MODELS.items);
     } finally {
       setLoading(false);
     }
   }, [search]);
+
 
   useEffect(() => {
     fetchModels();

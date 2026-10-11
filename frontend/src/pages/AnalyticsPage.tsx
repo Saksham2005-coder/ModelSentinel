@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { analyticsApi, OverviewMetrics, IncidentAnalytics, ModelReliability, RootCauseTrend, DeploymentHealth, FixEffectiveness, PolicyMetrics } from '../services/api/analytics';
+import { DEMO_OVERVIEW } from '../services/api/demoData';
 import { Link } from 'react-router-dom';
+
 import { Activity, BarChart2, Shield, GitMerge, ShieldCheck } from 'lucide-react';
 
 export const AnalyticsPage: React.FC = () => {
@@ -32,7 +34,7 @@ export const AnalyticsPage: React.FC = () => {
           analyticsApi.getFixEffectiveness(days),
           analyticsApi.getPolicyMetrics(days)
         ]);
-        setOverview(ovData);
+        setOverview(ovData || DEMO_OVERVIEW);
         setIncidents(incData);
         setModels(modData);
         setRootCauses(rcData);
@@ -41,9 +43,11 @@ export const AnalyticsPage: React.FC = () => {
         setPolicyMetrics(polData);
       } catch (err) {
         console.error(err);
+        setOverview(DEMO_OVERVIEW);
       } finally {
         setLoading(false);
       }
+
     };
     fetchData();
   }, [days]);

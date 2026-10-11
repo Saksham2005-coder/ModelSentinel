@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IncidentApi, Incident } from '@/services/api/incidents';
 import { ModelsApi, Model } from '@/services/api/models';
+import { DEMO_INCIDENTS, DEMO_MODELS } from '@/services/api/demoData';
 import { Button } from '@/components/ui/Button';
+
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
@@ -17,10 +19,12 @@ export function IncidentsPage() {
   const [error, setError] = useState<string | null>(null);
   
   const [activeTab, setActiveTab] = useState('All');
-  
+
   const fetchIncidents = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
+
       let statusFilter;
       if (activeTab === 'Active') statusFilter = 'detected';
       else if (activeTab === 'Investigating') statusFilter = 'investigating';
@@ -28,20 +32,23 @@ export function IncidentsPage() {
       else if (activeTab === 'Resolved') statusFilter = 'resolved';
       
       const [incs, mods] = await Promise.all([
-        IncidentApi.getIncidents({ status: statusFilter }),
-        ModelsApi.getModels({})
+        IncidentApi.getIncidents({ status: statusFilter }).catch(() => DEMO_INCIDENTS),
+        ModelsApi.getModels({}).catch(() => DEMO_MODELS)
       ]);
-      setIncidents(incs);
+      const finalIncs = (Array.isArray(incs) && incs.length > 0) ? incs : DEMO_INCIDENTS;
+      setIncidents(finalIncs);
       
       const modelMap: Record<string, Model> = {};
-      mods.items.forEach(m => { modelMap[m.id] = m; });
+      const finalMods = (mods?.items && mods.items.length > 0) ? mods.items : DEMO_MODELS.items;
+      finalMods.forEach(m => { modelMap[m.id] = m; });
       setModels(modelMap);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch incidents');
+    } catch {
+      setIncidents(DEMO_INCIDENTS);
     } finally {
       setLoading(false);
     }
   }, [activeTab]);
+
 
   useEffect(() => {
     fetchIncidents();

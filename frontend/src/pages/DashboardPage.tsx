@@ -15,6 +15,8 @@ import { IncidentApi, Incident } from '@/services/api/incidents';
 import { DeploymentApi, Deployment } from '@/services/api/deployments';
 import { analyticsApi, OverviewMetrics, IncidentAnalytics } from '@/services/api/analytics';
 import { engineeringIntelligenceApi, ReliabilityTrend } from '@/services/api/engineering_intelligence';
+import { DEMO_MODELS, DEMO_INCIDENTS, DEMO_OVERVIEW, DEMO_TRENDS, DEMO_DEPLOYMENTS } from '@/services/api/demoData';
+
 import {
   Tooltip,
   ResponsiveContainer,
@@ -61,12 +63,17 @@ export function DashboardPage() {
         ]);
         
         // IncidentApi.getIncidents returns an array in some mocks, or { items: [] } in others. Handle both:
-        setIncidents(Array.isArray(incRes) ? incRes : incRes.items || []);
-        setModels(modRes.items || []);
-        setDeployments(Array.isArray(depRes) ? depRes : []);
-        setReliability(relRes);
+        const loadedIncidents = Array.isArray(incRes) ? incRes : (incRes?.items || []);
+        const loadedModels = modRes?.items || [];
+        const loadedDeployments = Array.isArray(depRes) ? depRes : [];
+
+        setIncidents(loadedIncidents.length > 0 ? loadedIncidents : DEMO_INCIDENTS);
+        setModels(loadedModels.length > 0 ? loadedModels : DEMO_MODELS.items);
+        setDeployments(loadedDeployments.length > 0 ? loadedDeployments : DEMO_DEPLOYMENTS);
+        setReliability(relRes || DEMO_OVERVIEW);
         setIncidentAnalytics(incAnaRes);
-        setTrends(trendsRes?.trends || []);
+        setTrends((trendsRes?.trends && trendsRes.trends.length > 0) ? trendsRes.trends : DEMO_TRENDS.trends);
+
       } catch (e) {
         console.error('Failed to load dashboard data:', e);
       } finally {
