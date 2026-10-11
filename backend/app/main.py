@@ -10,13 +10,15 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS setup
-origins = os.getenv("BACKEND_CORS_ORIGINS", '["http://localhost:5173"]')
-if isinstance(origins, str):
+# CORS setup - allow all origins for deployment/preview flexibility
+origins = os.getenv("BACKEND_CORS_ORIGINS", "*")
+if isinstance(origins, str) and origins != "*":
     try:
         origins = json.loads(origins)
     except Exception:
         origins = [origins]
+elif origins == "*":
+    origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
