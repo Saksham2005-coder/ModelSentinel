@@ -95,6 +95,7 @@ def generate_patch(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/investigations/{investigation_id}/patches", response_model=List[PatchProposalResponse])
+@router.get("/investigations/{investigation_id}/patches/", response_model=List[PatchProposalResponse])
 def list_patches(
     investigation_id: str,
     db: Session = Depends(get_db)
@@ -104,6 +105,7 @@ def list_patches(
     return proposals
 
 @router.get("/patches/{patch_id}", response_model=PatchProposalResponse)
+@router.get("/patches/{patch_id}/", response_model=PatchProposalResponse)
 def get_patch(
     patch_id: str,
     db: Session = Depends(get_db)
@@ -128,6 +130,7 @@ def review_patch(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/patches/{patch_id}/change-intelligence")
+@router.get("/patches/{patch_id}/change-intelligence/")
 def get_patch_change_intelligence(
     patch_id: str,
     db: Session = Depends(get_db)

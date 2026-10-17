@@ -40,6 +40,7 @@ def start_validation(
     return {"validation_id": run.id, "status": run.status}
 
 @router.get("/patches/{patch_id}/validation", response_model=List[dict])
+@router.get("/patches/{patch_id}/validation/", response_model=List[dict])
 def get_validation_runs(
     patch_id: str,
     db: Session = Depends(get_db)
@@ -48,6 +49,7 @@ def get_validation_runs(
     return [{"id": r.id, "status": r.status, "verdict": r.verdict, "created_at": r.created_at, "summary": r.summary} for r in runs]
 
 @router.get("/validation/{validation_id}", response_model=dict)
+@router.get("/validation/{validation_id}/", response_model=dict)
 def get_validation_details(
     validation_id: str,
     db: Session = Depends(get_db)

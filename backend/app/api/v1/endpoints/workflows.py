@@ -16,6 +16,7 @@ def get_db():
     finally:
         db.close()
 
+@router.get("", response_model=List[WorkflowRunSchema])
 @router.get("/", response_model=List[WorkflowRunSchema])
 def list_workflows(db: Session = Depends(get_db)):
     svc = WorkflowService(db)

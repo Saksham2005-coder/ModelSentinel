@@ -114,6 +114,7 @@ def create_repository(
 
     raise HTTPException(status_code=400, detail="Invalid source_type")
 
+@router.get("")
 @router.get("/")
 def list_repositories(db: Session = Depends(get_db)):
     repos = db.query(Repository).all()

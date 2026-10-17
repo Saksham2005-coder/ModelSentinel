@@ -15,6 +15,7 @@ from typing import Any
 
 router = APIRouter()
 
+@router.get("")
 @router.get("/")
 def list_pull_requests(db: Session = Depends(get_db)) -> Any:
     prs = db.query(PullRequest).order_by(PullRequest.created_at.desc()).all()

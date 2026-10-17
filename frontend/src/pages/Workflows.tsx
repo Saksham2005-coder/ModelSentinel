@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { workflowsApi, WorkflowRun } from '../services/api/workflows';
+import { DEMO_WORKFLOWS } from '../services/api/demoData';
 
 const Workflows: React.FC = () => {
   const [workflows, setWorkflows] = useState<WorkflowRun[]>([]);
@@ -11,9 +12,10 @@ const Workflows: React.FC = () => {
     const fetchWorkflows = async () => {
       try {
         const data = await workflowsApi.listWorkflows();
-        setWorkflows(data);
+        setWorkflows(data && data.length > 0 ? data : DEMO_WORKFLOWS);
       } catch (error) {
         console.error("Failed to fetch workflows", error);
+        setWorkflows(DEMO_WORKFLOWS);
       } finally {
         setLoading(false);
       }

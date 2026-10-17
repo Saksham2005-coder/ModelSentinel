@@ -109,6 +109,7 @@ def get_metrics(
              .limit(limit).all()
 
 @router.get("/drift", response_model=List[FeatureMonitoringResultResponse])
+@router.get("/drift/features", response_model=List[FeatureMonitoringResultResponse])
 def get_drift(
     model_id: str,
     run_id: Optional[str] = None,
@@ -121,6 +122,7 @@ def get_drift(
     return query.order_by(desc(FeatureMonitoringResult.created_at)).limit(limit).all()
 
 @router.get("/data-quality", response_model=List[DataQualityResultResponse])
+@router.get("/quality", response_model=List[DataQualityResultResponse])
 def get_data_quality(
     model_id: str,
     run_id: Optional[str] = None,
@@ -131,6 +133,19 @@ def get_data_quality(
     if run_id:
         query = query.filter(DataQualityResult.monitoring_run_id == run_id)
     return query.order_by(desc(DataQualityResult.created_at)).limit(limit).all()
+
+@router.get("/predictions", response_model=List[PredictionMonitoringResultResponse])
+@router.get("/drift/predictions", response_model=List[PredictionMonitoringResultResponse])
+def get_predictions(
+    model_id: str,
+    run_id: Optional[str] = None,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    query = db.query(PredictionMonitoringResult).join(MonitoringRun).filter(MonitoringRun.model_id == model_id)
+    if run_id:
+        query = query.filter(PredictionMonitoringResult.monitoring_run_id == run_id)
+    return query.order_by(desc(PredictionMonitoringResult.created_at)).limit(limit).all()
 
 @router.get("/segments", response_model=List[SegmentAnalysisResultResponse])
 def get_segments(

@@ -33,6 +33,7 @@ class MemoryCreatePayload(BaseModel):
     resolution_summary: str = None
 
 @router.get("/memories")
+@router.get("/memories/")
 def list_memories(db: Session = Depends(get_db)):
     memories = db.query(IncidentMemory).order_by(IncidentMemory.created_at.desc()).all()
     # Simple dictionary serialization for frontend

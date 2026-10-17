@@ -16,6 +16,7 @@ def get_db():
         db.close()
 
 @router.get("/engineering-overview")
+@router.get("/engineering-overview/")
 def get_engineering_overview(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -24,6 +25,7 @@ def get_engineering_overview(
     return EngineeringIntelligenceService.get_engineering_overview(db, time_range_days, model_id)
 
 @router.get("/overview")
+@router.get("/overview/")
 def get_overview(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -32,6 +34,7 @@ def get_overview(
     return ReliabilityAnalyticsService.get_overview_metrics(db, time_range_days, model_id)
 
 @router.get("/incidents")
+@router.get("/incidents/")
 def get_incident_analytics(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -39,6 +42,7 @@ def get_incident_analytics(
     return ReliabilityAnalyticsService.get_incident_analytics(db, time_range_days)
 
 @router.get("/models")
+@router.get("/models/")
 def get_model_reliability(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -46,6 +50,7 @@ def get_model_reliability(
     return ReliabilityAnalyticsService.get_model_reliability(db, time_range_days)
 
 @router.get("/models/comparison")
+@router.get("/models/comparison/")
 def get_models_comparison(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -63,6 +68,7 @@ def get_model_analytics_detail(
     return overview
 
 @router.get("/root-causes")
+@router.get("/root-causes/")
 def get_root_causes(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -70,6 +76,7 @@ def get_root_causes(
     return ReliabilityAnalyticsService.get_root_cause_trends(db, time_range_days)
 
 @router.get("/deployments")
+@router.get("/deployments/")
 def get_deployments(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -77,6 +84,7 @@ def get_deployments(
     return ReliabilityAnalyticsService.get_deployment_health(db, time_range_days)
 
 @router.get("/fix-effectiveness")
+@router.get("/fix-effectiveness/")
 def get_fix_effectiveness(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -84,6 +92,7 @@ def get_fix_effectiveness(
     return ReliabilityAnalyticsService.get_fix_effectiveness(db, time_range_days)
 
 @router.get("/policies")
+@router.get("/policies/")
 def get_policy_metrics(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -91,6 +100,7 @@ def get_policy_metrics(
     return ReliabilityAnalyticsService.get_policy_metrics(db, time_range_days)
 
 @router.get("/slo")
+@router.get("/slo/")
 def get_slo_analytics(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -99,6 +109,7 @@ def get_slo_analytics(
     return ReliabilityAnalyticsService.get_slo_analytics(db, time_range_days, model_id)
 
 @router.get("/reliability-trends")
+@router.get("/reliability-trends/")
 def get_reliability_trends(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -109,6 +120,7 @@ def get_reliability_trends(
 
 
 @router.get("/engineering-effectiveness")
+@router.get("/engineering-effectiveness/")
 def get_engineering_effectiveness(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -117,6 +129,7 @@ def get_engineering_effectiveness(
     return EngineeringIntelligenceService.get_engineering_effectiveness(db, time_range_days, model_id)
 
 @router.get("/root-causes/intelligence")
+@router.get("/root-causes/intelligence/")
 def get_root_causes_intelligence(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -125,6 +138,7 @@ def get_root_causes_intelligence(
     return EngineeringIntelligenceService.get_root_cause_intelligence(db, time_range_days, model_id)
 
 @router.get("/change-reliability")
+@router.get("/change-reliability/")
 def get_change_reliability(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -133,6 +147,7 @@ def get_change_reliability(
     return EngineeringIntelligenceService.get_change_reliability_correlation(db, time_range_days, model_id)
 
 @router.get("/hotspots")
+@router.get("/hotspots/")
 def get_hotspots(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None)
@@ -140,6 +155,7 @@ def get_hotspots(
     return EngineeringIntelligenceService.get_engineering_hotspots(db, time_range_days)
 
 @router.get("/slo-intelligence")
+@router.get("/slo-intelligence/")
 def get_slo_intelligence(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -148,6 +164,7 @@ def get_slo_intelligence(
     return EngineeringIntelligenceService.get_slo_intelligence(db, time_range_days, model_id)
 
 @router.get("/reliability-drivers")
+@router.get("/reliability-drivers/")
 def get_reliability_drivers(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),
@@ -156,6 +173,7 @@ def get_reliability_drivers(
     return EngineeringIntelligenceService.get_reliability_drivers(db, time_range_days, model_id)
 
 @router.get("/interventions")
+@router.get("/interventions/")
 def get_interventions(
     db: Session = Depends(get_db),
     time_range_days: Optional[int] = Query(None),

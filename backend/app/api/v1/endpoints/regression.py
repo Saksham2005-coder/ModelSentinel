@@ -26,6 +26,7 @@ class RegressionCaseCreate(BaseModel):
     acceptance_criteria: dict = None
 
 @router.get("/regression-tests")
+@router.get("/regression-tests/")
 def list_regression_tests(db: Session = Depends(get_db)):
     svc = RegressionService(db)
     cases = svc.list_regression_cases()

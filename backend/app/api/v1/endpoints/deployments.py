@@ -17,6 +17,7 @@ import json
 
 router = APIRouter()
 
+@router.get("")
 @router.get("/")
 def list_deployments(db: Session = Depends(get_db)) -> Any:
     deps = db.query(Deployment).order_by(Deployment.created_at.desc()).all()

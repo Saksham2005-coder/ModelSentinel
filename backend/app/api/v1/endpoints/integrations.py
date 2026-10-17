@@ -86,7 +86,23 @@ async def github_webhook(
     
     return {"status": "ok", "delivery_id": delivery_id, "processing_status": webhook_event.processing_status}
 
+def serialize_integration(i) -> dict:
+    if not i:
+        return {}
+    return {
+        "id": i.id,
+        "provider": i.provider,
+        "name": i.name,
+        "type": i.type,
+        "status": i.status,
+        "config": i.config or {},
+        "created_by": i.created_by,
+        "created_at": i.created_at.isoformat() if i.created_at else None,
+        "updated_at": i.updated_at.isoformat() if i.updated_at else (i.created_at.isoformat() if i.created_at else None)
+    }
+
 @router.get("", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
+@router.get("/", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def list_integrations(
     db: Session = Depends(get_db),
     skip: int = 0,
@@ -98,9 +114,10 @@ def list_integrations(
     ensure_github_integration(db)
     
     integrations = db.query(Integration).offset(skip).limit(limit).all()
-    return integrations
+    return [serialize_integration(i) for i in integrations]
 
 @router.get("/github/status", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
+@router.get("/github/status/", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def get_github_status(
     db: Session = Depends(get_db),
     current_user: Any = Depends(deps.get_current_active_user)
@@ -108,7 +125,7 @@ def get_github_status(
     from app.models.integration import Integration
     ensure_github_integration(db)
     integration = db.query(Integration).filter(Integration.provider == "github").first()
-    return integration
+    return serialize_integration(integration) if integration else None
 
 def ensure_github_integration(db: Session):
     from app.models.integration import Integration
@@ -133,6 +150,7 @@ def ensure_github_integration(db: Session):
             db.commit()
 
 @router.get("/webhooks", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
+@router.get("/webhooks/", dependencies=[Depends(deps.RequirePermissions(["integrations.read"]))])
 def list_webhooks(
     db: Session = Depends(get_db),
     skip: int = 0,
@@ -148,7 +166,8 @@ def list_webhooks(
             "delivery_id": e.delivery_id,
             "event_type": e.event_type,
             "processing_status": e.processing_status,
-            "received_at": e.received_at,
+            "received_at": e.received_at.isoformat() if e.received_at else None,
             "error_summary": e.error_summary
         } for e in events
     ]
+

@@ -42,6 +42,7 @@ class ChangeRiskResponse(BaseModel):
         from_attributes = True
 
 @router.get("", response_model=List[ChangeRiskResponse])
+@router.get("/", response_model=List[ChangeRiskResponse])
 def list_assessments(db: Session = Depends(get_db)):
     """List all recent change risk assessments."""
     assessments = db.query(ChangeRiskAssessment).order_by(ChangeRiskAssessment.created_at.desc()).limit(50).all()

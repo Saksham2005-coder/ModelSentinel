@@ -12,6 +12,7 @@ from app.services.reliability_service import reliability_service
 
 router = APIRouter()
 
+@router.get("", response_model=List[AlertSchema])
 @router.get("/", response_model=List[AlertSchema])
 def list_alerts(
     db: Session = Depends(deps.get_db),

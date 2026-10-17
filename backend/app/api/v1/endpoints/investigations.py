@@ -42,6 +42,7 @@ def list_incident_investigations(
     return db.query(Investigation).filter(Investigation.incident_id == incident_id).order_by(Investigation.created_at.desc()).all()
 
 @router.get("/investigations", response_model=List[InvestigationResponse])
+@router.get("/investigations/", response_model=List[InvestigationResponse])
 def list_all_investigations(
     db: Session = Depends(get_db)
 ):

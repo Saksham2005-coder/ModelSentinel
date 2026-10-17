@@ -51,6 +51,7 @@ class EvaluateRequestSchema(BaseModel):
     model_id: Optional[str] = None
     context: Dict[str, Any]
 
+@router.get("")
 @router.get("/")
 def get_policies(db: Session = Depends(get_db)):
     return db.query(ReliabilityPolicy).all()

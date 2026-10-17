@@ -30,6 +30,7 @@ def create_objective(
         raise HTTPException(status_code=422, detail=str(e))
 
 @router.get("/objectives", response_model=List[ReliabilityObjectiveSchema])
+@router.get("/objectives/", response_model=List[ReliabilityObjectiveSchema])
 def list_objectives(
     db: Session = Depends(deps.get_db),
     skip: int = 0,

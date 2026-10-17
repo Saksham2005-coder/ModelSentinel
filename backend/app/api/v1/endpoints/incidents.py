@@ -18,6 +18,7 @@ def get_db():
 
 router = APIRouter()
 
+@router.get("", response_model=List[IncidentResponse])
 @router.get("/", response_model=List[IncidentResponse])
 def list_incidents(
     db: Session = Depends(get_db),

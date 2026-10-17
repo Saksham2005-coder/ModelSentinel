@@ -16,6 +16,7 @@ def get_db():
     finally:
         db.close()
 
+@router.post("", response_model=ProductionTelemetryResponse, status_code=201)
 @router.post("/", response_model=ProductionTelemetryResponse, status_code=201)
 def upload_telemetry(
     model_id: str = Form(...),
@@ -39,6 +40,7 @@ def upload_telemetry(
         file=file
     )
 
+@router.get("", response_model=List[ProductionTelemetryResponse])
 @router.get("/", response_model=List[ProductionTelemetryResponse])
 def get_telemetry_list(
     limit: int = 50,
