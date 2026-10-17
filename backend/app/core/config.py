@@ -55,5 +55,5 @@ settings = Settings()
 if settings.ENVIRONMENT == "production":
     if settings.SECRET_KEY == "fallback-secret-key-do-not-use-in-prod":
         raise ValueError("Unsafe production default: SECRET_KEY must be set in production")
-    if settings.POSTGRES_PASSWORD == "modelsentinel_password":
+    if not settings.DATABASE_URL and settings.POSTGRES_PASSWORD == "modelsentinel_password":
         raise ValueError("Unsafe production default: POSTGRES_PASSWORD must be changed in production")
