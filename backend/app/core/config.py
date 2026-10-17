@@ -44,7 +44,10 @@ class Settings(BaseSettings):
                 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
                 db_name = self.DATABASE_URL.replace("sqlite:///./", "")
                 return f"sqlite:///{os.path.join(project_root, db_name)}"
-            return self.DATABASE_URL
+            url = self.DATABASE_URL
+            if url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql://", 1)
+            return url
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()

@@ -26,3 +26,7 @@ test.db
 repositories/
 data/
 
+# Local binaries and demo artifacts
+cloudflared.exe
+demo_*.json
+
